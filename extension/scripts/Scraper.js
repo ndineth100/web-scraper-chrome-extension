@@ -27,7 +27,6 @@ Scraper.prototype = {
 	},
 
 	run: function (executionCallback) {
-		alert('running scraping')
 		var scraper = this;
 
 		// callback when scraping is finished
