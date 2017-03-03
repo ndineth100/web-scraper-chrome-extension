@@ -141,6 +141,7 @@ Scraper.prototype = {
 		var job = this.queue.getNextJob();
 		if (job === false) {
 			console.log("Scraper execution is finished");
+			this.browser.close()
 			this.executionCallback();
 			return;
 		}

@@ -29,7 +29,7 @@ describe("Scraper", function () {
 
   it.only("should be able to scrape one page", function (done) {
     this.timeout('60s')
-/*    var sitemap = new Sitemap({
+    var sitemap = new Sitemap({
       id: 'test',
       startUrl: 'http://test.lv/',
       selectors: [

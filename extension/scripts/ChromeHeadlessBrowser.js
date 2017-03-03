@@ -79,10 +79,11 @@ ChromeHeadlessBrowser.prototype = {
 	},
 
 	close: function () {
+	  console.log('closing')
     var browser = this
-    (async function () {
+    ;(async function () {
       try {
-        await CDP.close({id: browser.tab.id})
+        await CDP.Close({id: browser.tab.id})
       } catch (e) {
         console.error('Error on close', e)
       } finally {
