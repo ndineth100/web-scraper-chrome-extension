@@ -1,3 +1,8 @@
+if (typeof require !== 'undefined') {
+  var CDP = require('chrome-remote-interface')
+  var necessaryScripts = require('./../../necessary-scripts')
+  var fs = require('fs')
+}
 
 
 var ChromeHeadlessBrowser = function (options) {
@@ -45,7 +50,7 @@ ChromeHeadlessBrowser.prototype = {
         })
         callback.call(scope)
       } catch (e) {
-        console.error('Error in init popup window', err)
+        console.error('Error in init popup window', e)
       }
     })()
 	},
@@ -139,7 +144,7 @@ async function connectToTarget (targetId) {
 
 async function loadScript (client, path) {
   const {Runtime} = client
-  const library = await readFile('./spec/' + path)
+  const library = await fs.readFileSync('./extension/' + path).toString()
   console.log(library)
   const {scriptId} = await Runtime.compileScript({
     expression: library,
@@ -150,23 +155,9 @@ async function loadScript (client, path) {
 }
 
 async function loadScripts (client) {
-  const {Runtime} = client
-  const {scriptId} = await Runtime.compileScript({
-    expression: bundledLibrary,
-    sourceURL: Math.random().toString(36).substring(7),
-    persistScript: true
-  })
-  /*for (let path of paths) {
+  for (let path of necessaryScripts) {
     await loadScript(client, path)
-  }*/
-}
-
-function readFile(path) {
-  return new Promise(function (resolve, reject) {
-    fs.readFile(path, 'utf-8', function (f) {
-      resolve(f)
-    })
-  })
+  }
 }
 
 if (typeof require !== 'undefined') {

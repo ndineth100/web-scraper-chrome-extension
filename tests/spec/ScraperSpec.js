@@ -5,6 +5,10 @@ if (typeof require !== 'undefined') {
   require('./../../extension/scripts/Sitemap')
   require('./../FakeStore')
 	require('./../../extension/scripts/Scraper')
+  process.on("unhandledRejection", function (err) {
+  	console.error(err)
+
+	})
 
 }
 
