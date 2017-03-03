@@ -67,3 +67,7 @@ var SelectorText = {
 		return ['multiple', 'regex', 'delay']
 	}
 };
+
+if (typeof require !== 'undefined') {
+  global.SelectorText = SelectorText
+}

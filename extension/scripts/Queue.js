@@ -1,3 +1,4 @@
+
 var Queue = function () {
 	this.jobs = [];
 	this.scrapedUrls = {};
@@ -55,3 +56,7 @@ Queue.prototype = {
 		}
 	}
 };
+
+if (typeof require !== 'undefined') {
+  global.Queue = Queue
+}

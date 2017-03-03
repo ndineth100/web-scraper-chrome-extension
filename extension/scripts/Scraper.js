@@ -1,3 +1,4 @@
+
 Scraper = function (options) {
 	this.queue = options.queue;
 	this.sitemap = options.sitemap;
@@ -202,3 +203,7 @@ Scraper.prototype = {
 		}.bind(this));
 	}
 };
+
+if (typeof require !== 'undefined') {
+  global.Scraper = Scraper
+}

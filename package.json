@@ -1,0 +1,26 @@
+{
+  "name": "web-scraper-chrome-extension",
+  "version": "1.0.0",
+  "description": "Web Scraper is a chrome browser extension built for data extraction from web  pages. Using this extension you can create a plan (sitemap) how a web site  should be traversed and what should be extracted. Using these sitemaps the  Web Scraper will navigate the site accordingly and extract all data. Scraped  data later can be exported as CSV.",
+  "main": "config.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "jasmine-node tests/spec/ScraperSpec.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/martinsbalodis/web-scraper-chrome-extension.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/martinsbalodis/web-scraper-chrome-extension/issues"
+  },
+  "homepage": "https://github.com/martinsbalodis/web-scraper-chrome-extension#readme",
+  "devDependencies": {
+    "jasmine-node": "^1.14.5"
+  }
+}

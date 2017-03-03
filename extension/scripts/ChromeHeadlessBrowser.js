@@ -1,3 +1,5 @@
+
+
 var ChromeHeadlessBrowser = function (options) {
 
 	this.pageLoadDelay = options.pageLoadDelay;
@@ -10,38 +12,47 @@ ChromeHeadlessBrowser.prototype = {
 	_initPopupWindow: function (callback, scope) {
     console.log('init popup ')
     var browser = this
-    if (this.tab) {
+    if (browser.client) {
       callback.call(scope)
       return
     }
-    getTab('chrome://newtab')
+    /*getTab('chrome://newtab')
       .then(function (tab) {
         console.log('tab id', this.tab.id)
         browser.tab = tab
         return CDP({tab})
-      })
-        .then(function (client) {
-          browser.client = client
-          client.Runtime.consoleAPICalled(function ({args}) {
-              if(args.length > 1 && args[0].description === 'scraped-event') {
-                var id = args[1].description
-                var callback = browser.pendingRequests[id]
-                if (callback) {
-                  callback(args[2].description)
-                  delete browser.pendingRequests[id]
-                }
-              }
+      })*/
+    (async function () {
+      try {
+        const tab = await CDP.New()
+        browser.tab = tab
+        const client = await CDP({tab})
+        const {Runtime, Console, Page} = client
+        await Runtime.enable()
+        await Console.enable()
+        await Page.enable()
+        browser.client = client
+        Runtime.consoleAPICalled(function ({args}) {
+          if(args.length > 2 && args[0].description === 'scraped-event') {
+            var id = args[1].description
+            var callback = browser.pendingRequests[id]
+            if (callback) {
+              callback(args[2].description)
+              delete browser.pendingRequests[id]
+            }
+          }
 
-          })
-          callback.call(scope)
         })
-      .catch(function (err) {
+        callback.call(scope)
+      } catch (e) {
         console.error('Error in init popup window', err)
-      })
+      }
+    })()
 	},
 
 	loadUrl: function (url, callback) {
     var browser = this
+    var client = this.client
     var {Page} = this.client
 
     Page.navigate({url})
@@ -55,20 +66,22 @@ ChromeHeadlessBrowser.prototype = {
     async function load (client) {
       const {Page, Runtime} = client
       await Runtime.enable()
-      await loadScripts(client, contentScripts)
+      await loadScripts(client)
 
     }
 	},
 
 	close: function () {
     var browser = this
-    CDP.close({id: browser.tab.id}).
-    then(function () {
-      browser.client.close()
-    }).catch(function (e) {
-      console.error('Error on close', e)
-      browser.client.close()
-    })
+    (async function () {
+      try {
+        await CDP.close({id: browser.tab.id})
+      } catch (e) {
+        console.error('Error on close', e)
+      } finally {
+        browser.client.close()
+      }
+    })()
 	},
 
 	fetchData: function (url, sitemap, parentSelectorId, callback, scope) {
@@ -102,7 +115,7 @@ ChromeHeadlessBrowser.prototype = {
 	}
 };
 
-async getTab (url) {
+async function getTab (url) {
   const targetId = await newTarget(url)
   const tab = await connectToTarget(targetId)
   return tab
@@ -126,7 +139,8 @@ async function connectToTarget (targetId) {
 
 async function loadScript (client, path) {
   const {Runtime} = client
-  const library = fs.readFileSync(path).toString()
+  const library = await readFile('./spec/' + path)
+  console.log(library)
   const {scriptId} = await Runtime.compileScript({
     expression: library,
     sourceURL: Math.random().toString(36).substring(7),
@@ -135,8 +149,26 @@ async function loadScript (client, path) {
   await Runtime.runScript({scriptId})
 }
 
-async function loadScripts (client, paths) {
-  for (let path of paths) {
+async function loadScripts (client) {
+  const {Runtime} = client
+  const {scriptId} = await Runtime.compileScript({
+    expression: bundledLibrary,
+    sourceURL: Math.random().toString(36).substring(7),
+    persistScript: true
+  })
+  /*for (let path of paths) {
     await loadScript(client, path)
-  }
+  }*/
+}
+
+function readFile(path) {
+  return new Promise(function (resolve, reject) {
+    fs.readFile(path, 'utf-8', function (f) {
+      resolve(f)
+    })
+  })
+}
+
+if (typeof require !== 'undefined') {
+  global.ChromeHeadlessBrowser = ChromeHeadlessBrowser
 }

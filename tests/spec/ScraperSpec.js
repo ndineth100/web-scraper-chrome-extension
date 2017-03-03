@@ -1,3 +1,14 @@
+if (typeof require !== 'undefined') {
+  require('./../../extension/scripts/Queue')
+  require('./../../extension/scripts/Job')
+  require('./../../extension/scripts/ChromeHeadlessBrowser')
+  require('./../../extension/scripts/Sitemap')
+  require('./../FakeStore')
+	require('./../../extension/scripts/Scraper')
+
+}
+
+console.log(Queue)
 describe("Scraper", function () {
 
 	var q, store, $el;
@@ -5,15 +16,9 @@ describe("Scraper", function () {
 	beforeEach(function () {
 		q = new Queue();
 		store = new FakeStore();
-		window.chromeAPI.reset();
-
-		$el = jQuery("#tests").html("");
-		if($el.length === 0) {
-			$el = $("<div id='tests' style='display:none'></div>").appendTo("body");
-		}
 	});
 
-	it("should be able to scrape one page", function () {
+	iit("should be able to scrape one page", function () {
 
 		var sitemap = new Sitemap({
 			id: 'test',
@@ -31,7 +36,7 @@ describe("Scraper", function () {
 			]
 		});
 
-		var browser = new ChromePopupBrowser({
+		var browser = new ChromeHeadlessBrowser({
 			pageLoadDelay: 500
 		});
 
@@ -81,7 +86,7 @@ describe("Scraper", function () {
 			]
 		});
 
-		var browser = new ChromePopupBrowser({
+		var browser = new ChromeHeadlessBrowser({
 			pageLoadDelay: 500
 		});
 
@@ -280,7 +285,7 @@ describe("Scraper", function () {
 			]
 		});
 
-		var browser = new ChromePopupBrowser({
+		var browser = new ChromeHeadlessBrowser({
 			pageLoadDelay: 500
 		});
 

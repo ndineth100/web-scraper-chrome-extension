@@ -1,3 +1,5 @@
+
+
 var FakeStore = function () {
 	this.data = [];
 };
@@ -15,3 +17,7 @@ FakeStore.prototype = {
 		callback(this);
 	}
 };
+
+if (typeof require !== 'undefined') {
+  global.FakeStore = FakeStore
+}

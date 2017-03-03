@@ -1,3 +1,5 @@
+
+
 var Job = function (url, parentSelector, scraper, parentJob, baseData) {
 
 	if (parentJob !== undefined) {
@@ -76,3 +78,6 @@ Job.prototype = {
 		return this.dataItems;
 	}
 };
+if (typeof require !== 'undefined') {
+  global.Job = Job
+}

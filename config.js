@@ -1,4 +1,4 @@
- var contentScripts = [
+ module.exports = [
   "assets/jquery-2.0.3.js",
   "assets/jquery.whencallsequentially.js",
   "assets/sugar-1.4.1.js",

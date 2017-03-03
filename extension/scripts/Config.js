@@ -1,3 +1,8 @@
+if (typeof require !== 'undefined') {
+  module.exports = Config
+}
+
+
 var Config = function () {
 
 };

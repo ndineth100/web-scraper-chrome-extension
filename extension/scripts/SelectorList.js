@@ -1,3 +1,7 @@
+if (typeof require !== 'undefined') {
+  require('./Selector')
+}
+
 var SelectorList = function (selectors) {
 
 	if(selectors === undefined) {
@@ -278,4 +282,9 @@ SelectorList.prototype.hasRecursiveElementSelectors = function() {
 
 	return RecursionFound;
 };
+
+
+if (typeof require !== 'undefined') {
+  global.SelectorList = SelectorList
+}
 
