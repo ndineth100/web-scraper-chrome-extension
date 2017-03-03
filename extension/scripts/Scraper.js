@@ -1,4 +1,6 @@
-
+if (typeof require !== 'undefined') {
+  require('./../assets/jquery.whencallsequentially')
+}
 Scraper = function (options) {
 	this.queue = options.queue;
 	this.sitemap = options.sitemap;

@@ -1,3 +1,9 @@
+if (typeof require !== 'undefined' && typeof $ === 'undefined') {
+	var jquery = require('jquery-deferred')
+  global.$ = {
+		Deferred: jquery.Deferred
+	}
+}
 /**
  * @author Martins Balodis
  *

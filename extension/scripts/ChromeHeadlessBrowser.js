@@ -38,12 +38,13 @@ ChromeHeadlessBrowser.prototype = {
         await Page.enable()
         browser.client = client
         Runtime.consoleAPICalled(function ({args}) {
-          console.log(args)
-          if(args.length > 2 && args[0].description === 'scraped-event') {
-            var id = args[1].description
+          console.log(args.length, args[0])
+          if(args.length > 2 && args[0].value === 'scraped-event') {
+            var id = args[1].value
+            console.log(browser.pendingRequests)
             var callback = browser.pendingRequests[id]
             if (callback) {
-              callback(args[2].description)
+              callback(args[2].value)
               delete browser.pendingRequests[id]
             }
           }
@@ -106,7 +107,7 @@ ChromeHeadlessBrowser.prototype = {
 				};
         var id = Math.random().toString(36).substring(15)
         browser.pendingRequests[id] = function (dataString) {
-          console.log('pending request')
+          console.log('pending request', dataString)
           callback.call(scope, JSON.parse(dataString))
         }
         console.log(JSON.stringify(message))

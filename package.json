@@ -26,6 +26,7 @@
     "mocha": "^3.2.0"
   },
   "dependencies": {
-    "chrome-remote-interface": "^0.18.0"
+    "chrome-remote-interface": "^0.18.0",
+    "jquery-deferred": "^0.3.1"
   }
 }

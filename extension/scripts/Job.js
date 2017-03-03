@@ -72,7 +72,6 @@ Job.prototype = {
 				}
 				this.dataItems.push(result);
 			}
-			console.log(job);
 			callback(job);
 		}.bind(this), this);
 	},
