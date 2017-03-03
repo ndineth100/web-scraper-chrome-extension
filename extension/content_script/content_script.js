@@ -1,5 +1,4 @@
-chrome.runtime.onMessage.addListener(
-	function (request, sender, sendResponse) {
+function extensionListener (request, sender, sendResponse) {
 
 		console.log("chrome.runtime.onMessage", request);
 
@@ -38,4 +37,4 @@ chrome.runtime.onMessage.addListener(
 			return true;
 		}
 	}
-);
+chrome.runtime.onMessage.addListener(extensionListener)

@@ -95,7 +95,6 @@ ChromeHeadlessBrowser.prototype = {
     var browser = this;
 
 		this._initPopupWindow(function (scope) {
-		  console.log('scope', scope)
 			const {Runtime} = browser.client
 
 			browser.loadUrl(url, function () {
@@ -113,9 +112,9 @@ ChromeHeadlessBrowser.prototype = {
         console.log(JSON.stringify(message))
         Runtime.evaluate({
           expression: `
-            chrome.runtime.sendMessage(${JSON.stringify(message)}, function (data) {
+            extensionListener(${JSON.stringify(message)}, null, function (data) {
               console.log('extracted data from webpage', data)
-              console.log('scraped-event', ${id}, JSON.stringify(data))
+              console.log('scraped-event', '${id}', JSON.stringify(data))
             })
           `
         }).then(function (r) {
