@@ -259,7 +259,7 @@ describe("Scraper", function () {
 		});
 	});
 
-	it("should store images while scraping", function() {
+	xit("should store images while scraping", function() {
 
 		$el.append('<div id="scraper-test-img"><img src="../docs/images/chrome-store-logo.png"></div>');
 
