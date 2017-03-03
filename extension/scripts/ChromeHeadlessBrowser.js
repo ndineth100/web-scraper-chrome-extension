@@ -38,6 +38,7 @@ ChromeHeadlessBrowser.prototype = {
         await Page.enable()
         browser.client = client
         Runtime.consoleAPICalled(function ({args}) {
+          console.log(args)
           if(args.length > 2 && args[0].description === 'scraped-event') {
             var id = args[1].description
             var callback = browser.pendingRequests[id]
@@ -46,8 +47,8 @@ ChromeHeadlessBrowser.prototype = {
               delete browser.pendingRequests[id]
             }
           }
-
         })
+
         callback.call(scope)
       } catch (e) {
         console.error('Error in init popup window', e)
@@ -91,9 +92,10 @@ ChromeHeadlessBrowser.prototype = {
 
 	fetchData: function (url, sitemap, parentSelectorId, callback, scope) {
 
-		var browser = this;
+    var browser = this;
 
-		this._initPopupWindow(function () {
+		this._initPopupWindow(function (scope) {
+		  console.log('scope', scope)
 			const {Runtime} = browser.client
 
 			browser.loadUrl(url, function () {
@@ -105,18 +107,22 @@ ChromeHeadlessBrowser.prototype = {
 				};
         var id = Math.random().toString(36).substring(15)
         browser.pendingRequests[id] = function (dataString) {
+          console.log('pending request')
           callback.call(scope, JSON.parse(dataString))
         }
-        browser.client.Runtime.evaluate({
+        console.log(JSON.stringify(message))
+        Runtime.evaluate({
           expression: `
-            chrome.runtime.sendMessage(JSON.parse(${JSON.stringify(messsage)}), function (data) {
+            chrome.runtime.sendMessage(${JSON.stringify(message)}, function (data) {
               console.log('extracted data from webpage', data)
               console.log('scraped-event', ${id}, JSON.stringify(data))
             })
           `
-        })
+        }).then(function (r) {
+          console.log('result of evaluating', r)
+        }).catch(e => console.error(e, 'error in evaluating'))
 			})
-		}, this);
+		}, browser);
 	}
 };
 
@@ -145,7 +151,6 @@ async function connectToTarget (targetId) {
 async function loadScript (client, path) {
   const {Runtime} = client
   const library = await fs.readFileSync('./extension/' + path).toString()
-  console.log(library)
   const {scriptId} = await Runtime.compileScript({
     expression: library,
     sourceURL: Math.random().toString(36).substring(7),

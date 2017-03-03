@@ -8,7 +8,8 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "jasmine-node tests/spec/ScraperSpec.js"
+    "test": "mocha tests/spec/ScraperSpec-mocha",
+    "test-jasmine": "jasmine-node tests/spec/ScraperSpec.js"
   },
   "repository": {
     "type": "git",
@@ -21,7 +22,8 @@
   },
   "homepage": "https://github.com/martinsbalodis/web-scraper-chrome-extension#readme",
   "devDependencies": {
-    "jasmine-node": "^1.14.5"
+    "jasmine-node": "^1.14.5",
+    "mocha": "^3.2.0"
   },
   "dependencies": {
     "chrome-remote-interface": "^0.18.0"

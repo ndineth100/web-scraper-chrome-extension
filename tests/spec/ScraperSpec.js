@@ -12,7 +12,6 @@ if (typeof require !== 'undefined') {
 
 }
 
-console.log(Queue)
 describe("Scraper", function () {
 
 	var q, store, $el;
@@ -22,7 +21,7 @@ describe("Scraper", function () {
 		store = new FakeStore();
 	});
 
-	iit("should be able to scrape one page", function () {
+	iit("should be able to scrape one page", function (done) {
 
 		var sitemap = new Sitemap({
 			id: 'test',
@@ -53,17 +52,21 @@ describe("Scraper", function () {
 
 		var executed = false;
 		runs(function () {
-			s.run(function () {
-				executed = true;
+
+      s.run(function () {
+        executed = true;
 			});
 		});
 
 		waitsFor(function () {
 			return executed;
-		}, 1000);
+		}, 3000);
 		runs(function () {
-			expect(executed).toBe(true);
+      console.log('running')
+
+      expect(executed).toBe(true);
 			expect(JSON.stringify(store.data[0])).toBe(JSON.stringify({a: 'a'}));
+			done()
 		});
 	});
 

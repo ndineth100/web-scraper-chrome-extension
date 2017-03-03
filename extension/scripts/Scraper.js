@@ -142,9 +142,9 @@ Scraper.prototype = {
 			this.executionCallback();
 			return;
 		}
-
+		console.log('starting execute')
 		job.execute(this.browser, function (job) {
-
+			console.log('finished executing')
 			var scrapedRecords = [];
 			var deferredDatamanipulations = [];
 
