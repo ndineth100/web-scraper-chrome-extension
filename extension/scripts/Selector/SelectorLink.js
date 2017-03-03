@@ -72,3 +72,7 @@ var SelectorLink = {
 		return "a";
 	}
 };
+
+if (typeof require !== 'undefined') {
+  global.SelectorLink = SelectorLink
+}

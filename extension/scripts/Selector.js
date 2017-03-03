@@ -1,5 +1,6 @@
 if (typeof require !== 'undefined') {
   require('./Selector/SelectorText')
+	require('./Selector/SelectorLink')
 }
 
 var globalObject = typeof window !== 'undefined' ? window : global
@@ -25,6 +26,7 @@ Selector.prototype = {
 	 */
 	updateData: function (data) {
 		var allowedKeys = ['id', 'type', 'selector', 'parentSelectors'];
+		console.log('data type', data.type)
 		allowedKeys = allowedKeys.concat(globalObject[data.type].getFeatures());
 
 		// update data

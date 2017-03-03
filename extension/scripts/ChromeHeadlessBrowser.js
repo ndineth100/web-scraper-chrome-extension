@@ -38,7 +38,7 @@ ChromeHeadlessBrowser.prototype = {
         await Page.enable()
         browser.client = client
         Runtime.consoleAPICalled(function ({args}) {
-          console.log(args.length, args[0])
+          console.log(args)
           if(args.length > 2 && args[0].value === 'scraped-event') {
             var id = args[1].value
             console.log(browser.pendingRequests)

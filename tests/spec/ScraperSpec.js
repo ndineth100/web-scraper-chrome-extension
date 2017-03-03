@@ -60,7 +60,7 @@ describe("Scraper", function () {
 
 		waitsFor(function () {
 			return executed;
-		}, 3000);
+		}, 10000);
 		runs(function () {
       console.log('running')
 
