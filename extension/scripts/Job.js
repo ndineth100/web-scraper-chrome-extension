@@ -72,6 +72,6 @@ Job.prototype = {
     return this.dataItems
   }
 }
-if (typeof require !== 'undefined') {
-  global.Job = Job
-}
+
+module.exports = Job
+

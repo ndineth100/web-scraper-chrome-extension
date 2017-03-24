@@ -1,7 +1,9 @@
 if (typeof require !== 'undefined') {
   require('./../assets/jquery.whencallsequentially')
 }
-Scraper = function (options) {
+var Job = require('./Job')
+
+var Scraper = function (options) {
   this.queue = options.queue
   this.sitemap = options.sitemap
   this.store = options.store
@@ -105,9 +107,9 @@ Scraper.prototype = {
                     deferredDownloadDone.resolve()
                     chrome.downloads.onChanged.removeListener(cbDownloaded)
                   } else if (downloadItem.state.current === 'interrupted') {
-                deferredDownloadDone.reject('download failed')
-                chrome.downloads.onChanged.removeListener(cbDownloaded)
-              }
+                    deferredDownloadDone.reject('download failed')
+                    chrome.downloads.onChanged.removeListener(cbDownloaded)
+                  }
                 }
               }
 
@@ -152,20 +154,18 @@ Scraper.prototype = {
         if (this.recordCanHaveChildJobs(record)) {
           var followSelectorId = record._followSelectorId
           var followURL = record['_follow']
-          var followSelectorId = record['_followSelectorId']
           delete record['_follow']
           delete record['_followSelectorId']
           var newJob = new Job(followURL, followSelectorId, this, job, record)
           if (this.queue.canBeAdded(newJob)) {
             this.queue.add(newJob)
-          }
-					// store already scraped links
-          else {
+          } else {
+            // store already scraped links
             console.log('Ignoring next')
             console.log(record)
 //						scrapedRecords.push(record);
           }
-        }				else {
+        } else {
           if (record._follow !== undefined) {
             delete record['_follow']
             delete record['_followSelectorId']
@@ -193,6 +193,4 @@ Scraper.prototype = {
   }
 }
 
-if (typeof require !== 'undefined') {
-  global.Scraper = Scraper
-}
+module.exports = Scraper

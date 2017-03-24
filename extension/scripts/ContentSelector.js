@@ -1,9 +1,10 @@
+var ElementQuery = require('./ElementQuery')
 /**
  * @param options.parentCSSSelector	Elements can be only selected within this element
  * @param options.allowedElements	Elements that can only be selected
  * @constructor
  */
-ContentSelector = function (options) {
+var ContentSelector = function (options) {
 	// deferred response
   this.deferredCSSSelectorResponse = $.Deferred()
 
@@ -361,3 +362,5 @@ ContentSelector.prototype = {
     })
   }
 }
+
+module.exports = ContentSelector

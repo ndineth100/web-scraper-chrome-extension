@@ -1,4 +1,5 @@
 var selectors = require('./Selectors')
+var ElementQuery = require('./ElementQuery')
 
 var Selector = function (selector) {
   this.updateData(selector)
@@ -23,16 +24,16 @@ Selector.prototype = {
     var allowedKeys = ['id', 'type', 'selector', 'parentSelectors']
     console.log('data type', data.type)
     allowedKeys = allowedKeys.concat(selectors[data.type].getFeatures())
-
+    var key
 		// update data
-    for (var key in data) {
+    for (key in data) {
       if (allowedKeys.indexOf(key) !== -1 || typeof data[key] === 'function') {
         this[key] = data[key]
       }
     }
 
 		// remove values that are not needed for this type of selector
-    for (var key in this) {
+    for (key in this) {
       if (allowedKeys.indexOf(key) === -1 && typeof this[key] !== 'function') {
         delete this[key]
       }
@@ -52,7 +53,7 @@ Selector.prototype = {
 	 */
   initType: function () {
     if (selectors[this.type] === undefined) {
-      throw 'Selector type not defined ' + this.type
+      throw new Error('Selector type not defined ' + this.type)
     }
 
 		// overrides objects methods

@@ -88,7 +88,7 @@ SelectorGraph.prototype = {
     var anchorNode = vis.selectAll('g.anchorNode').data(force2.nodes()).enter().append('svg:g').attr('class', 'anchorNode')
     anchorNode.append('svg:circle').attr('r', 0).style('fill', '#FFF')
     anchorNode.append('svg:text').text(function (d, i) {
-      return i % 2 == 0 ? '' : d.node.id
+      return i % 2 === 0 ? '' : d.node.id
     }).style('fill', '#555').style('font-family', 'Arial').style('font-size', 12)
 
     var updateLink = function () {
@@ -115,7 +115,7 @@ SelectorGraph.prototype = {
       node.call(updateNode)
 
       anchorNode.each(function (d, i) {
-        if (i % 2 == 0) {
+        if (i % 2 === 0) {
           d.x = d.node.x
           d.y = d.node.y
         } else {
@@ -140,3 +140,5 @@ SelectorGraph.prototype = {
     })
   }
 }
+
+module.exports = SelectorGraph

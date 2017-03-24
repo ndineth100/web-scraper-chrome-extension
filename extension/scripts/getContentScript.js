@@ -1,5 +1,5 @@
 var getBackgroundScript = require('./getBackgroundScript')
-
+var ContentScript = require('./ContentScript')
 /**
  *
  * @param location	configure from where the content script is being accessed (ContentScript, BackgroundPage, DevTools)
@@ -37,7 +37,7 @@ var getContentScript = function (location) {
     contentScript.backgroundScript = backgroundScript
     return contentScript
   } else {
-    throw 'Invalid ContentScript initialization - ' + location
+    throw new Error('Invalid ContentScript initialization - ' + location)
   }
 }
 

@@ -148,10 +148,10 @@ DataExtractor.prototype = {
 	 */
   getMultiSelectorData: function (selectors, selector, parentElement, commonData) {
     var deferredResponse = $.Deferred()
-
+    var deferredData
 		// if the selector is not an Element selector then its fetched data is the result.
     if (!selector.willReturnElements()) {
-      var deferredData = selector.getData(parentElement)
+      deferredData = selector.getData(parentElement)
       deferredData.done(function (selectorData) {
         var newCommonData = Object.clone(commonData, true)
         var resultData = []
@@ -166,7 +166,7 @@ DataExtractor.prototype = {
     }
 
 		// handle situation when this selector is an elementSelector
-    var deferredData = selector.getData(parentElement)
+    deferredData = selector.getData(parentElement)
     deferredData.done(function (selectorData) {
       var deferredDataCalls = []
 
@@ -180,7 +180,7 @@ DataExtractor.prototype = {
         var resultData = []
         responses.forEach(function (childRecordList) {
           childRecordList.forEach(function (childRecord) {
-            var rec = new Object()
+            var rec = {}
             Object.merge(rec, childRecord, true)
             resultData.push(rec)
           })
@@ -215,7 +215,7 @@ DataExtractor.prototype = {
         var resultData = []
         responses.forEach(function (childRecords) {
           childRecords.forEach(function (childRecord) {
-            var rec = new Object()
+            var rec = {}
             Object.merge(rec, childRecord, true)
             resultData.push(rec)
           })
@@ -265,10 +265,13 @@ DataExtractor.prototype = {
     var selector = this.sitemap.selectors.getSelector(selectorId)
     var childSelectors = sitemap.selectors.getAllSelectors(selectorId)
     var parentSelectors = []
-    for (var i = parentSelectorIds.length - 1; i >= 0; i--) {
-      var id = parentSelectorIds[i]
+    var i
+    var id
+    var parentSelector
+    for (i = parentSelectorIds.length - 1; i >= 0; i--) {
+      id = parentSelectorIds[i]
       if (id === '_root') break
-      var parentSelector = this.sitemap.selectors.getSelector(id)
+      parentSelector = this.sitemap.selectors.getSelector(id)
       parentSelectors.push(parentSelector)
     }
 
@@ -279,13 +282,13 @@ DataExtractor.prototype = {
 
     var parentSelectorId
 		// find the parent that leaded to the page where required selector is being used
-    for (var i = parentSelectorIds.length - 1; i >= 0; i--) {
-      var id = parentSelectorIds[i]
+    for (i = parentSelectorIds.length - 1; i >= 0; i--) {
+      id = parentSelectorIds[i]
       if (id === '_root') {
         parentSelectorId = id
         break
       }
-      var parentSelector = this.sitemap.selectors.getSelector(parentSelectorIds[i])
+      parentSelector = this.sitemap.selectors.getSelector(parentSelectorIds[i])
       if (!parentSelector.willReturnElements()) {
         parentSelectorId = id
         break

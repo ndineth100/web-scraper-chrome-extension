@@ -3,7 +3,7 @@
  * @param parentElement
  * @param selector
  */
-ElementQuery = function (CSSSelector, parentElement) {
+var ElementQuery = function (CSSSelector, parentElement) {
   CSSSelector = CSSSelector || ''
 
   var selectedElements = []
@@ -53,3 +53,5 @@ ElementQuery.getSelectorParts = function (CSSSelector) {
 
   return resultSelectors
 }
+
+module.exports = ElementQuery

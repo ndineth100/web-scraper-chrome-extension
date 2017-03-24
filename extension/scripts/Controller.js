@@ -1,7 +1,9 @@
 var selectors = require('./Selectors')
 var Selector = require('./Selector')
+var SelectorTable = selectors.SelectorTable
 var Sitemap = require('./Sitemap')
-
+var getBackgroundScript = require('./getBackgroundScript')
+var getContentScript = require('./getContentScript')
 var SitemapController = function (options) {
   for (var i in options) {
     this[i] = options[i]
@@ -302,7 +304,7 @@ SitemapController.prototype = {
               message: 'The sitemap id should be atleast 3 characters long'
             },
             regexp: {
-              regexp: /^[a-z][a-z0-9_\$\(\)\+\-/]+$/,
+              regexp: /^[a-z][a-z0-9_$()+\-/]+$/,
               message: 'Only lowercase characters (a-z), digits (0-9), or any of the characters _, $, (, ), +, -, and / are allowed. Must begin with a letter.'
             },
 						// placeholder for sitemap id existance validation
@@ -348,7 +350,7 @@ SitemapController.prototype = {
               message: 'The sitemap id should be atleast 3 characters long'
             },
             regexp: {
-              regexp: /^[a-z][a-z0-9_\$\(\)\+\-/]+$/,
+              regexp: /^[a-z][a-z0-9_$()+\-/]+$/,
               message: 'Only lowercase characters (a-z), digits (0-9), or any of the characters _, $, (, ), +, -, and / are allowed. Must begin with a letter.'
             },
 						// placeholder for sitemap id existance validation
@@ -525,9 +527,8 @@ SitemapController.prototype = {
         this.store.saveSitemap(sitemap, function (sitemap) {
           this.showSitemapSelectorList()
         }.bind(this))
-      }
-			// id changed. we need to delete the old one and create a new one
-      else {
+      } else {
+        // id changed. we need to delete the old one and create a new one
         var newSitemap = new Sitemap(sitemap)
         var oldSitemap = sitemap
         newSitemap._id = sitemapData.id
@@ -800,9 +801,8 @@ SitemapController.prototype = {
         $option.text(selector.id).val(selector.id)
         $('#edit-selector #parentSelectors').append($option)
       }
-    }
+    } else {
 		// remove if type doesn't allow to have child selectors
-    else {
       $('#edit-selector #parentSelectors .currently-edited').remove()
     }
   },

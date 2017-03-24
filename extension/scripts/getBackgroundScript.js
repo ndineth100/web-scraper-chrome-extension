@@ -35,6 +35,8 @@ var getBackgroundScript = function (location) {
 
     return backgroundScript
   } else {
-    throw 'Invalid BackgroundScript initialization - ' + location
+    throw new Error('Invalid BackgroundScript initialization - ' + location)
   }
 }
+
+module.exports = getBackgroundScript

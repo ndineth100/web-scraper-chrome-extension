@@ -1,3 +1,6 @@
+var StoreDevtools = require('/StoreDevtools')
+var SitemapController = require('./Controller')
+
 $(function () {
 	// init bootstrap alerts
   $('.alert').alert()

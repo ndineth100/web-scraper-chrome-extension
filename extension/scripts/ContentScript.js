@@ -1,3 +1,5 @@
+var ContentSelector = require('./ContentSelector')
+
 /**
  * ContentScript that can be called from anywhere within the extension
  */
