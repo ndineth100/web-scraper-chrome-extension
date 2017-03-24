@@ -1,3 +1,5 @@
+var Sitemap = require('./Sitemap')
+
 /**
  * From devtools panel there is no possibility to execute XHR requests. So all requests to a remote CouchDb must be
  * handled through Background page. StoreDevtools is a simply a proxy store

@@ -142,3 +142,5 @@ var getContentScript = function(location) {
 		throw "Invalid ContentScript initialization - " + location;
 	}
 };
+
+module.exports = ContentScript

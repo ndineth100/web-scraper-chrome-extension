@@ -1,3 +1,5 @@
+var Sitemap = require('./Sitemap')
+
 var Store = function (config) {
     this.config = config;
 

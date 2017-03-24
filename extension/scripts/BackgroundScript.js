@@ -102,3 +102,5 @@ var getBackgroundScript = function(location) {
 		throw "Invalid BackgroundScript initialization - " + location;
 	}
 };
+
+module.exports = BackgroundScript

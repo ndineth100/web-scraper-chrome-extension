@@ -1,6 +1,4 @@
-if (typeof require !== 'undefined') {
-  require('./Selector')
-}
+var Selector = require('./Selector')
 
 var SelectorList = function (selectors) {
 
@@ -284,7 +282,4 @@ SelectorList.prototype.hasRecursiveElementSelectors = function() {
 };
 
 
-if (typeof require !== 'undefined') {
-  global.SelectorList = SelectorList
-}
-
+module.exports = SelectorList

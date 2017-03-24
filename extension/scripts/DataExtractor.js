@@ -1,4 +1,7 @@
-DataExtractor = function (options) {
+var SelectorList = require('./SelectorList')
+var Sitemap = require('./Sitemap')
+
+var DataExtractor = function (options) {
 
 	if (options.sitemap instanceof Sitemap) {
 		this.sitemap = options.sitemap;
@@ -320,3 +323,5 @@ DataExtractor.prototype = {
 		return this.getData();
 	}
 };
+
+module.exports = DataExtractor

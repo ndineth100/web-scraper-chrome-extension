@@ -1,9 +1,4 @@
-if (typeof require !== 'undefined') {
-  require('./Selector/SelectorText')
-	require('./Selector/SelectorLink')
-}
-
-var globalObject = typeof window !== 'undefined' ? window : global
+var selectors = require('./Selectors')
 
 var Selector = function (selector) {
 	this.updateData(selector);
@@ -27,7 +22,7 @@ Selector.prototype = {
 	updateData: function (data) {
 		var allowedKeys = ['id', 'type', 'selector', 'parentSelectors'];
 		console.log('data type', data.type)
-		allowedKeys = allowedKeys.concat(globalObject[data.type].getFeatures());
+		allowedKeys = allowedKeys.concat(selectors[data.type].getFeatures());
 
 		// update data
 		for (var key in data) {
@@ -57,13 +52,13 @@ Selector.prototype = {
 	 */
 	initType: function () {
 
-		if (globalObject[this.type] === undefined) {
+		if (selectors[this.type] === undefined) {
 			throw "Selector type not defined " + this.type;
 		}
 
 		// overrides objects methods
-		for (var i in globalObject[this.type]) {
-			this[i] = globalObject[this.type][i];
+		for (var i in selectors[this.type]) {
+			this[i] = selectors[this.type][i];
 		}
 	},
 
@@ -129,6 +124,4 @@ Selector.prototype = {
 	}
 };
 
-if (typeof require !== 'undefined') {
-  global.Selector = Selector
-}
+module.exports = Selector

@@ -1,3 +1,5 @@
+var Selector = require('./Selector')
+var SelectorList = require('./SelectorList')
 var Sitemap = function (sitemapObj) {
 	this.initData(sitemapObj);
 };

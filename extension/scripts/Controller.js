@@ -1,4 +1,6 @@
 var selectors = require('./Selectors')
+var Selector = require('./Selector')
+var Sitemap = require('./Sitemap')
 
 var SitemapController = function (options) {
 
