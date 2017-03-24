@@ -1,11 +1,10 @@
 $(function () {
-
 	// init bootstrap alerts
-	$(".alert").alert();
+  $('.alert').alert()
 
-	var store = new StoreDevtools();
-	new SitemapController({
-		store: store,
-		templateDir: 'views/'
-	});
-});
+  var store = new StoreDevtools()
+  new SitemapController({
+    store: store,
+    templateDir: 'views/'
+  })
+})

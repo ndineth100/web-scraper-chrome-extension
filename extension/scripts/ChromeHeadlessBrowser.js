@@ -4,29 +4,27 @@ if (typeof require !== 'undefined') {
   var fs = require('fs')
 }
 
-
 var ChromeHeadlessBrowser = function (options) {
-
-	this.pageLoadDelay = options.pageLoadDelay;
+  this.pageLoadDelay = options.pageLoadDelay
   this.pendingRequests = {}
 	// @TODO somehow handle the closed window
-};
+}
 
 ChromeHeadlessBrowser.prototype = {
 
-	_initPopupWindow: function (callback, scope) {
+  _initPopupWindow: function (callback, scope) {
     console.log('init popup ')
     var browser = this
     if (browser.client) {
       callback.call(scope)
       return
     }
-    /*getTab('chrome://newtab')
+    /* getTab('chrome://newtab')
       .then(function (tab) {
         console.log('tab id', this.tab.id)
         browser.tab = tab
         return CDP({tab})
-      })*/
+      }) */
     (async function () {
       try {
         const tab = await CDP.New()
@@ -39,7 +37,7 @@ ChromeHeadlessBrowser.prototype = {
         browser.client = client
         Runtime.consoleAPICalled(function ({args}) {
           console.log(args)
-          if(args.length > 2 && args[0].value === 'scraped-event') {
+          if (args.length > 2 && args[0].value === 'scraped-event') {
             var id = args[1].value
             console.log(browser.pendingRequests)
             var callback = browser.pendingRequests[id]
@@ -55,15 +53,15 @@ ChromeHeadlessBrowser.prototype = {
         console.error('Error in init popup window', e)
       }
     })()
-	},
+  },
 
-	loadUrl: function (url, callback) {
+  loadUrl: function (url, callback) {
     var browser = this
     var client = this.client
     var {Page} = this.client
 
     Page.navigate({url})
-		Page.loadEventFired(() => {
+    Page.loadEventFired(() => {
       console.log('page loaded')
       load(client)
         .then(() => setTimeout(callback, browser.pageLoadDelay))
@@ -74,11 +72,10 @@ ChromeHeadlessBrowser.prototype = {
       const {Page, Runtime} = client
       await Runtime.enable()
       await loadScripts(client)
-
     }
-	},
+  },
 
-	close: function () {
+  close: function () {
 	  console.log('closing')
     var browser = this
     ;(async function () {
@@ -90,22 +87,20 @@ ChromeHeadlessBrowser.prototype = {
         browser.client.close()
       }
     })()
-	},
+  },
 
-	fetchData: function (url, sitemap, parentSelectorId, callback, scope) {
+  fetchData: function (url, sitemap, parentSelectorId, callback, scope) {
+    var browser = this
 
-    var browser = this;
+    this._initPopupWindow(function (scope) {
+      const {Runtime} = browser.client
 
-		this._initPopupWindow(function (scope) {
-			const {Runtime} = browser.client
-
-			browser.loadUrl(url, function () {
-
-				var message = {
-					extractData: true,
-					sitemap: JSON.parse(JSON.stringify(sitemap)),
-					parentSelectorId: parentSelectorId
-				};
+      browser.loadUrl(url, function () {
+        var message = {
+          extractData: true,
+          sitemap: JSON.parse(JSON.stringify(sitemap)),
+          parentSelectorId: parentSelectorId
+        }
         var id = Math.random().toString(36).substring(15)
         browser.pendingRequests[id] = function (dataString) {
           console.log('pending request', dataString)
@@ -122,10 +117,10 @@ ChromeHeadlessBrowser.prototype = {
         }).then(function (r) {
           console.log('result of evaluating', r)
         }).catch(e => console.error(e, 'error in evaluating'))
-			})
-		}, browser);
-	}
-};
+      })
+    }, browser)
+  }
+}
 
 async function getTab (url) {
   const targetId = await newTarget(url)
@@ -135,7 +130,7 @@ async function getTab (url) {
 
 async function newTarget (url) {
   const client = await CDP({tab: 'ws://localhost:9222/devtools/browser'})
-  //console.log('client', client)
+  // console.log('client', client)
   const info = await client.Target.createTarget({url})
   console.log('info', info)
   client.close()

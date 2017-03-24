@@ -1,9 +1,9 @@
 var selectors = require('./Selectors')
 
 var Selector = function (selector) {
-	this.updateData(selector);
-	this.initType();
-};
+  this.updateData(selector)
+  this.initType()
+}
 
 Selector.prototype = {
 
@@ -11,117 +11,111 @@ Selector.prototype = {
 	 * Is this selector configured to return multiple items?
 	 * @returns {boolean}
 	 */
-	willReturnMultipleRecords: function () {
-		return this.canReturnMultipleRecords() && this.multiple;
-	},
+  willReturnMultipleRecords: function () {
+    return this.canReturnMultipleRecords() && this.multiple
+  },
 
 	/**
 	 * Update current selector configuration
 	 * @param data
 	 */
-	updateData: function (data) {
-		var allowedKeys = ['id', 'type', 'selector', 'parentSelectors'];
-		console.log('data type', data.type)
-		allowedKeys = allowedKeys.concat(selectors[data.type].getFeatures());
+  updateData: function (data) {
+    var allowedKeys = ['id', 'type', 'selector', 'parentSelectors']
+    console.log('data type', data.type)
+    allowedKeys = allowedKeys.concat(selectors[data.type].getFeatures())
 
 		// update data
-		for (var key in data) {
-			if (allowedKeys.indexOf(key) !== -1 || typeof data[key] === 'function') {
-				this[key] = data[key];
-			}
-		}
+    for (var key in data) {
+      if (allowedKeys.indexOf(key) !== -1 || typeof data[key] === 'function') {
+        this[key] = data[key]
+      }
+    }
 
 		// remove values that are not needed for this type of selector
-		for (var key in this) {
-			if (allowedKeys.indexOf(key) === -1 && typeof this[key] !== 'function') {
-				delete this[key];
-			}
-		}
-	},
+    for (var key in this) {
+      if (allowedKeys.indexOf(key) === -1 && typeof this[key] !== 'function') {
+        delete this[key]
+      }
+    }
+  },
 
 	/**
 	 * CSS selector which will be used for element selection
 	 * @returns {string}
 	 */
-	getItemCSSSelector: function() {
-		return "*";
-	},
+  getItemCSSSelector: function () {
+    return '*'
+  },
 
 	/**
 	 * override objects methods based on seletor type
 	 */
-	initType: function () {
-
-		if (selectors[this.type] === undefined) {
-			throw "Selector type not defined " + this.type;
-		}
+  initType: function () {
+    if (selectors[this.type] === undefined) {
+      throw 'Selector type not defined ' + this.type
+    }
 
 		// overrides objects methods
-		for (var i in selectors[this.type]) {
-			this[i] = selectors[this.type][i];
-		}
-	},
+    for (var i in selectors[this.type]) {
+      this[i] = selectors[this.type][i]
+    }
+  },
 
 	/**
 	 * Check whether a selector is a paren selector of this selector
 	 * @param selectorId
 	 * @returns {boolean}
 	 */
-	hasParentSelector: function (selectorId) {
-		return (this.parentSelectors.indexOf(selectorId) !== -1);
-	},
+  hasParentSelector: function (selectorId) {
+    return (this.parentSelectors.indexOf(selectorId) !== -1)
+  },
 
-	removeParentSelector: function (selectorId) {
-		var index = this.parentSelectors.indexOf(selectorId);
-		if(index !== -1) {
-			this.parentSelectors.splice(index, 1);
-		}
-	},
+  removeParentSelector: function (selectorId) {
+    var index = this.parentSelectors.indexOf(selectorId)
+    if (index !== -1) {
+      this.parentSelectors.splice(index, 1)
+    }
+  },
 
-	renameParentSelector: function (originalId, replacementId) {
-		if (this.hasParentSelector(originalId)) {
-			var pos = this.parentSelectors.indexOf(originalId);
-			this.parentSelectors.splice(pos, 1, replacementId);
-		}
-	},
+  renameParentSelector: function (originalId, replacementId) {
+    if (this.hasParentSelector(originalId)) {
+      var pos = this.parentSelectors.indexOf(originalId)
+      this.parentSelectors.splice(pos, 1, replacementId)
+    }
+  },
 
-	getDataElements: function (parentElement) {
+  getDataElements: function (parentElement) {
+    var elements = ElementQuery(this.selector, parentElement)
+    if (this.multiple) {
+      return elements
+    } else if (elements.length > 0) {
+      return [elements[0]]
+    } else {
+      return []
+    }
+  },
 
-		var elements = ElementQuery(this.selector, parentElement);
-		if (this.multiple) {
-			return elements;
-		}
-		else if (elements.length > 0) {
-			return [elements[0]];
-		}
-		else {
-			return [];
-		}
-	},
-
-	getData: function(parentElement) {
-
-		var d = $.Deferred();
-		var timeout = this.delay || 0;
+  getData: function (parentElement) {
+    var d = $.Deferred()
+    var timeout = this.delay || 0
 
 		// this works much faster because $.whenCallSequentially isn't running next data extraction immediately
-		if(timeout === 0) {
-			var deferredData = this._getData(parentElement);
-			deferredData.done(function(data){
-				d.resolve(data);
-			});
-		}
-		else {
-			setTimeout(function() {
-				var deferredData = this._getData(parentElement);
-				deferredData.done(function(data){
-					d.resolve(data);
-				});
-			}.bind(this), timeout);
-		}
+    if (timeout === 0) {
+      var deferredData = this._getData(parentElement)
+      deferredData.done(function (data) {
+        d.resolve(data)
+      })
+    }		else {
+      setTimeout(function () {
+        var deferredData = this._getData(parentElement)
+        deferredData.done(function (data) {
+          d.resolve(data)
+        })
+      }.bind(this), timeout)
+    }
 
-		return d.promise();
-	}
-};
+    return d.promise()
+  }
+}
 
 module.exports = Selector

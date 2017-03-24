@@ -8,93 +8,84 @@ var ContentScript = {
 	 * @param request.CSSSelector	css selector as string
 	 * @returns $.Deferred()
 	 */
-	getHTML: function(request) {
-
-		var deferredHTML = $.Deferred();
-		var html = $(request.CSSSelector).clone().wrap('<p>').parent().html();
-		deferredHTML.resolve(html);
-		return deferredHTML.promise();
-	},
+  getHTML: function (request) {
+    var deferredHTML = $.Deferred()
+    var html = $(request.CSSSelector).clone().wrap('<p>').parent().html()
+    deferredHTML.resolve(html)
+    return deferredHTML.promise()
+  },
 
 	/**
 	 * Removes current content selector if is in use within the page
 	 * @returns $.Deferred()
 	 */
-	removeCurrentContentSelector: function() {
+  removeCurrentContentSelector: function () {
+    var deferredResponse = $.Deferred()
+    var contentSelector = window.cs
+    if (contentSelector === undefined) {
+      deferredResponse.resolve()
+    } else {
+      contentSelector.removeGUI()
+      window.cs = undefined
+      deferredResponse.resolve()
+    }
 
-		var deferredResponse = $.Deferred();
-		var contentSelector = window.cs;
-		if(contentSelector === undefined) {
-			deferredResponse.resolve();
-		}
-		else {
-			contentSelector.removeGUI();
-			window.cs = undefined;
-			deferredResponse.resolve();
-		}
-
-		return deferredResponse.promise();
-	},
+    return deferredResponse.promise()
+  },
 
 	/**
 	 * Select elements within the page
 	 * @param request.parentCSSSelector
 	 * @param request.allowedElements
 	 */
-	selectSelector: function(request) {
+  selectSelector: function (request) {
+    var deferredResponse = $.Deferred()
 
-		var deferredResponse = $.Deferred();
+    this.removeCurrentContentSelector().done(function () {
+      var contentSelector = new ContentSelector({
+        parentCSSSelector: request.parentCSSSelector,
+        allowedElements: request.allowedElements
+      })
+      window.cs = contentSelector
 
-		this.removeCurrentContentSelector().done(function() {
+      var deferredCSSSelector = contentSelector.getCSSSelector()
+      deferredCSSSelector.done(function (response) {
+        this.removeCurrentContentSelector().done(function () {
+          deferredResponse.resolve(response)
+          window.cs = undefined
+        })
+      }.bind(this)).fail(function (message) {
+        deferredResponse.reject(message)
+        window.cs = undefined
+      })
+    }.bind(this))
 
-			var contentSelector = new ContentSelector({
-				parentCSSSelector: request.parentCSSSelector,
-				allowedElements: request.allowedElements
-			});
-			window.cs = contentSelector;
-
-			var deferredCSSSelector = contentSelector.getCSSSelector();
-			deferredCSSSelector.done(function(response) {
-				this.removeCurrentContentSelector().done(function(){
-					deferredResponse.resolve(response);
-					window.cs = undefined;
-				}.bind(this));
-			}.bind(this)).fail(function(message) {
-				deferredResponse.reject(message);
-				window.cs = undefined;
-			}.bind(this));
-
-		}.bind(this));
-
-		return deferredResponse.promise();
-	},
+    return deferredResponse.promise()
+  },
 
 	/**
 	 * Preview elements
 	 * @param request.parentCSSSelector
 	 * @param request.elementCSSSelector
 	 */
-	previewSelector: function(request) {
+  previewSelector: function (request) {
+    var deferredResponse = $.Deferred()
+    this.removeCurrentContentSelector().done(function () {
+      var contentSelector = new ContentSelector({
+        parentCSSSelector: request.parentCSSSelector
+      })
+      window.cs = contentSelector
 
-		var deferredResponse = $.Deferred();
-		this.removeCurrentContentSelector().done(function () {
-
-			var contentSelector = new ContentSelector({
-				parentCSSSelector: request.parentCSSSelector
-			});
-			window.cs = contentSelector;
-
-			var deferredSelectorPreview = contentSelector.previewSelector(request.elementCSSSelector);
-			deferredSelectorPreview.done(function() {
-				deferredResponse.resolve();
-			}).fail(function(message) {
-				deferredResponse.reject(message);
-				window.cs = undefined;
-			});
-		});
-		return deferredResponse;
-	}
-};
-
+      var deferredSelectorPreview = contentSelector.previewSelector(request.elementCSSSelector)
+      deferredSelectorPreview.done(function () {
+        deferredResponse.resolve()
+      }).fail(function (message) {
+        deferredResponse.reject(message)
+        window.cs = undefined
+      })
+    })
+    return deferredResponse
+  }
+}
 
 module.exports = ContentScript

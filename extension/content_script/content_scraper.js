@@ -2,42 +2,39 @@ var DataExtractor = require('./../scripts/DataExtractor')
 var getContentScript = require('./../scripts/getContentScript')
 
 function extensionListener (request, sender, sendResponse) {
-
-  console.log("chrome.runtime.onMessage", request);
+  console.log('chrome.runtime.onMessage', request)
 
   if (request.extractData) {
-    console.log("received data extraction request", request);
-    var extractor = new DataExtractor(request);
-    var deferredData = extractor.getData();
-    deferredData.done(function(data){
-      console.log("dataextractor data", data);
-      sendResponse(data);
-    });
-    return true;
-  }
-  else if(request.previewSelectorData) {
-    console.log("received data-preview extraction request", request);
-    var extractor = new DataExtractor(request);
-    var deferredData = extractor.getSingleSelectorData(request.parentSelectorIds, request.selectorId);
-    deferredData.done(function(data){
-      console.log("dataextractor data", data);
-      sendResponse(data);
-    });
-    return true;
+    console.log('received data extraction request', request)
+    var extractor = new DataExtractor(request)
+    var deferredData = extractor.getData()
+    deferredData.done(function (data) {
+      console.log('dataextractor data', data)
+      sendResponse(data)
+    })
+    return true
+  } else if (request.previewSelectorData) {
+    console.log('received data-preview extraction request', request)
+    var extractor = new DataExtractor(request)
+    var deferredData = extractor.getSingleSelectorData(request.parentSelectorIds, request.selectorId)
+    deferredData.done(function (data) {
+      console.log('dataextractor data', data)
+      sendResponse(data)
+    })
+    return true
   }
   // Universal ContentScript communication handler
-  else if(request.contentScriptCall) {
+  else if (request.contentScriptCall) {
+    var contentScript = getContentScript('ContentScript')
 
-    var contentScript = getContentScript("ContentScript");
+    console.log('received ContentScript request', request)
 
-    console.log("received ContentScript request", request);
+    var deferredResponse = contentScript[request.fn](request.request)
+    deferredResponse.done(function (response) {
+      sendResponse(response)
+    })
 
-    var deferredResponse = contentScript[request.fn](request.request);
-    deferredResponse.done(function(response) {
-      sendResponse(response);
-    });
-
-    return true;
+    return true
   }
 }
 
