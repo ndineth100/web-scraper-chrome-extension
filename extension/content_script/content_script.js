@@ -1,2 +1,1 @@
-var extensionListener = require('./content_scraper')
-chrome.runtime.onMessage.addListener(extensionListener)
+chrome.runtime.onMessage.addListener(scraper)

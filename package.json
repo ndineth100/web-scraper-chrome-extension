@@ -9,7 +9,8 @@
   },
   "scripts": {
     "test": "mocha tests/spec/ScraperSpec-mocha",
-    "test-jasmine": "jasmine-node tests/spec/ScraperSpec.js"
+    "test-jasmine": "jasmine-node tests/spec/ScraperSpec.js",
+    "generate-scraper": "browserify extension/content_script/content_scraper.js --standalone scraper > extension/generated/scraper.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
     "mocha": "^3.2.0"
   },
   "dependencies": {
+    "browserify": "^14.1.0",
     "chrome-remote-interface": "^0.18.0",
     "jquery-deferred": "^0.3.1"
   }
