@@ -53,3 +53,5 @@ var SelectorGroup = {
 		return ['delay','extractAttribute']
 	}
 };
+
+module.exports = SelectorGroup

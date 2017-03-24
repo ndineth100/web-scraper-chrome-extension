@@ -129,3 +129,5 @@ var SelectorPopupLink = {
 		return "*";
 	}
 };
+
+module.exports = SelectorPopupLink

@@ -175,3 +175,5 @@ var SelectorTable = {
 		return columns;
 	}
 };
+
+module.exports = SelectorTable

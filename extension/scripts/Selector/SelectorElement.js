@@ -37,3 +37,5 @@ var SelectorElement = {
 		return ['multiple', 'delay']
 	}
 };
+
+module.exports = SelectorElement

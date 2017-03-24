@@ -49,3 +49,5 @@ var SelectorElementAttribute = {
 		return ['multiple', 'extractAttribute', 'delay']
 	}
 };
+
+module.exports = SelectorElementAttribute

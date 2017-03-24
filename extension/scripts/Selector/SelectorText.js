@@ -68,6 +68,5 @@ var SelectorText = {
 	}
 };
 
-if (typeof require !== 'undefined') {
-  global.SelectorText = SelectorText
-}
+module.exports = SelectorText
+

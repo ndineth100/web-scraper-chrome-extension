@@ -73,6 +73,4 @@ var SelectorLink = {
 	}
 };
 
-if (typeof require !== 'undefined') {
-  global.SelectorLink = SelectorLink
-}
+module.exports = SelectorLink

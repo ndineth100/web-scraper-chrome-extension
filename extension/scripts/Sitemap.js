@@ -1,6 +1,3 @@
-if (typeof require !== 'undefined') {
-  require('./SelectorList')
-}
 var Sitemap = function (sitemapObj) {
 	this.initData(sitemapObj);
 };

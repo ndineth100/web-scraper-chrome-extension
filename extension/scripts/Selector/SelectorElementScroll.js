@@ -66,3 +66,5 @@ var SelectorElementScroll = {
 		return ['multiple', 'delay']
 	}
 };
+
+module.exports = SelectorElementScroll

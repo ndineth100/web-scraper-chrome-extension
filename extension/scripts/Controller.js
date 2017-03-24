@@ -1,3 +1,5 @@
+var selectors = require('./Selectors')
+
 var SitemapController = function (options) {
 
 	for (var i in options) {
@@ -805,7 +807,7 @@ SitemapController.prototype = {
 	},
 	selectorTypeChanged: function () {
 		var type = $("#edit-selector select[name=type]").val();
-		var features = window[type].getFeatures();
+		var features = selectors[type].getFeatures();
 		$("#edit-selector .feature").hide();
 		features.forEach(function (feature) {
 			$("#edit-selector .feature-" + feature).show();

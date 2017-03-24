@@ -155,3 +155,5 @@ var SelectorElementClick = {
 		return ['multiple', 'delay', 'clickElementSelector', 'clickType', 'discardInitialElements', 'clickElementUniquenessType']
 	}
 };
+
+module.exports = SelectorElementClick

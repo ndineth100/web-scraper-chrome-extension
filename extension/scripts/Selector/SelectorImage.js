@@ -121,3 +121,5 @@ var SelectorImage = {
 		return "img";
 	}
 };
+
+module.exports = SelectorImage

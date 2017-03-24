@@ -61,3 +61,5 @@ var SelectorHTML = {
 		return ['multiple', 'regex', 'delay']
 	}
 };
+
+module.exports = SelectorHTML
