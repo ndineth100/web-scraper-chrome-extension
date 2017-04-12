@@ -2,7 +2,7 @@
  * Only Elements unique will be added to this array
  * @constructor
  */
-UniqueElementList = function (clickElementUniquenessType) {
+function UniqueElementList (clickElementUniquenessType) {
   this.clickElementUniquenessType = clickElementUniquenessType
   this.addedElements = {}
 }
@@ -56,6 +56,8 @@ UniqueElementList.prototype.getElementUniqueId = function (element) {
     throw 'Invalid clickElementUniquenessType ' + this.clickElementUniquenessType
   }
 }
+
+module.exports = UniqueElementList
 
 UniqueElementList.prototype.isAdded = function (element) {
   var elementUniqueId = this.getElementUniqueId(element)

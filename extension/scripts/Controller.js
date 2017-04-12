@@ -2,6 +2,7 @@ var selectors = require('./Selectors')
 var Selector = require('./Selector')
 var SelectorTable = selectors.SelectorTable
 var Sitemap = require('./Sitemap')
+var SelectorGraphv2 = require('./SelectorGraphv2')
 var getBackgroundScript = require('./getBackgroundScript')
 var getContentScript = require('./getContentScript')
 var SitemapController = function (options) {

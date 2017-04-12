@@ -1,76 +1,74 @@
 var SelectorLink = {
-	canReturnMultipleRecords: function () {
-		return true;
-	},
+  canReturnMultipleRecords: function () {
+    return true
+  },
 
-	canHaveChildSelectors: function () {
-		return true;
-	},
+  canHaveChildSelectors: function () {
+    return true
+  },
 
-	canHaveLocalChildSelectors: function () {
-		return false;
-	},
+  canHaveLocalChildSelectors: function () {
+    return false
+  },
 
-	canCreateNewJobs: function () {
-		return true;
-	},
-	willReturnElements: function () {
-		return false;
-	},
-	_getData: function (parentElement) {
-		var elements = this.getDataElements(parentElement);
+  canCreateNewJobs: function () {
+    return true
+  },
+  willReturnElements: function () {
+    return false
+  },
+  _getData: function (parentElement) {
+    var elements = this.getDataElements(parentElement)
 
-		var dfd = $.Deferred();
+    var dfd = $.Deferred()
 
 		// return empty record if not multiple type and no elements found
-		if (this.multiple === false && elements.length === 0) {
-			var data = {};
-			data[this.id] = null;
-			dfd.resolve([data]);
-			return dfd;
-		}
+    if (this.multiple === false && elements.length === 0) {
+      var data = {}
+      data[this.id] = null
+      dfd.resolve([data])
+      return dfd
+    }
 
 		// extract links one by one
-		var deferredDataExtractionCalls = [];
-		$(elements).each(function (k, element) {
+    var deferredDataExtractionCalls = []
+    $(elements).each(function (k, element) {
+      deferredDataExtractionCalls.push(function (element) {
+        var deferredData = $.Deferred()
 
-			deferredDataExtractionCalls.push(function(element) {
+        var data = {}
+        data[this.id] = $(element).text()
+        data._followSelectorId = this.id
+        data[this.id + '-href'] = element.href
+        data._follow = element.href
+        deferredData.resolve(data)
 
-				var deferredData = $.Deferred();
+        return deferredData
+      }.bind(this, element))
+    }.bind(this))
 
-				var data = {};
-				data[this.id] = $(element).text();
-				data._followSelectorId = this.id;
-				data[this.id + '-href'] = element.href;
-				data._follow = element.href;
-				deferredData.resolve(data);
+    $.whenCallSequentially(deferredDataExtractionCalls).done(function (responses) {
+      var result = []
+      responses.forEach(function (dataResult) {
+        result.push(dataResult)
+      })
+      dfd.resolve(result)
+    })
 
-				return deferredData;
-			}.bind(this, element));
-		}.bind(this));
+    return dfd.promise()
+  },
 
-		$.whenCallSequentially(deferredDataExtractionCalls).done(function(responses) {
-			var result = [];
-			responses.forEach(function(dataResult) {
-				result.push(dataResult);
-			});
-			dfd.resolve(result);
-		});
+  getDataColumns: function () {
+    return [this.id, this.id + '-href']
+  },
 
-		return dfd.promise();
-	},
+  getFeatures: function () {
+    return ['multiple', 'delay']
+  },
 
-	getDataColumns: function () {
-		return [this.id, this.id + '-href'];
-	},
-
-	getFeatures: function () {
-		return ['multiple', 'delay']
-	},
-
-	getItemCSSSelector: function() {
-		return "a";
-	}
-};
+  getItemCSSSelector: function () {
+    return 'a'
+  }
+}
 
 module.exports = SelectorLink

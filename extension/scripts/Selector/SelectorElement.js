@@ -1,41 +1,40 @@
 var SelectorElement = {
 
-	canReturnMultipleRecords: function () {
-		return true;
-	},
+  canReturnMultipleRecords: function () {
+    return true
+  },
 
-	canHaveChildSelectors: function () {
-		return true;
-	},
+  canHaveChildSelectors: function () {
+    return true
+  },
 
-	canHaveLocalChildSelectors: function () {
-		return true;
-	},
+  canHaveLocalChildSelectors: function () {
+    return true
+  },
 
-	canCreateNewJobs: function () {
-		return false;
-	},
-	willReturnElements: function () {
-		return true;
-	},
+  canCreateNewJobs: function () {
+    return false
+  },
+  willReturnElements: function () {
+    return true
+  },
 
-	_getData: function (parentElement) {
+  _getData: function (parentElement) {
+    var dfd = $.Deferred()
 
-		var dfd = $.Deferred();
+    var elements = this.getDataElements(parentElement)
+    dfd.resolve(jQuery.makeArray(elements))
 
-		var elements = this.getDataElements(parentElement);
-		dfd.resolve(jQuery.makeArray(elements));
+    return dfd.promise()
+  },
 
-		return dfd.promise();
-	},
+  getDataColumns: function () {
+    return []
+  },
 
-	getDataColumns: function () {
-		return [];
-	},
-
-	getFeatures: function () {
-		return ['multiple', 'delay']
-	}
-};
+  getFeatures: function () {
+    return ['multiple', 'delay']
+  }
+}
 
 module.exports = SelectorElement

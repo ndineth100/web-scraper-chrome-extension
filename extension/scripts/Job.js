@@ -74,4 +74,3 @@ Job.prototype = {
 }
 
 module.exports = Job
-
