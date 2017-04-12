@@ -10,7 +10,7 @@
   "scripts": {
     "test": "mocha tests/spec/ScraperSpec-mocha",
     "test-jasmine": "jasmine-node tests/spec/ScraperSpec.js",
-    "generate-scraper": "browserify extension/content_script/content_scraper.js --standalone scraper > extension/generated/scraper.js"
+    "generate-scraper": "browserify extension/content_script/content_scraper.js --standalone contentScraper > extension/generated/content-scraper.js"
   },
   "repository": {
     "type": "git",

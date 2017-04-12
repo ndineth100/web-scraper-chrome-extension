@@ -1,3 +1,5 @@
+var UniqueElementList = require('./../UniqueElementList')
+var ElementQuery = require('./../ElementQuery')
 var SelectorElementClick = {
 
   canReturnMultipleRecords: function () {

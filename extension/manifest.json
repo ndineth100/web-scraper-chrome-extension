@@ -68,8 +68,7 @@
 				"assets/sugar-1.4.1.js",
 				"assets/css-selector/lib/CssSelector.js",
 				"assets/base64.js",
-				"scripts/UniqueElementList.js",
-				"generated/scraper.js",
+				"generated/content-scraper.js",
 				"content_script/content_script.js"
 			],
 			"css": [

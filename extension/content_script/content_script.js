@@ -1,1 +1,1 @@
-chrome.runtime.onMessage.addListener(scraper)
+chrome.runtime.onMessage.addListener(contentScraper)
