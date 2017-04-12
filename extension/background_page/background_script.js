@@ -4,6 +4,7 @@ var Sitemap = require('../scripts/Sitemap')
 var Queue = require('../scripts/Queue')
 var Scraper = require('../scripts/Scraper')
 var ChromePopupBrowser = require('../scripts/ChromePopupBrowser')
+var getBackgroundScript = require('../scripts/getBackgroundScript')
 
 var config = new Config()
 var store
