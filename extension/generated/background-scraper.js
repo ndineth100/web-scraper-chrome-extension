@@ -310,10 +310,6 @@ ChromePopupBrowser.prototype = {
 }
 
 },{}],5:[function(require,module,exports){
-if (typeof require !== 'undefined') {
-  module.exports = Config
-}
-
 var Config = function () {
 
 }
@@ -361,6 +357,7 @@ Config.prototype = {
   }
 }
 
+module.exports = Config
 },{}],6:[function(require,module,exports){
 /**
  * Element selector. Uses jQuery as base and adds some more features
@@ -2522,6 +2519,8 @@ Store.prototype = {
     })
   }
 }
+
+module.exports = Store
 
 },{"./Sitemap":24}],26:[function(require,module,exports){
 /**

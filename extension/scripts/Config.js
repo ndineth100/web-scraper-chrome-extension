@@ -1,7 +1,3 @@
-if (typeof require !== 'undefined') {
-  module.exports = Config
-}
-
 var Config = function () {
 
 }
@@ -48,3 +44,5 @@ Config.prototype = {
     chrome.storage.sync.set(items, callback)
   }
 }
+
+module.exports = Config
