@@ -1351,3 +1351,5 @@ SitemapController.prototype = {
     }
   }
 }
+
+module.exports = SitemapController

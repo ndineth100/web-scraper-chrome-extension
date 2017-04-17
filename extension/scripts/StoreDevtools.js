@@ -68,3 +68,6 @@ StoreDevtools.prototype = {
     })
   }
 }
+
+
+module.exports = StoreDevtools

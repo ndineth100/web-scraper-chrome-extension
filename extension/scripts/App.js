@@ -1,4 +1,4 @@
-var StoreDevtools = require('/StoreDevtools')
+var StoreDevtools = require('./StoreDevtools')
 var SitemapController = require('./Controller')
 
 $(function () {

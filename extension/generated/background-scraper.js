@@ -2183,7 +2183,6 @@ module.exports = {
 }
 
 },{"./Selector/SelectorElement":11,"./Selector/SelectorElementAttribute":12,"./Selector/SelectorElementClick":13,"./Selector/SelectorElementScroll":14,"./Selector/SelectorGroup":15,"./Selector/SelectorHTML":16,"./Selector/SelectorImage":17,"./Selector/SelectorLink":18,"./Selector/SelectorPopupLink":19,"./Selector/SelectorTable":20,"./Selector/SelectorText":21}],24:[function(require,module,exports){
-(function (global){
 var Selector = require('./Selector')
 var SelectorList = require('./SelectorList')
 var Sitemap = function (sitemapObj) {
@@ -2393,11 +2392,8 @@ Sitemap.prototype = {
   }
 }
 
-if (typeof require !== 'undefined') {
-  global.Sitemap = Sitemap
-}
+module.exports = Sitemap
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./Selector":10,"./SelectorList":22}],25:[function(require,module,exports){
 var Sitemap = require('./Sitemap')
 

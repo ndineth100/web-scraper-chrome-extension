@@ -1,47 +1,19 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.contentScraper = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var DataExtractor = require('./../scripts/DataExtractor')
-var getContentScript = require('./../scripts/getContentScript')
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.devtoolsApp = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var StoreDevtools = require('./StoreDevtools')
+var SitemapController = require('./Controller')
 
-function extensionListener (request, sender, sendResponse) {
-  console.log('chrome.runtime.onMessage', request)
+$(function () {
+	// init bootstrap alerts
+  $('.alert').alert()
 
-  if (request.extractData) {
-    console.log('received data extraction request', request)
-    var extractor = new DataExtractor(request)
-    var deferredData = extractor.getData()
-    deferredData.done(function (data) {
-      console.log('dataextractor data', data)
-      sendResponse(data)
-    })
-    return true
-  } else if (request.previewSelectorData) {
-    console.log('received data-preview extraction request', request)
-    var extractor = new DataExtractor(request)
-    var deferredData = extractor.getSingleSelectorData(request.parentSelectorIds, request.selectorId)
-    deferredData.done(function (data) {
-      console.log('dataextractor data', data)
-      sendResponse(data)
-    })
-    return true
-  }
-  // Universal ContentScript communication handler
-  else if (request.contentScriptCall) {
-    var contentScript = getContentScript('ContentScript')
+  var store = new StoreDevtools()
+  new SitemapController({
+    store: store,
+    templateDir: 'views/'
+  })
+})
 
-    console.log('received ContentScript request', request)
-
-    var deferredResponse = contentScript[request.fn](request.request)
-    deferredResponse.done(function (response) {
-      sendResponse(response)
-    })
-
-    return true
-  }
-}
-
-module.exports = extensionListener
-
-},{"./../scripts/DataExtractor":5,"./../scripts/getContentScript":24}],2:[function(require,module,exports){
+},{"./Controller":5,"./StoreDevtools":23}],2:[function(require,module,exports){
 /**
  * ContentScript that can be called from anywhere within the extension
  */
@@ -562,311 +534,1363 @@ ContentSelector.prototype = {
 module.exports = ContentSelector
 
 },{"./ElementQuery":6}],5:[function(require,module,exports){
-var SelectorList = require('./SelectorList')
+var selectors = require('./Selectors')
+var Selector = require('./Selector')
+var SelectorTable = selectors.SelectorTable
 var Sitemap = require('./Sitemap')
-
-var DataExtractor = function (options) {
-  if (options.sitemap instanceof Sitemap) {
-    this.sitemap = options.sitemap
-  } else {
-    this.sitemap = new Sitemap(options.sitemap)
+var SelectorGraphv2 = require('./SelectorGraphv2')
+var getBackgroundScript = require('./getBackgroundScript')
+var getContentScript = require('./getContentScript')
+var SitemapController = function (options) {
+  for (var i in options) {
+    this[i] = options[i]
   }
-
-  this.parentSelectorId = options.parentSelectorId
-  this.parentElement = options.parentElement || $('html')[0]
+  this.init()
 }
 
-DataExtractor.prototype = {
+SitemapController.prototype = {
 
-	/**
-	 * Returns a list of independent selector lists. follow=true splits selectors in trees.
-	 * Two side by side type=multiple selectors split trees.
-	 */
-  findSelectorTrees: function () {
-    return this._findSelectorTrees(this.parentSelectorId, new SelectorList())
+  backgroundScript: getBackgroundScript('DevTools'),
+  contentScript: getContentScript('DevTools'),
+
+  control: function (controls) {
+    var controller = this
+
+    for (var selector in controls) {
+      for (var event in controls[selector]) {
+        $(document).on(event, selector, (function (selector, event) {
+          return function () {
+            var continueBubbling = controls[selector][event].call(controller, this)
+            if (continueBubbling !== true) {
+              return false
+            }
+          }
+        })(selector, event))
+      }
+    }
   },
 
 	/**
-	 * the selector cannot return multiple records and it also cannot create new jobs. Also all of its child selectors
-	 * must have the same features
-	 * @param selector
-	 * @returns {boolean}
+	 * Loads templates for ICanHaz
 	 */
-  selectorIsCommonToAllTrees: function (selector) {
-		// selectors which return mutiple items cannot be common to all
-		// selectors
-    if (selector.willReturnMultipleRecords()) {
-      return false
-    }
-
-		// Link selectors which will follow to a new page also cannot be common
-		// to all selectors
-    if (selector.canCreateNewJobs() &&
-			this.sitemap.getDirectChildSelectors(selector.id).length > 0) {
-      return false
-    }
-
-		// also all child selectors must have the same features
-    var childSelectors = this.sitemap.getAllSelectors(selector.id)
-    for (var i in childSelectors) {
-      var childSelector = childSelectors[i]
-      if (!this.selectorIsCommonToAllTrees(childSelector)) {
-        return false
+  loadTemplates: function (cbAllTemplatesLoaded) {
+    var templateIds = [
+      'Viewport',
+      'SitemapList',
+      'SitemapListItem',
+      'SitemapCreate',
+      'SitemapStartUrlField',
+      'SitemapImport',
+      'SitemapExport',
+      'SitemapBrowseData',
+      'SitemapScrapeConfig',
+      'SitemapExportDataCSV',
+      'SitemapEditMetadata',
+      'SelectorList',
+      'SelectorListItem',
+      'SelectorEdit',
+      'SelectorEditTableColumn',
+      'SitemapSelectorGraph',
+      'DataPreview'
+    ]
+    var templatesLoaded = 0
+    var cbLoaded = function (templateId, template) {
+      templatesLoaded++
+      ich.addTemplate(templateId, template)
+      if (templatesLoaded === templateIds.length) {
+        cbAllTemplatesLoaded()
       }
     }
+
+    templateIds.forEach(function (templateId) {
+      $.get(this.templateDir + templateId + '.html', cbLoaded.bind(this, templateId))
+    }.bind(this))
+  },
+
+  init: function () {
+    this.loadTemplates(function () {
+			// currently viewed objects
+      this.clearState()
+
+			// render main viewport
+      ich.Viewport().appendTo('body')
+
+			// cancel all form submits
+      $('form').bind('submit', function () {
+        return false
+      })
+
+      this.control({
+        '#sitemaps-nav-button': {
+          click: this.showSitemaps
+        },
+        '#create-sitemap-create-nav-button': {
+          click: this.showCreateSitemap
+        },
+        '#create-sitemap-import-nav-button': {
+          click: this.showImportSitemapPanel
+        },
+        '#sitemap-export-nav-button': {
+          click: this.showSitemapExportPanel
+        },
+        '#sitemap-export-data-csv-nav-button': {
+          click: this.showSitemapExportDataCsvPanel
+        },
+        '#submit-create-sitemap': {
+          click: this.createSitemap
+        },
+        '#submit-import-sitemap': {
+          click: this.importSitemap
+        },
+        '#sitemap-edit-metadata-nav-button': {
+          click: this.editSitemapMetadata
+        },
+        '#sitemap-selector-list-nav-button': {
+          click: this.showSitemapSelectorList
+        },
+        '#sitemap-selector-graph-nav-button': {
+          click: this.showSitemapSelectorGraph
+        },
+        '#sitemap-browse-nav-button': {
+          click: this.browseSitemapData
+        },
+        'button#submit-edit-sitemap': {
+          click: this.editSitemapMetadataSave
+        },
+        '#edit-sitemap-metadata-form': {
+          submit: function () { return false }
+        },
+        '#sitemaps tr': {
+          click: this.editSitemap
+        },
+        '#sitemaps button[action=delete-sitemap]': {
+          click: this.deleteSitemap
+        },
+        '#sitemap-scrape-nav-button': {
+          click: this.showScrapeSitemapConfigPanel
+        },
+        '#submit-scrape-sitemap-form': {
+          submit: function () { return false }
+        },
+        '#submit-scrape-sitemap': {
+          click: this.scrapeSitemap
+        },
+        '#sitemaps button[action=browse-sitemap-data]': {
+          click: this.sitemapListBrowseSitemapData
+        },
+        '#sitemaps button[action=csv-download-sitemap-data]': {
+          click: this.downloadSitemapData
+        },
+				// @TODO move to tr
+        '#selector-tree tbody tr': {
+          click: this.showChildSelectors
+        },
+        '#selector-tree .breadcrumb a': {
+          click: this.treeNavigationshowSitemapSelectorList
+        },
+        '#selector-tree tr button[action=edit-selector]': {
+          click: this.editSelector
+        },
+        '#edit-selector select[name=type]': {
+          change: this.selectorTypeChanged
+        },
+        '#edit-selector button[action=save-selector]': {
+          click: this.saveSelector
+        },
+        '#edit-selector button[action=cancel-selector-editing]': {
+          click: this.cancelSelectorEditing
+        },
+        '#edit-selector #selectorId': {
+          keyup: this.updateSelectorParentListOnIdChange
+        },
+        '#selector-tree button[action=add-selector]': {
+          click: this.addSelector
+        },
+        '#selector-tree tr button[action=delete-selector]': {
+          click: this.deleteSelector
+        },
+        '#selector-tree tr button[action=preview-selector]': {
+          click: this.previewSelectorFromSelectorTree
+        },
+        '#selector-tree tr button[action=data-preview-selector]': {
+          click: this.previewSelectorDataFromSelectorTree
+        },
+        '#edit-selector button[action=select-selector]': {
+          click: this.selectSelector
+        },
+        '#edit-selector button[action=select-table-header-row-selector]': {
+          click: this.selectTableHeaderRowSelector
+        },
+        '#edit-selector button[action=select-table-data-row-selector]': {
+          click: this.selectTableDataRowSelector
+        },
+        '#edit-selector button[action=preview-selector]': {
+          click: this.previewSelector
+        },
+        '#edit-selector button[action=preview-click-element-selector]': {
+          click: this.previewClickElementSelector
+        },
+        '#edit-selector button[action=preview-table-row-selector]': {
+          click: this.previewTableRowSelector
+        },
+        '#edit-selector button[action=preview-selector-data]': {
+          click: this.previewSelectorDataFromSelectorEditing
+        },
+        'button.add-extra-start-url': {
+          click: this.addStartUrl
+        },
+        'button.remove-start-url': {
+          click: this.removeStartUrl
+        }
+      })
+      this.showSitemaps()
+    }.bind(this))
+  },
+
+  clearState: function () {
+    this.state = {
+			// sitemap that is currently open
+      currentSitemap: null,
+			// selector ids that are shown in the navigation
+      editSitemapBreadcumbsSelectors: null,
+      currentParentSelectorId: null,
+      currentSelector: null
+    }
+  },
+
+  setStateEditSitemap: function (sitemap) {
+    this.state.currentSitemap = sitemap
+    this.state.editSitemapBreadcumbsSelectors = [
+			{id: '_root'}
+    ]
+    this.state.currentParentSelectorId = '_root'
+  },
+
+  setActiveNavigationButton: function (navigationId) {
+    $('.nav .active').removeClass('active')
+    $('#' + navigationId + '-nav-button').closest('li').addClass('active')
+
+    if (navigationId.match(/^sitemap-/)) {
+      $('#sitemap-nav-button').removeClass('disabled')
+      $('#sitemap-nav-button').closest('li').addClass('active')
+      $('#navbar-active-sitemap-id').text('(' + this.state.currentSitemap._id + ')')
+    }		else {
+      $('#sitemap-nav-button').addClass('disabled')
+      $('#navbar-active-sitemap-id').text('')
+    }
+
+    if (navigationId.match(/^create-sitemap-/)) {
+      $('#create-sitemap-nav-button').closest('li').addClass('active')
+    }
+  },
+
+	/**
+	 * Simple info popup for sitemap start url input field
+	 */
+  initMultipleStartUrlHelper: function () {
+    $('#startUrl')
+			.popover({
+  title: 'Multiple start urls',
+  html: true,
+  content: 'You can create ranged start urls like this:<br />http://example.com/[1-100].html',
+  placement: 'bottom'
+})
+			.blur(function () {
+  $(this).popover('hide')
+})
+  },
+
+	/**
+	 * Returns bootstrapValidator object for current form in viewport
+	 */
+  getFormValidator: function () {
+    var validator = $('#viewport form').data('bootstrapValidator')
+    return validator
+  },
+
+	/**
+	 * Returns whether current form in the viewport is valid
+	 * @returns {Boolean}
+	 */
+  isValidForm: function () {
+    var validator = this.getFormValidator()
+
+		// validator.validate();
+		// validate method calls submit which is not needed in this case.
+    for (var field in validator.options.fields) {
+      validator.validateField(field)
+    }
+
+    var valid = validator.isValid()
+    return valid
+  },
+
+	/**
+	 * Add validation to sitemap creation or editing form
+	 */
+  initSitemapValidation: function () {
+    $('#viewport form').bootstrapValidator({
+      fields: {
+        '_id': {
+          validators: {
+            notEmpty: {
+              message: 'The sitemap id is required and cannot be empty'
+            },
+            stringLength: {
+              min: 3,
+              message: 'The sitemap id should be atleast 3 characters long'
+            },
+            regexp: {
+              regexp: /^[a-z][a-z0-9_$()+\-/]+$/,
+              message: 'Only lowercase characters (a-z), digits (0-9), or any of the characters _, $, (, ), +, -, and / are allowed. Must begin with a letter.'
+            },
+						// placeholder for sitemap id existance validation
+            callback: {
+              message: 'Sitemap with this id already exists',
+              callback: function (value, validator) {
+                return true
+              }
+            }
+          }
+        },
+        'startUrl[]': {
+          validators: {
+            notEmpty: {
+              message: 'The start URL is required and cannot be empty'
+            },
+            uri: {
+              message: 'The start URL is not a valid URL'
+            }
+          }
+        }
+      }
+    })
+  },
+
+  showCreateSitemap: function () {
+    this.setActiveNavigationButton('create-sitemap-create')
+    var sitemapForm = ich.SitemapCreate()
+    $('#viewport').html(sitemapForm)
+    this.initMultipleStartUrlHelper()
+    this.initSitemapValidation()
+
     return true
   },
 
-  getSelectorsCommonToAllTrees: function (parentSelectorId) {
-    var commonSelectors = []
-    var childSelectors = this.sitemap.getDirectChildSelectors(parentSelectorId)
-
-    childSelectors.forEach(function (childSelector) {
-      if (this.selectorIsCommonToAllTrees(childSelector)) {
-        commonSelectors.push(childSelector)
-				// also add all child selectors which. Child selectors were also checked
-
-        var selectorChildSelectors = this.sitemap.getAllSelectors(childSelector.id)
-        selectorChildSelectors.forEach(function (selector) {
-          if (commonSelectors.indexOf(selector) === -1) {
-            commonSelectors.push(selector)
+  initImportStiemapValidation: function () {
+    $('#viewport form').bootstrapValidator({
+      fields: {
+        '_id': {
+          validators: {
+            stringLength: {
+              min: 3,
+              message: 'The sitemap id should be atleast 3 characters long'
+            },
+            regexp: {
+              regexp: /^[a-z][a-z0-9_$()+\-/]+$/,
+              message: 'Only lowercase characters (a-z), digits (0-9), or any of the characters _, $, (, ), +, -, and / are allowed. Must begin with a letter.'
+            },
+						// placeholder for sitemap id existance validation
+            callback: {
+              message: 'Sitemap with this id already exists',
+              callback: function (value, validator) {
+                return true
+              }
+            }
           }
-        })
-      }
-    }.bind(this))
-
-    return commonSelectors
-  },
-
-  _findSelectorTrees: function (parentSelectorId, commonSelectorsFromParent) {
-    var commonSelectors = commonSelectorsFromParent.concat(this.getSelectorsCommonToAllTrees(parentSelectorId))
-
-		// find selectors that will be making a selector tree
-    var selectorTrees = []
-    var childSelectors = this.sitemap.getDirectChildSelectors(parentSelectorId)
-    childSelectors.forEach(function (selector) {
-      if (!this.selectorIsCommonToAllTrees(selector)) {
-				// this selector will be making a new selector tree. But this selector might contain some child
-				// selectors that are making more trees so here should be a some kind of seperation for that
-        if (!selector.canHaveLocalChildSelectors()) {
-          var selectorTree = commonSelectors.concat([selector])
-          selectorTrees.push(selectorTree)
-        } else {
-					// find selector tree within this selector
-          var commonSelectorsFromParent = commonSelectors.concat([selector])
-          var childSelectorTrees = this._findSelectorTrees(selector.id, commonSelectorsFromParent)
-          selectorTrees = selectorTrees.concat(childSelectorTrees)
+        },
+        sitemapJSON: {
+          validators: {
+            notEmpty: {
+              message: 'Sitemap JSON is required and cannot be empty'
+            },
+            callback: {
+              message: 'JSON is not valid',
+              callback: function (value, validator) {
+                try {
+                  JSON.parse(value)
+                } catch (e) {
+                  return false
+                }
+                return true
+              }
+            }
+          }
         }
       }
-    }.bind(this))
+    })
+  },
 
-		// it there were not any selectors that make a separate tree then all common selectors make up a single selector tree
-    if (selectorTrees.length === 0) {
-      return [commonSelectors]
+  showImportSitemapPanel: function () {
+    this.setActiveNavigationButton('create-sitemap-import')
+    var sitemapForm = ich.SitemapImport()
+    $('#viewport').html(sitemapForm)
+    this.initImportStiemapValidation()
+    return true
+  },
+
+  showSitemapExportPanel: function () {
+    this.setActiveNavigationButton('sitemap-export')
+    var sitemap = this.state.currentSitemap
+    var sitemapJSON = sitemap.exportSitemap()
+    var sitemapExportForm = ich.SitemapExport({
+      sitemapJSON: sitemapJSON
+    })
+    $('#viewport').html(sitemapExportForm)
+    return true
+  },
+
+  showSitemaps: function () {
+    this.clearState()
+    this.setActiveNavigationButton('sitemaps')
+
+    this.store.getAllSitemaps(function (sitemaps) {
+      $sitemapListPanel = ich.SitemapList()
+      sitemaps.forEach(function (sitemap) {
+        $sitemap = ich.SitemapListItem(sitemap)
+        $sitemap.data('sitemap', sitemap)
+        $sitemapListPanel.find('tbody').append($sitemap)
+      })
+      $('#viewport').html($sitemapListPanel)
+    })
+  },
+
+  getSitemapFromMetadataForm: function () {
+    var id = $('#viewport form input[name=_id]').val()
+    var $startUrlInputs = $('#viewport form .input-start-url')
+    var startUrl
+    if ($startUrlInputs.length === 1) {
+      startUrl = $startUrlInputs.val()
     } else {
-      return selectorTrees
+      startUrl = []
+      $startUrlInputs.each(function (i, element) {
+        startUrl.push($(element).val())
+      })
+    }
+
+    return {
+      id: id,
+      startUrl: startUrl
     }
   },
 
-  getSelectorTreeCommonData: function (selectors, parentSelectorId, parentElement) {
-    var childSelectors = selectors.getDirectChildSelectors(parentSelectorId)
-    var deferredDataCalls = []
-    childSelectors.forEach(function (selector) {
-      if (!selectors.willReturnMultipleRecords(selector.id)) {
-        deferredDataCalls.push(this.getSelectorCommonData.bind(this, selectors, selector, parentElement))
+  createSitemap: function (form) {
+		// cancel submit if invalid form
+    if (!this.isValidForm()) {
+      return false
+    }
+
+    var sitemapData = this.getSitemapFromMetadataForm()
+
+		// check whether sitemap with this id already exist
+    this.store.sitemapExists(sitemapData.id, function (sitemapExists) {
+      if (sitemapExists) {
+        var validator = this.getFormValidator()
+        validator.updateStatus('_id', 'INVALID', 'callback')
+      } else {
+        var sitemap = new Sitemap({
+          _id: sitemapData.id,
+          startUrl: sitemapData.startUrl,
+          selectors: []
+        })
+        this.store.createSitemap(sitemap, function (sitemap) {
+          this._editSitemap(sitemap, ['_root'])
+        }.bind(this, sitemap))
       }
     }.bind(this))
-
-    var deferredResponse = $.Deferred()
-    $.whenCallSequentially(deferredDataCalls).done(function (responses) {
-      var commonData = {}
-      responses.forEach(function (data) {
-        commonData = Object.merge(commonData, data)
-      })
-      deferredResponse.resolve(commonData)
-    })
-
-    return deferredResponse
   },
 
-  getSelectorCommonData: function (selectors, selector, parentElement) {
-    var d = $.Deferred()
-    var deferredData = selector.getData(parentElement)
-    deferredData.done(function (data) {
-      if (selector.willReturnElements()) {
-        var newParentElement = data[0]
-        var deferredChildCommonData = this.getSelectorTreeCommonData(selectors, selector.id, newParentElement)
-        deferredChildCommonData.done(function (data) {
-          d.resolve(data)
-        })
-      }			else {
-        d.resolve(data[0])
+  importSitemap: function () {
+		// cancel submit if invalid form
+    if (!this.isValidForm()) {
+      return false
+    }
+
+		// load data from form
+    var sitemapJSON = $('[name=sitemapJSON]').val()
+    var id = $('input[name=_id]').val()
+    var sitemap = new Sitemap()
+    sitemap.importSitemap(sitemapJSON)
+    if (id.length) {
+      sitemap._id = id
+    }
+		// check whether sitemap with this id already exist
+    this.store.sitemapExists(sitemap._id, function (sitemapExists) {
+      if (sitemapExists) {
+        var validator = this.getFormValidator()
+        validator.updateStatus('_id', 'INVALID', 'callback')
+      } else {
+        this.store.createSitemap(sitemap, function (sitemap) {
+          this._editSitemap(sitemap, ['_root'])
+        }.bind(this, sitemap))
       }
     }.bind(this))
+  },
 
-    return d
+  editSitemapMetadata: function (button) {
+    this.setActiveNavigationButton('sitemap-edit-metadata')
+
+    var sitemap = this.state.currentSitemap
+    var $sitemapMetadataForm = ich.SitemapEditMetadata(sitemap)
+    $('#viewport').html($sitemapMetadataForm)
+    this.initMultipleStartUrlHelper()
+    this.initSitemapValidation()
+
+    return true
+  },
+
+  editSitemapMetadataSave: function (button) {
+    var sitemap = this.state.currentSitemap
+    var sitemapData = this.getSitemapFromMetadataForm()
+
+		// cancel submit if invalid form
+    if (!this.isValidForm()) {
+      return false
+    }
+
+		// check whether sitemap with this id already exist
+    this.store.sitemapExists(sitemapData.id, function (sitemapExists) {
+      if (sitemap._id !== sitemapData.id && sitemapExists) {
+        var validator = this.getFormValidator()
+        validator.updateStatus('_id', 'INVALID', 'callback')
+        return
+      }
+
+			// change data
+      sitemap.startUrl = sitemapData.startUrl
+
+			// just change sitemaps url
+      if (sitemapData.id === sitemap._id) {
+        this.store.saveSitemap(sitemap, function (sitemap) {
+          this.showSitemapSelectorList()
+        }.bind(this))
+      } else {
+        // id changed. we need to delete the old one and create a new one
+        var newSitemap = new Sitemap(sitemap)
+        var oldSitemap = sitemap
+        newSitemap._id = sitemapData.id
+        this.store.createSitemap(newSitemap, function (newSitemap) {
+          this.store.deleteSitemap(oldSitemap, function () {
+            this.state.currentSitemap = newSitemap
+            this.showSitemapSelectorList()
+          }.bind(this))
+        }.bind(this))
+      }
+    }.bind(this))
   },
 
 	/**
-	 * Returns all data records for a selector that can return multiple records
+	 * Callback when sitemap edit button is clicked in sitemap grid
 	 */
-  getMultiSelectorData: function (selectors, selector, parentElement, commonData) {
-    var deferredResponse = $.Deferred()
-    var deferredData
-		// if the selector is not an Element selector then its fetched data is the result.
-    if (!selector.willReturnElements()) {
-      deferredData = selector.getData(parentElement)
-      deferredData.done(function (selectorData) {
-        var newCommonData = Object.clone(commonData, true)
-        var resultData = []
-
-        selectorData.forEach(function (record) {
-          Object.merge(record, newCommonData, true)
-          resultData.push(record)
-        })
-
-        deferredResponse.resolve(resultData)
-      })
-    }
-
-		// handle situation when this selector is an elementSelector
-    deferredData = selector.getData(parentElement)
-    deferredData.done(function (selectorData) {
-      var deferredDataCalls = []
-
-      selectorData.forEach(function (element) {
-        var newCommonData = Object.clone(commonData, true)
-        var childRecordDeferredCall = this.getSelectorTreeData.bind(this, selectors, selector.id, element, newCommonData)
-        deferredDataCalls.push(childRecordDeferredCall)
-      }.bind(this))
-
-      $.whenCallSequentially(deferredDataCalls).done(function (responses) {
-        var resultData = []
-        responses.forEach(function (childRecordList) {
-          childRecordList.forEach(function (childRecord) {
-            var rec = {}
-            Object.merge(rec, childRecord, true)
-            resultData.push(rec)
-          })
-        })
-        deferredResponse.resolve(resultData)
-      })
-    }.bind(this))
-
-    return deferredResponse
+  editSitemap: function (tr) {
+    var sitemap = $(tr).data('sitemap')
+    this._editSitemap(sitemap)
   },
+  _editSitemap: function (sitemap) {
+    this.setStateEditSitemap(sitemap)
+    this.setActiveNavigationButton('sitemap')
 
-  getSelectorTreeData: function (selectors, parentSelectorId, parentElement, commonData) {
-    var childSelectors = selectors.getDirectChildSelectors(parentSelectorId)
-    var childCommonDataDeferred = this.getSelectorTreeCommonData(selectors, parentSelectorId, parentElement)
-    var deferredResponse = $.Deferred()
-
-    childCommonDataDeferred.done(function (childCommonData) {
-      commonData = Object.merge(commonData, childCommonData)
-
-      var dataDeferredCalls = []
-
-      childSelectors.forEach(function (selector) {
-        if (selectors.willReturnMultipleRecords(selector.id)) {
-          var newCommonData = Object.clone(commonData, true)
-          var dataDeferredCall = this.getMultiSelectorData.bind(this, selectors, selector, parentElement, newCommonData)
-          dataDeferredCalls.push(dataDeferredCall)
-        }
-      }.bind(this))
-
-			// merge all data records together
-      $.whenCallSequentially(dataDeferredCalls).done(function (responses) {
-        var resultData = []
-        responses.forEach(function (childRecords) {
-          childRecords.forEach(function (childRecord) {
-            var rec = {}
-            Object.merge(rec, childRecord, true)
-            resultData.push(rec)
-          })
-        })
-
-        if (resultData.length === 0) {
-					// If there are no multi record groups then return common data.
-					// In a case where common data is empty return nothing.
-          if (Object.keys(commonData).length === 0) {
-            deferredResponse.resolve([])
-          } else {
-            deferredResponse.resolve([commonData])
-          }
-        }				else {
-          deferredResponse.resolve(resultData)
-        }
-      })
-    }.bind(this))
-
-    return deferredResponse
+    this.showSitemapSelectorList()
   },
+  showSitemapSelectorList: function () {
+    this.setActiveNavigationButton('sitemap-selector-list')
 
-  getData: function () {
-    var selectorTrees = this.findSelectorTrees()
-    var dataDeferredCalls = []
+    var sitemap = this.state.currentSitemap
+    var parentSelectors = this.state.editSitemapBreadcumbsSelectors
+    var parentSelectorId = this.state.currentParentSelectorId
 
-    selectorTrees.forEach(function (selectorTree) {
-      var deferredTreeDataCall = this.getSelectorTreeData.bind(this, selectorTree, this.parentSelectorId, this.parentElement, {})
-      dataDeferredCalls.push(deferredTreeDataCall)
-    }.bind(this))
-
-    var responseDeferred = $.Deferred()
-    $.whenCallSequentially(dataDeferredCalls).done(function (responses) {
-      var results = []
-      responses.forEach(function (dataResults) {
-        results = results.concat(dataResults)
-      })
-      responseDeferred.resolve(results)
+    var $selectorListPanel = ich.SelectorList({
+      parentSelectors: parentSelectors
     })
-    return responseDeferred
+    var selectors = sitemap.getDirectChildSelectors(parentSelectorId)
+    selectors.forEach(function (selector) {
+      $selector = ich.SelectorListItem(selector)
+      $selector.data('selector', selector)
+      $selectorListPanel.find('tbody').append($selector)
+    })
+    $('#viewport').html($selectorListPanel)
+
+    return true
+  },
+  showSitemapSelectorGraph: function () {
+    this.setActiveNavigationButton('sitemap-selector-graph')
+    var sitemap = this.state.currentSitemap
+    var $selectorGraphPanel = ich.SitemapSelectorGraph()
+    $('#viewport').html($selectorGraphPanel)
+    var graphDiv = $('#selector-graph')[0]
+    var graph = new SelectorGraphv2(sitemap)
+    graph.draw(graphDiv, $(document).width(), 200)
+    return true
+  },
+  showChildSelectors: function (tr) {
+    var selector = $(tr).data('selector')
+    var parentSelectors = this.state.editSitemapBreadcumbsSelectors
+    this.state.currentParentSelectorId = selector.id
+    parentSelectors.push(selector)
+
+    this.showSitemapSelectorList()
   },
 
-  getSingleSelectorData: function (parentSelectorIds, selectorId) {
-		// to fetch only single selectors data we will create a sitemap that only contains this selector, his
-		// parents and all child selectors
-    var sitemap = this.sitemap
-    var selector = this.sitemap.selectors.getSelector(selectorId)
-    var childSelectors = sitemap.selectors.getAllSelectors(selectorId)
-    var parentSelectors = []
-    var i
-    var id
-    var parentSelector
-    for (i = parentSelectorIds.length - 1; i >= 0; i--) {
-      id = parentSelectorIds[i]
-      if (id === '_root') break
-      parentSelector = this.sitemap.selectors.getSelector(id)
-      parentSelectors.push(parentSelector)
+  treeNavigationshowSitemapSelectorList: function (button) {
+    var parentSelectors = this.state.editSitemapBreadcumbsSelectors
+    var controller = this
+    $('#selector-tree .breadcrumb li a').each(function (i, parentSelectorButton) {
+      if (parentSelectorButton === button) {
+        parentSelectors.splice(i + 1)
+        controller.state.currentParentSelectorId = parentSelectors[i].id
+      }
+    })
+    this.showSitemapSelectorList()
+  },
+
+  initSelectorValidation: function () {
+    $('#viewport form').bootstrapValidator({
+      fields: {
+        'id': {
+          validators: {
+            notEmpty: {
+              message: 'Sitemap id required and cannot be empty'
+            },
+            stringLength: {
+              min: 3,
+              message: 'The sitemap id should be atleast 3 characters long'
+            },
+            regexp: {
+              regexp: /^[^_].*$/,
+              message: 'Selector id cannot start with an underscore _'
+            }
+          }
+        },
+        selector: {
+          validators: {
+            notEmpty: {
+              message: 'Selector is required and cannot be empty'
+            }
+          }
+        },
+        regex: {
+          validators: {
+            callback: {
+              message: 'JavaScript does not support regular expressions that can match 0 characters.',
+              callback: function (value, validator) {
+								// allow no regex
+                if (!value) {
+                  return true
+                }
+
+                var matches = ''.match(new RegExp(value))
+                if (matches !== null && matches[0] === '') {
+                  return false
+                } else {
+                  return true
+                }
+              }
+            }
+          }
+        },
+        clickElementSelector: {
+          validators: {
+            notEmpty: {
+              message: 'Click selector is required and cannot be empty'
+            }
+          }
+        },
+        tableHeaderRowSelector: {
+          validators: {
+            notEmpty: {
+              message: 'Header row selector is required and cannot be empty'
+            }
+          }
+        },
+        tableDataRowSelector: {
+          validators: {
+            notEmpty: {
+              message: 'Data row selector is required and cannot be empty'
+            }
+          }
+        },
+        delay: {
+          validators: {
+            numeric: {
+              message: 'Delay must be numeric'
+            }
+          }
+        },
+        parentSelectors: {
+          validators: {
+            notEmpty: {
+              message: 'You must choose at least one parent selector'
+            },
+            callback: {
+              message: 'Cannot handle recursive element selectors',
+              callback: function (value, validator, $field) {
+                var sitemap = this.getCurrentlyEditedSelectorSitemap()
+                return !sitemap.selectors.hasRecursiveElementSelectors()
+              }.bind(this)
+            }
+          }
+        }
+      }
+    })
+  },
+  editSelector: function (button) {
+    var selector = $(button).closest('tr').data('selector')
+    this._editSelector(selector)
+  },
+  updateSelectorParentListOnIdChange: function () {
+    var selector = this.getCurrentlyEditedSelector()
+    $('.currently-edited').val(selector.id).text(selector.id)
+  },
+  _editSelector: function (selector) {
+    var sitemap = this.state.currentSitemap
+    var selectorIds = sitemap.getPossibleParentSelectorIds()
+
+    var $editSelectorForm = ich.SelectorEdit({
+      selector: selector,
+      selectorIds: selectorIds,
+      selectorTypes: [
+        {
+          type: 'SelectorText',
+          title: 'Text'
+        },
+        {
+          type: 'SelectorLink',
+          title: 'Link'
+        },
+        {
+          type: 'SelectorPopupLink',
+          title: 'Popup Link'
+        },
+        {
+          type: 'SelectorImage',
+          title: 'Image'
+        },
+        {
+          type: 'SelectorTable',
+          title: 'Table'
+        },
+        {
+          type: 'SelectorElementAttribute',
+          title: 'Element attribute'
+        },
+        {
+          type: 'SelectorHTML',
+          title: 'HTML'
+        },
+        {
+          type: 'SelectorElement',
+          title: 'Element'
+        },
+        {
+          type: 'SelectorElementScroll',
+          title: 'Element scroll down'
+        },
+        {
+          type: 'SelectorElementClick',
+          title: 'Element click'
+        },
+        {
+          type: 'SelectorGroup',
+          title: 'Grouped'
+        }
+      ]
+    })
+    $('#viewport').html($editSelectorForm)
+		// mark initially opened selector as currently edited
+    $('#edit-selector #parentSelectors option').each(function (i, element) {
+      if ($(element).val() === selector.id) {
+        $(element).addClass('currently-edited')
+      }
+    })
+
+		// set clickType
+    if (selector.clickType) {
+      $editSelectorForm.find('[name=clickType]').val(selector.clickType)
+    }
+		// set clickElementUniquenessType
+    if (selector.clickElementUniquenessType) {
+      $editSelectorForm.find('[name=clickElementUniquenessType]').val(selector.clickElementUniquenessType)
     }
 
-		// merge all needed selectors together
-    var selectors = parentSelectors.concat(childSelectors)
-    selectors.push(selector)
-    sitemap.selectors = new SelectorList(selectors)
+		// handle selects seperately
+    $editSelectorForm.find('[name=type]').val(selector.type)
+    selector.parentSelectors.forEach(function (parentSelectorId) {
+      $editSelectorForm.find("#parentSelectors [value='" + parentSelectorId + "']").attr('selected', 'selected')
+    })
 
-    var parentSelectorId
-		// find the parent that leaded to the page where required selector is being used
-    for (i = parentSelectorIds.length - 1; i >= 0; i--) {
-      id = parentSelectorIds[i]
-      if (id === '_root') {
-        parentSelectorId = id
-        break
+    this.state.currentSelector = selector
+    this.selectorTypeChanged()
+    this.initSelectorValidation()
+  },
+  selectorTypeChanged: function () {
+    var type = $('#edit-selector select[name=type]').val()
+    var features = selectors[type].getFeatures()
+    $('#edit-selector .feature').hide()
+    features.forEach(function (feature) {
+      $('#edit-selector .feature-' + feature).show()
+    })
+
+		// add this selector to possible parent selector
+    var selector = this.getCurrentlyEditedSelector()
+    if (selector.canHaveChildSelectors()) {
+      if ($('#edit-selector #parentSelectors .currently-edited').length === 0) {
+        var $option = $('<option class="currently-edited"></option>')
+        $option.text(selector.id).val(selector.id)
+        $('#edit-selector #parentSelectors').append($option)
       }
-      parentSelector = this.sitemap.selectors.getSelector(parentSelectorIds[i])
-      if (!parentSelector.willReturnElements()) {
-        parentSelectorId = id
-        break
-      }
+    } else {
+		// remove if type doesn't allow to have child selectors
+      $('#edit-selector #parentSelectors .currently-edited').remove()
     }
-    this.parentSelectorId = parentSelectorId
+  },
+  saveSelector: function (button) {
+    var sitemap = this.state.currentSitemap
+    var selector = this.state.currentSelector
+    var newSelector = this.getCurrentlyEditedSelector()
 
-    return this.getData()
+		// cancel submit if invalid form
+    if (!this.isValidForm()) {
+      return false
+    }
+
+		// cancel possible element selection
+    this.contentScript.removeCurrentContentSelector().done(function () {
+      sitemap.updateSelector(selector, newSelector)
+
+      this.store.saveSitemap(sitemap, function () {
+        this.showSitemapSelectorList()
+      }.bind(this))
+    }.bind(this))
+  },
+	/**
+	 * Get selector from selector editing form
+	 */
+  getCurrentlyEditedSelector: function () {
+    var id = $('#edit-selector [name=id]').val()
+    var selectorsSelector = $('#edit-selector [name=selector]').val()
+    var tableDataRowSelector = $('#edit-selector [name=tableDataRowSelector]').val()
+    var tableHeaderRowSelector = $('#edit-selector [name=tableHeaderRowSelector]').val()
+    var clickElementSelector = $('#edit-selector [name=clickElementSelector]').val()
+    var type = $('#edit-selector [name=type]').val()
+    var clickElementUniquenessType = $('#edit-selector [name=clickElementUniquenessType]').val()
+    var clickType = $('#edit-selector [name=clickType]').val()
+    var discardInitialElements = $('#edit-selector [name=discardInitialElements]').is(':checked')
+    var multiple = $('#edit-selector [name=multiple]').is(':checked')
+    var downloadImage = $('#edit-selector [name=downloadImage]').is(':checked')
+    var clickPopup = $('#edit-selector [name=clickPopup]').is(':checked')
+    var regex = $('#edit-selector [name=regex]').val()
+    var delay = $('#edit-selector [name=delay]').val()
+    var extractAttribute = $('#edit-selector [name=extractAttribute]').val()
+    var parentSelectors = $('#edit-selector [name=parentSelectors]').val()
+    var columns = []
+    var $columnHeaders = $('#edit-selector .column-header')
+    var $columnNames = $('#edit-selector .column-name')
+    var $columnExtracts = $('#edit-selector .column-extract')
+
+    $columnHeaders.each(function (i) {
+      var header = $($columnHeaders[i]).val()
+      var name = $($columnNames[i]).val()
+      var extract = $($columnExtracts[i]).is(':checked')
+      columns.push({
+        header: header,
+        name: name,
+        extract: extract
+      })
+    })
+
+    var newSelector = new Selector({
+      id: id,
+      selector: selectorsSelector,
+      tableHeaderRowSelector: tableHeaderRowSelector,
+      tableDataRowSelector: tableDataRowSelector,
+      clickElementSelector: clickElementSelector,
+      clickElementUniquenessType: clickElementUniquenessType,
+      clickType: clickType,
+      discardInitialElements: discardInitialElements,
+      type: type,
+      multiple: multiple,
+      downloadImage: downloadImage,
+      clickPopup: clickPopup,
+      regex: regex,
+      extractAttribute: extractAttribute,
+      parentSelectors: parentSelectors,
+      columns: columns,
+      delay: delay
+    })
+    return newSelector
+  },
+	/**
+	 * @returns {Sitemap|*} Cloned Sitemap with currently edited selector
+	 */
+  getCurrentlyEditedSelectorSitemap: function () {
+    var sitemap = this.state.currentSitemap.clone()
+    var selector = sitemap.getSelectorById(this.state.currentSelector.id)
+    var newSelector = this.getCurrentlyEditedSelector()
+    sitemap.updateSelector(selector, newSelector)
+    return sitemap
+  },
+  cancelSelectorEditing: function (button) {
+		// cancel possible element selection
+    this.contentScript.removeCurrentContentSelector().done(function () {
+      this.showSitemapSelectorList()
+    }.bind(this))
+  },
+  addSelector: function () {
+    var parentSelectorId = this.state.currentParentSelectorId
+    var sitemap = this.state.currentSitemap
+
+    var selector = new Selector({
+      parentSelectors: [parentSelectorId],
+      type: 'SelectorText',
+      multiple: false
+    })
+
+    this._editSelector(selector, sitemap)
+  },
+  deleteSelector: function (button) {
+    var sitemap = this.state.currentSitemap
+    var selector = $(button).closest('tr').data('selector')
+    sitemap.deleteSelector(selector)
+
+    this.store.saveSitemap(sitemap, function () {
+      this.showSitemapSelectorList()
+    }.bind(this))
+  },
+  deleteSitemap: function (button) {
+    var sitemap = $(button).closest('tr').data('sitemap')
+    var controller = this
+    this.store.deleteSitemap(sitemap, function () {
+      controller.showSitemaps()
+    })
+  },
+  initScrapeSitemapConfigValidation: function () {
+    $('#viewport form').bootstrapValidator({
+      fields: {
+        'requestInterval': {
+          validators: {
+            notEmpty: {
+              message: 'The request interval is required and cannot be empty'
+            },
+            numeric: {
+              message: 'The request interval must be numeric'
+            },
+            callback: {
+              message: 'The request interval must be atleast 2000 milliseconds',
+              callback: function (value, validator) {
+                return value >= 2000
+              }
+            }
+          }
+        },
+        'pageLoadDelay': {
+          validators: {
+            notEmpty: {
+              message: 'The page load delay is required and cannot be empty'
+            },
+            numeric: {
+              message: 'The page laod delay must be numeric'
+            },
+            callback: {
+              message: 'The page load delay must be atleast 500 milliseconds',
+              callback: function (value, validator) {
+                return value >= 500
+              }
+            }
+          }
+        }
+      }
+    })
+  },
+  showScrapeSitemapConfigPanel: function () {
+    this.setActiveNavigationButton('sitemap-scrape')
+    var scrapeConfigPanel = ich.SitemapScrapeConfig()
+    $('#viewport').html(scrapeConfigPanel)
+    this.initScrapeSitemapConfigValidation()
+    return true
+  },
+  scrapeSitemap: function () {
+    if (!this.isValidForm()) {
+      return false
+    }
+
+    var requestInterval = $('input[name=requestInterval]').val()
+    var pageLoadDelay = $('input[name=pageLoadDelay]').val()
+
+    var sitemap = this.state.currentSitemap
+    var request = {
+      scrapeSitemap: true,
+      sitemap: JSON.parse(JSON.stringify(sitemap)),
+      requestInterval: requestInterval,
+      pageLoadDelay: pageLoadDelay
+    }
+
+		// show sitemap scraping panel
+    this.getFormValidator().destroy()
+    $('.scraping-in-progress').removeClass('hide')
+    $('#submit-scrape-sitemap').closest('.form-group').hide()
+    $('#scrape-sitemap-config input').prop('disabled', true)
+
+    chrome.runtime.sendMessage(request, function (response) {
+      this.browseSitemapData()
+    }.bind(this))
+    return false
+  },
+  sitemapListBrowseSitemapData: function (button) {
+    var sitemap = $(button).closest('tr').data('sitemap')
+    this.setStateEditSitemap(sitemap)
+    this.browseSitemapData()
+  },
+  browseSitemapData: function () {
+    this.setActiveNavigationButton('sitemap-browse')
+    var sitemap = this.state.currentSitemap
+    this.store.getSitemapData(sitemap, function (data) {
+      var dataColumns = sitemap.getDataColumns()
+
+      var dataPanel = ich.SitemapBrowseData({
+        columns: dataColumns
+      })
+      $('#viewport').html(dataPanel)
+
+			// display data
+			// Doing this the long way so there aren't xss vulnerubilites
+			// while working with data or with the selector titles
+      var $tbody = $('#sitemap-data tbody')
+      data.forEach(function (row) {
+        var $tr = $('<tr></tr>')
+        dataColumns.forEach(function (column) {
+          var $td = $('<td></td>')
+          var cellData = row[column]
+          if (typeof cellData === 'object') {
+            cellData = JSON.stringify(cellData)
+          }
+          $td.text(cellData)
+          $tr.append($td)
+        })
+        $tbody.append($tr)
+      })
+    })
+
+    return true
+  },
+
+  showSitemapExportDataCsvPanel: function () {
+    this.setActiveNavigationButton('sitemap-export-data-csv')
+
+    var sitemap = this.state.currentSitemap
+    var exportPanel = ich.SitemapExportDataCSV(sitemap)
+    $('#viewport').html(exportPanel)
+
+		// generate data
+    $('.download-button').hide()
+    this.store.getSitemapData(sitemap, function (data) {
+      var blob = sitemap.getDataExportCsvBlob(data)
+      $('.download-button a').attr('href', window.URL.createObjectURL(blob))
+      $('.download-button a').attr('download', sitemap._id + '.csv')
+      $('.download-button').show()
+    })
+
+    return true
+  },
+
+  selectSelector: function (button) {
+    var input = $(button).closest('.form-group').find('input.selector-value')
+    var sitemap = this.getCurrentlyEditedSelectorSitemap()
+    var selector = this.getCurrentlyEditedSelector()
+    var currentStateParentSelectorIds = this.getCurrentStateParentSelectorIds()
+    var parentCSSSelector = sitemap.selectors.getParentCSSSelectorWithinOnePage(currentStateParentSelectorIds)
+
+    var deferredSelector = this.contentScript.selectSelector({
+      parentCSSSelector: parentCSSSelector,
+      allowedElements: selector.getItemCSSSelector()
+    })
+
+    deferredSelector.done(function (result) {
+      $(input).val(result.CSSSelector)
+
+			// update validation for selector field
+      var validator = this.getFormValidator()
+      validator.revalidateField(input)
+
+			// @TODO how could this be encapsulated?
+			// update header row, data row selectors after selecting the table. selectors are updated based on tables
+			// inner html
+      if (selector.type === 'SelectorTable') {
+        this.getSelectorHTML().done(function (html) {
+          var tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html)
+          var tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html)
+          $('input[name=tableHeaderRowSelector]').val(tableHeaderRowSelector)
+          $('input[name=tableDataRowSelector]').val(tableDataRowSelector)
+
+          var headerColumns = SelectorTable.getTableHeaderColumnsFromHTML(tableHeaderRowSelector, html)
+          this.renderTableHeaderColumns(headerColumns)
+        }.bind(this))
+      }
+    }.bind(this))
+  },
+
+  getCurrentStateParentSelectorIds: function () {
+    var parentSelectorIds = this.state.editSitemapBreadcumbsSelectors.map(function (selector) {
+      return selector.id
+    })
+
+    return parentSelectorIds
+  },
+
+  selectTableHeaderRowSelector: function (button) {
+    var input = $(button).closest('.form-group').find('input.selector-value')
+    var sitemap = this.getCurrentlyEditedSelectorSitemap()
+    var selector = this.getCurrentlyEditedSelector()
+    var currentStateParentSelectorIds = this.getCurrentStateParentSelectorIds()
+    var parentCSSSelector = sitemap.selectors.getCSSSelectorWithinOnePage(selector.id, currentStateParentSelectorIds)
+
+    var deferredSelector = this.contentScript.selectSelector({
+      parentCSSSelector: parentCSSSelector,
+      allowedElements: 'tr'
+    })
+
+    deferredSelector.done(function (result) {
+      var tableHeaderRowSelector = result.CSSSelector
+      $(input).val(tableHeaderRowSelector)
+
+      this.getSelectorHTML().done(function (html) {
+        var headerColumns = SelectorTable.getTableHeaderColumnsFromHTML(tableHeaderRowSelector, html)
+        this.renderTableHeaderColumns(headerColumns)
+      }.bind(this))
+
+			// update validation for selector field
+      var validator = this.getFormValidator()
+      validator.revalidateField(input)
+    }.bind(this))
+  },
+
+  selectTableDataRowSelector: function (button) {
+    var input = $(button).closest('.form-group').find('input.selector-value')
+    var sitemap = this.getCurrentlyEditedSelectorSitemap()
+    var selector = this.getCurrentlyEditedSelector()
+    var currentStateParentSelectorIds = this.getCurrentStateParentSelectorIds()
+    var parentCSSSelector = sitemap.selectors.getCSSSelectorWithinOnePage(selector.id, currentStateParentSelectorIds)
+
+    var deferredSelector = this.contentScript.selectSelector({
+      parentCSSSelector: parentCSSSelector,
+      allowedElements: 'tr'
+    })
+
+    deferredSelector.done(function (result) {
+      $(input).val(result.CSSSelector)
+
+			// update validation for selector field
+      var validator = this.getFormValidator()
+      validator.revalidateField(input)
+    }.bind(this))
+  },
+
+	/**
+	 * update table selector column editing fields
+	 */
+  renderTableHeaderColumns: function (headerColumns) {
+		// reset previous columns
+    var $tbody = $('.feature-columns table tbody')
+    $tbody.html('')
+    headerColumns.forEach(function (column) {
+      var $row = ich.SelectorEditTableColumn(column)
+      $tbody.append($row)
+    })
+  },
+
+	/**
+	 * Returns HTML that the current selector would select
+	 */
+  getSelectorHTML: function () {
+    var sitemap = this.getCurrentlyEditedSelectorSitemap()
+    var selector = this.getCurrentlyEditedSelector()
+    var currentStateParentSelectorIds = this.getCurrentStateParentSelectorIds()
+    var CSSSelector = sitemap.selectors.getCSSSelectorWithinOnePage(selector.id, currentStateParentSelectorIds)
+    var deferredHTML = this.contentScript.getHTML({CSSSelector: CSSSelector})
+
+    return deferredHTML
+  },
+  previewSelector: function (button) {
+    if (!$(button).hasClass('preview')) {
+      var sitemap = this.getCurrentlyEditedSelectorSitemap()
+      var selector = this.getCurrentlyEditedSelector()
+      var currentStateParentSelectorIds = this.getCurrentStateParentSelectorIds()
+      var parentCSSSelector = sitemap.selectors.getParentCSSSelectorWithinOnePage(currentStateParentSelectorIds)
+      var deferredSelectorPreview = this.contentScript.previewSelector({
+        parentCSSSelector: parentCSSSelector,
+        elementCSSSelector: selector.selector
+      })
+
+      deferredSelectorPreview.done(function () {
+        $(button).addClass('preview')
+      })
+    } else {
+      this.contentScript.removeCurrentContentSelector()
+      $(button).removeClass('preview')
+    }
+  },
+  previewClickElementSelector: function (button) {
+    if (!$(button).hasClass('preview')) {
+      var sitemap = this.state.currentSitemap
+      var selector = this.getCurrentlyEditedSelector()
+      var currentStateParentSelectorIds = this.getCurrentStateParentSelectorIds()
+      var parentCSSSelector = sitemap.selectors.getParentCSSSelectorWithinOnePage(currentStateParentSelectorIds)
+
+      var deferredSelectorPreview = this.contentScript.previewSelector({
+        parentCSSSelector: parentCSSSelector,
+        elementCSSSelector: selector.clickElementSelector
+      })
+
+      deferredSelectorPreview.done(function () {
+        $(button).addClass('preview')
+      })
+    } else {
+      this.contentScript.removeCurrentContentSelector()
+      $(button).removeClass('preview')
+    }
+  },
+  previewTableRowSelector: function (button) {
+    if (!$(button).hasClass('preview')) {
+      var sitemap = this.getCurrentlyEditedSelectorSitemap()
+      var selector = this.getCurrentlyEditedSelector()
+      var currentStateParentSelectorIds = this.getCurrentStateParentSelectorIds()
+      var parentCSSSelector = sitemap.selectors.getCSSSelectorWithinOnePage(selector.id, currentStateParentSelectorIds)
+      var rowSelector = $(button).closest('.form-group').find('input').val()
+
+      var deferredSelectorPreview = this.contentScript.previewSelector({
+        parentCSSSelector: parentCSSSelector,
+        elementCSSSelector: rowSelector
+      })
+
+      deferredSelectorPreview.done(function () {
+        $(button).addClass('preview')
+      })
+    } else {
+      this.contentScript.removeCurrentContentSelector()
+      $(button).removeClass('preview')
+    }
+  },
+  previewSelectorFromSelectorTree: function (button) {
+    if (!$(button).hasClass('preview')) {
+      var sitemap = this.state.currentSitemap
+      var selector = $(button).closest('tr').data('selector')
+      var currentStateParentSelectorIds = this.getCurrentStateParentSelectorIds()
+      var parentCSSSelector = sitemap.selectors.getParentCSSSelectorWithinOnePage(currentStateParentSelectorIds)
+      var deferredSelectorPreview = this.contentScript.previewSelector({
+        parentCSSSelector: parentCSSSelector,
+        elementCSSSelector: selector.selector
+      })
+
+      deferredSelectorPreview.done(function () {
+        $(button).addClass('preview')
+      })
+    } else {
+      this.contentScript.removeCurrentContentSelector()
+      $(button).removeClass('preview')
+    }
+  },
+  previewSelectorDataFromSelectorTree: function (button) {
+    var sitemap = this.state.currentSitemap
+    var selector = $(button).closest('tr').data('selector')
+    this.previewSelectorData(sitemap, selector.id)
+  },
+  previewSelectorDataFromSelectorEditing: function () {
+    var sitemap = this.state.currentSitemap.clone()
+    var selector = sitemap.getSelectorById(this.state.currentSelector.id)
+    var newSelector = this.getCurrentlyEditedSelector()
+    sitemap.updateSelector(selector, newSelector)
+    this.previewSelectorData(sitemap, newSelector.id)
+  },
+	/**
+	 * Returns a list of selector ids that the user has opened
+	 * @returns {Array}
+	 */
+  getStateParentSelectorIds: function () {
+    var parentSelectorIds = []
+    this.state.editSitemapBreadcumbsSelectors.forEach(function (selector) {
+      parentSelectorIds.push(selector.id)
+    })
+    return parentSelectorIds
+  },
+  previewSelectorData: function (sitemap, selectorId) {
+		// data preview will be base on how the selector tree is opened
+    var parentSelectorIds = this.getStateParentSelectorIds()
+
+    var request = {
+      previewSelectorData: true,
+      sitemap: JSON.parse(JSON.stringify(sitemap)),
+      parentSelectorIds: parentSelectorIds,
+      selectorId: selectorId
+    }
+    chrome.runtime.sendMessage(request, function (response) {
+      if (response.length === 0) {
+        return
+      }
+      var dataColumns = Object.keys(response[0])
+
+      console.log(dataColumns)
+
+      var $dataPreviewPanel = ich.DataPreview({
+        columns: dataColumns
+      })
+      $('#viewport').append($dataPreviewPanel)
+      $dataPreviewPanel.modal('show')
+			// display data
+			// Doing this the long way so there aren't xss vulnerubilites
+			// while working with data or with the selector titles
+      var $tbody = $('tbody', $dataPreviewPanel)
+      response.forEach(function (row) {
+        var $tr = $('<tr></tr>')
+        dataColumns.forEach(function (column) {
+          var $td = $('<td></td>')
+          var cellData = row[column]
+          if (typeof cellData === 'object') {
+            cellData = JSON.stringify(cellData)
+          }
+          $td.text(cellData)
+          $tr.append($td)
+        })
+        $tbody.append($tr)
+      })
+
+      var windowHeight = $(window).height()
+
+      $('.data-preview-modal .modal-body').height(windowHeight - 130)
+
+			// remove modal from dom after it is closed
+      $dataPreviewPanel.on('hidden.bs.modal', function () {
+        $(this).remove()
+      })
+    })
+  },
+	/**
+	 * Add start url to sitemap creation or editing form
+	 * @param button
+	 */
+  addStartUrl: function (button) {
+    var $startUrlInputField = ich.SitemapStartUrlField()
+    $('#viewport .start-url-block:last').after($startUrlInputField)
+    var validator = this.getFormValidator()
+    validator.addField($startUrlInputField.find('input'))
+  },
+	/**
+	 * Remove start url from sitemap creation or editing form.
+	 * @param button
+	 */
+  removeStartUrl: function (button) {
+    var $block = $(button).closest('.start-url-block')
+    if ($('#viewport .start-url-block').length > 1) {
+			// remove from validator
+      var validator = this.getFormValidator()
+      validator.removeField($block.find('input'))
+
+      $block.remove()
+    }
   }
 }
 
-module.exports = DataExtractor
+module.exports = SitemapController
 
-},{"./SelectorList":19,"./Sitemap":21}],6:[function(require,module,exports){
+},{"./Selector":7,"./SelectorGraphv2":19,"./Selectors":21,"./Sitemap":22,"./getBackgroundScript":25,"./getContentScript":26}],6:[function(require,module,exports){
 /**
  * Element selector. Uses jQuery as base and adds some more features
  * @param parentElement
@@ -1049,7 +2073,7 @@ Selector.prototype = {
 
 module.exports = Selector
 
-},{"./ElementQuery":6,"./Selectors":20}],8:[function(require,module,exports){
+},{"./ElementQuery":6,"./Selectors":21}],8:[function(require,module,exports){
 var SelectorElement = {
 
   canReturnMultipleRecords: function () {
@@ -1302,7 +2326,7 @@ var SelectorElementClick = {
 
 module.exports = SelectorElementClick
 
-},{"./../ElementQuery":6,"./../UniqueElementList":22}],11:[function(require,module,exports){
+},{"./../ElementQuery":6,"./../UniqueElementList":24}],11:[function(require,module,exports){
 var SelectorElementScroll = {
 
   canReturnMultipleRecords: function () {
@@ -2055,6 +3079,219 @@ var SelectorText = {
 module.exports = SelectorText
 
 },{}],19:[function(require,module,exports){
+var SelectorGraphv2 = function (sitemap) {
+  this.sitemap = sitemap
+}
+
+SelectorGraphv2.prototype = {
+
+	/**
+	 * Inits d3.layout.tree
+	 */
+  initTree: function (w, h) {
+    this.tree = d3.layout.tree().size([h, w])
+    this.tree.children(this.getSelectorVisibleChildren.bind(this))
+  },
+  getSelectorChildren: function (parentSelector) {
+    if (parentSelector.childSelectors === undefined) {
+      parentSelector.childSelectors = this.sitemap.selectors.getDirectChildSelectors(parentSelector.id).fullClone()
+    }
+
+    if (parentSelector.childSelectors.length === 0) {
+      return null
+    } else {
+      return parentSelector.childSelectors
+    }
+  },
+
+  getSelectorVisibleChildren: function (parentSelector) {
+		// initially hide selector children
+    if (parentSelector.visibleChildren === undefined) {
+      parentSelector.visibleChildren = false
+    }
+
+    if (parentSelector.visibleChildren === false) {
+      return null
+    }
+
+    return this.getSelectorChildren(parentSelector)
+  },
+
+  selectorHasChildren: function (parentSelector) {
+    var children = this.sitemap.selectors.getDirectChildSelectors(parentSelector.id)
+    var selectorHasChildren = children.length > 0
+    return selectorHasChildren
+  },
+
+	/**
+	 * function for line drawing between two nodes
+	 */
+  diagonal: d3.svg.diagonal()
+		.projection(function (d) {
+  return [d.y, d.x]
+}),
+
+  draw: function (element, w, h) {
+    var m = [20, 120, 20, 120],
+      w = w - m[1] - m[3],
+      h = h - m[0] - m[2],
+      i = 0,
+      root,
+      selectorList
+
+    this.initTree(w, h)
+
+		// @TODO use element
+    this.svg = d3.select(element).append('svg:svg')
+			.attr('width', w + m[1] + m[3])
+			.attr('height', h + m[0] + m[2])
+			.append('svg:g')
+			.attr('transform', 'translate(' + m[3] + ',' + m[0] + ')')
+
+    this.root = {
+      id: '_root',
+      x0: h / 2,
+      y0: 0,
+      i: '_root'
+    }
+
+    this.update(this.root)
+  },
+
+	/**
+	 * Color for selectors circle
+	 * @param selector
+	 */
+  getNodeColor: function (selector) {
+    if (this.selectorHasChildren(selector) && !selector.visibleChildren) {
+      return 'lightsteelblue'
+    }		else {
+      return '#fff'
+    }
+  },
+
+  update: function (source) {
+    var duration = 500
+
+		// Compute the new tree layout.
+    var nodes = this.tree.nodes(this.root).reverse()
+
+		// Normalize for fixed-depth.
+    nodes.forEach(function (d) {
+      d.y = d.depth * 100
+    })
+    var i = 0
+		// Update the nodes…
+    var node = this.svg.selectAll('g.node')
+			.data(nodes, function (d) {
+  if (d.i === undefined) {
+    d.i = d.id
+    d.i = source.i + '/' + d.i
+  }
+  return d.i
+})
+
+		// Enter any new nodes at the parent's previous position.
+    var nodeEnter = node.enter().append('svg:g')
+			.attr('class', 'node')
+			.attr('transform', function (d) {
+  return 'translate(' + source.y0 + ',' + source.x0 + ')'
+})
+			.on('click', function (d) {
+  this.toggle(d)
+  this.update(d)
+}.bind(this))
+
+    nodeEnter.append('svg:circle')
+			.attr('r', 1e-6)
+			.style('fill', this.getNodeColor.bind(this))
+
+    nodeEnter.append('svg:text')
+			.attr('x', function (d) {
+  return this.selectorHasChildren(d) ? -10 : 10
+}.bind(this))
+			.attr('dy', '.35em')
+			.attr('text-anchor', function (d) {
+  return this.selectorHasChildren(d) ? 'end' : 'start'
+}.bind(this))
+			.text(function (d) {
+  return d.id
+})
+			.style('fill-opacity', 1e-6)
+
+		// Transition nodes to their new position.
+    var nodeUpdate = node.transition()
+			.duration(duration)
+			.attr('transform', function (d) {
+  return 'translate(' + d.y + ',' + d.x + ')'
+})
+
+    nodeUpdate.select('circle')
+			.attr('r', 6)
+			.style('fill', this.getNodeColor.bind(this))
+
+    nodeUpdate.select('text')
+			.style('fill-opacity', 1)
+
+		// Transition exiting nodes to the parent's new position.
+    var nodeExit = node.exit().transition()
+			.duration(duration)
+			.attr('transform', function (d) {
+  return 'translate(' + source.y + ',' + source.x + ')'
+})
+			.remove()
+
+    nodeExit.select('circle')
+			.attr('r', 1e-6)
+
+    nodeExit.select('text')
+			.style('fill-opacity', 1e-6)
+
+		// Update the links…
+    var link = this.svg.selectAll('path.link')
+			.data(this.tree.links(nodes), function (d) {
+  return d.target.i
+})
+
+		// Enter any new links at the parent's previous position.
+    link.enter().insert('svg:path', 'g')
+			.attr('class', 'link')
+			.attr('d', function (d) {
+  var o = {x: source.x0, y: source.y0}
+  var res = this.diagonal({source: o, target: o})
+  return res
+}.bind(this))
+			.transition()
+			.duration(duration)
+			.attr('d', this.diagonal)
+
+		// Transition links to their new position.
+    link.transition()
+			.duration(duration)
+			.attr('d', this.diagonal)
+
+		// Transition exiting nodes to the parent's new position.
+    link.exit().transition()
+			.duration(duration)
+			.attr('d', function (d) {
+  var o = {x: source.x, y: source.y}
+  return this.diagonal({source: o, target: o})
+}.bind(this))
+			.remove()
+
+		// Stash the old positions for transition.
+    nodes.forEach(function (d) {
+      d.x0 = d.x
+      d.y0 = d.y
+    })
+  },
+
+  toggle: function (d) {
+    d.visibleChildren = !d.visibleChildren
+  }
+}
+
+},{}],20:[function(require,module,exports){
 var Selector = require('./Selector')
 
 var SelectorList = function (selectors) {
@@ -2325,7 +3562,7 @@ SelectorList.prototype.hasRecursiveElementSelectors = function () {
 
 module.exports = SelectorList
 
-},{"./Selector":7}],20:[function(require,module,exports){
+},{"./Selector":7}],21:[function(require,module,exports){
 var SelectorElement = require('./Selector/SelectorElement')
 var SelectorElementAttribute = require('./Selector/SelectorElementAttribute')
 var SelectorElementClick = require('./Selector/SelectorElementClick')
@@ -2352,7 +3589,7 @@ module.exports = {
   SelectorText
 }
 
-},{"./Selector/SelectorElement":8,"./Selector/SelectorElementAttribute":9,"./Selector/SelectorElementClick":10,"./Selector/SelectorElementScroll":11,"./Selector/SelectorGroup":12,"./Selector/SelectorHTML":13,"./Selector/SelectorImage":14,"./Selector/SelectorLink":15,"./Selector/SelectorPopupLink":16,"./Selector/SelectorTable":17,"./Selector/SelectorText":18}],21:[function(require,module,exports){
+},{"./Selector/SelectorElement":8,"./Selector/SelectorElementAttribute":9,"./Selector/SelectorElementClick":10,"./Selector/SelectorElementScroll":11,"./Selector/SelectorGroup":12,"./Selector/SelectorHTML":13,"./Selector/SelectorImage":14,"./Selector/SelectorLink":15,"./Selector/SelectorPopupLink":16,"./Selector/SelectorTable":17,"./Selector/SelectorText":18}],22:[function(require,module,exports){
 var Selector = require('./Selector')
 var SelectorList = require('./SelectorList')
 var Sitemap = function (sitemapObj) {
@@ -2564,7 +3801,82 @@ Sitemap.prototype = {
 
 module.exports = Sitemap
 
-},{"./Selector":7,"./SelectorList":19}],22:[function(require,module,exports){
+},{"./Selector":7,"./SelectorList":20}],23:[function(require,module,exports){
+var Sitemap = require('./Sitemap')
+
+/**
+ * From devtools panel there is no possibility to execute XHR requests. So all requests to a remote CouchDb must be
+ * handled through Background page. StoreDevtools is a simply a proxy store
+ * @constructor
+ */
+var StoreDevtools = function () {
+
+}
+
+StoreDevtools.prototype = {
+  createSitemap: function (sitemap, callback) {
+    var request = {
+      createSitemap: true,
+      sitemap: JSON.parse(JSON.stringify(sitemap))
+    }
+
+    chrome.runtime.sendMessage(request, function (callbackFn, originalSitemap, newSitemap) {
+      originalSitemap._rev = newSitemap._rev
+      callbackFn(originalSitemap)
+    }.bind(this, callback, sitemap))
+  },
+  saveSitemap: function (sitemap, callback) {
+    this.createSitemap(sitemap, callback)
+  },
+  deleteSitemap: function (sitemap, callback) {
+    var request = {
+      deleteSitemap: true,
+      sitemap: JSON.parse(JSON.stringify(sitemap))
+    }
+    chrome.runtime.sendMessage(request, function (response) {
+      callback()
+    })
+  },
+  getAllSitemaps: function (callback) {
+    var request = {
+      getAllSitemaps: true
+    }
+
+    chrome.runtime.sendMessage(request, function (response) {
+      var sitemaps = []
+
+      for (var i in response) {
+        sitemaps.push(new Sitemap(response[i]))
+      }
+      callback(sitemaps)
+    })
+  },
+  getSitemapData: function (sitemap, callback) {
+    var request = {
+      getSitemapData: true,
+      sitemap: JSON.parse(JSON.stringify(sitemap))
+    }
+
+    chrome.runtime.sendMessage(request, function (response) {
+      callback(response)
+    })
+  },
+  sitemapExists: function (sitemapId, callback) {
+    var request = {
+      sitemapExists: true,
+      sitemapId: sitemapId
+    }
+
+    chrome.runtime.sendMessage(request, function (response) {
+      callback(response)
+    })
+  }
+}
+
+
+module.exports = StoreDevtools
+
+},{"./Sitemap":22}],24:[function(require,module,exports){
 /**
  * Only Elements unique will be added to this array
  * @constructor
@@ -2632,7 +3944,7 @@ UniqueElementList.prototype.isAdded = function (element) {
   return isAdded
 }
 
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 var BackgroundScript = require('./BackgroundScript')
 /**
  * @param location	configure from where the content script is being accessed (ContentScript, BackgroundPage, DevTools)
@@ -2676,7 +3988,7 @@ var getBackgroundScript = function (location) {
 
 module.exports = getBackgroundScript
 
-},{"./BackgroundScript":2}],24:[function(require,module,exports){
+},{"./BackgroundScript":2}],26:[function(require,module,exports){
 var getBackgroundScript = require('./getBackgroundScript')
 var ContentScript = require('./ContentScript')
 /**
@@ -2722,5 +4034,5 @@ var getContentScript = function (location) {
 
 module.exports = getContentScript
 
-},{"./ContentScript":3,"./getBackgroundScript":23}]},{},[1])(1)
+},{"./ContentScript":3,"./getBackgroundScript":25}]},{},[1])(1)
 });

@@ -7,12 +7,21 @@
     "doc": "docs",
     "test": "tests"
   },
+  "watch": {
+    "generate": {
+      "patterns": ["extension"],
+      "ignore": "extension/generated",
+      "extensions": "js"
+    }
+  },
   "scripts": {
     "test": "mocha tests/spec/ScraperSpec-mocha",
     "test-jasmine": "jasmine-node tests/spec/ScraperSpec.js",
     "generate-scraper": "browserify extension/content_script/content_scraper.js --standalone contentScraper > extension/generated/content-scraper.js",
     "generate-background-script": "browserify extension/background_page/background_script.js --standalone backgroundScraper > extension/generated/background-scraper.js",
-    "generate": "npm run generate-scraper && npm run generate-background-script"
+    "generate-devtools": "browserify extension/scripts/App.js --standalone devtoolsApp > extension/generated/devtools-scraper.js",
+    "generate": "npm run generate-scraper && npm run generate-background-script && npm run generate-devtools",
+    "watch": "npm-watch"
   },
   "repository": {
     "type": "git",
@@ -27,6 +36,7 @@
   "devDependencies": {
     "jasmine-node": "^1.14.5",
     "mocha": "^3.2.0",
+    "npm-watch": "^0.1.8",
     "standard": "^9.0.2"
   },
   "dependencies": {

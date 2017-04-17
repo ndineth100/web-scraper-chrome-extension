@@ -207,6 +207,4 @@ Sitemap.prototype = {
   }
 }
 
-if (typeof require !== 'undefined') {
-  global.Sitemap = Sitemap
-}
+module.exports = Sitemap
