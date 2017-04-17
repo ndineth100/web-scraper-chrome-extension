@@ -7,7 +7,6 @@
     "chrome": true,
     "CSSSelector": true,
     "jQuery": true,
-    "Base64": true,
     "describe": true,
     "it": true,
     "beforeEach": true,

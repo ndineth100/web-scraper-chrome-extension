@@ -75,3 +75,5 @@ ChromePopupBrowser.prototype = {
     }, this)
   }
 }
+
+module.exports = ChromePopupBrowser

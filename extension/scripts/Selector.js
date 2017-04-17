@@ -1,5 +1,6 @@
 var selectors = require('./Selectors')
 var ElementQuery = require('./ElementQuery')
+var jquery = require('jquery-deferred')
 
 var Selector = function (selector) {
   this.updateData(selector)
@@ -97,10 +98,10 @@ Selector.prototype = {
   },
 
   getData: function (parentElement) {
-    var d = $.Deferred()
+    var d = jquery.Deferred()
     var timeout = this.delay || 0
 
-		// this works much faster because $.whenCallSequentially isn't running next data extraction immediately
+		// this works much faster because whenCallSequentally isn't running next data extraction immediately
     if (timeout === 0) {
       var deferredData = this._getData(parentElement)
       deferredData.done(function (data) {

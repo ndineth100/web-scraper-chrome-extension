@@ -1,3 +1,5 @@
+var jquery = require('jquery-deferred')
+
 var SelectorTable = {
 
   canReturnMultipleRecords: function () {
@@ -33,7 +35,7 @@ var SelectorTable = {
     return columns
   },
   _getData: function (parentElement) {
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
     var tables = this.getDataElements(parentElement)
 

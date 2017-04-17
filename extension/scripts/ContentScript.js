@@ -1,5 +1,5 @@
 var ContentSelector = require('./ContentSelector')
-
+var jquery = require('jquery-deferred')
 /**
  * ContentScript that can be called from anywhere within the extension
  */
@@ -8,10 +8,10 @@ var ContentScript = {
 	/**
 	 * Fetch
 	 * @param request.CSSSelector	css selector as string
-	 * @returns $.Deferred()
+	 * @returns jquery.Deferred()
 	 */
   getHTML: function (request) {
-    var deferredHTML = $.Deferred()
+    var deferredHTML = jquery.Deferred()
     var html = $(request.CSSSelector).clone().wrap('<p>').parent().html()
     deferredHTML.resolve(html)
     return deferredHTML.promise()
@@ -19,10 +19,10 @@ var ContentScript = {
 
 	/**
 	 * Removes current content selector if is in use within the page
-	 * @returns $.Deferred()
+	 * @returns jquery.Deferred()
 	 */
   removeCurrentContentSelector: function () {
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var contentSelector = window.cs
     if (contentSelector === undefined) {
       deferredResponse.resolve()
@@ -41,7 +41,7 @@ var ContentScript = {
 	 * @param request.allowedElements
 	 */
   selectSelector: function (request) {
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
 
     this.removeCurrentContentSelector().done(function () {
       var contentSelector = new ContentSelector({
@@ -71,7 +71,7 @@ var ContentScript = {
 	 * @param request.elementCSSSelector
 	 */
   previewSelector: function (request) {
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     this.removeCurrentContentSelector().done(function () {
       var contentSelector = new ContentSelector({
         parentCSSSelector: request.parentCSSSelector

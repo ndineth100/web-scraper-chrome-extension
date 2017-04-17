@@ -1,3 +1,4 @@
+var jquery = require('jquery-deferred')
 var UniqueElementList = require('./../UniqueElementList')
 var ElementQuery = require('./../ElementQuery')
 var SelectorElementClick = {
@@ -63,7 +64,7 @@ var SelectorElementClick = {
 
   _getData: function (parentElement) {
     var delay = parseInt(this.delay) || 0
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var foundElements = new UniqueElementList('uniqueText')
     var clickElements = this.getClickElements(parentElement)
     var doneClickingElements = new UniqueElementList(this.getClickElementUniquenessType())

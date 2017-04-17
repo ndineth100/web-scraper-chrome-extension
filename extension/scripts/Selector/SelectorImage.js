@@ -1,3 +1,6 @@
+var jquery = require('jquery-deferred')
+var whenCallSequentially = require('../assets/jquery.whencallsequentially')
+var Base64 = require('../../assets/base64')
 var SelectorImage = {
   canReturnMultipleRecords: function () {
     return true
@@ -18,14 +21,14 @@ var SelectorImage = {
     return false
   },
   _getData: function (parentElement) {
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
     var elements = this.getDataElements(parentElement)
 
     var deferredDataCalls = []
     $(elements).each(function (i, element) {
       deferredDataCalls.push(function () {
-        var deferredData = $.Deferred()
+        var deferredData = jquery.Deferred()
 
         var data = {}
         data[this.id + '-src'] = element.src
@@ -52,7 +55,7 @@ var SelectorImage = {
       }.bind(this))
     }.bind(this))
 
-    $.whenCallSequentially(deferredDataCalls).done(function (dataResults) {
+    whenCallSequentially(deferredDataCalls).done(function (dataResults) {
       if (this.multiple === false && elements.length === 0) {
         var data = {}
         data[this.id + '-src'] = null
@@ -66,7 +69,7 @@ var SelectorImage = {
   },
 
   downloadFileAsBlob: function (url) {
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var xhr = new XMLHttpRequest()
     xhr.onreadystatechange = function () {
       if (this.readyState == 4) {
@@ -86,7 +89,7 @@ var SelectorImage = {
   },
 
   downloadImageBase64: function (url) {
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var deferredDownload = this.downloadFileAsBlob(url)
     deferredDownload.done(function (blob) {
       var mimeType = blob.type

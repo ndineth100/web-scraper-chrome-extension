@@ -1,18 +1,19 @@
+var jquery = require('jquery-deferred')
 /**
  * ContentScript that can be called from anywhere within the extension
  */
 var BackgroundScript = {
 
   dummy: function () {
-    return $.Deferred().resolve('dummy').promise()
+    return jquery.Deferred().resolve('dummy').promise()
   },
 
 	/**
 	 * Returns the id of the tab that is visible to user
-	 * @returns $.Deferred() integer
+	 * @returns jquery.Deferred() integer
 	 */
   getActiveTabId: function () {
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
 
     chrome.tabs.query({
       active: true,
@@ -40,7 +41,7 @@ var BackgroundScript = {
       fn: request.fn,
       request: request.request
     }
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var deferredActiveTabId = this.getActiveTabId()
     deferredActiveTabId.done(function (tabId) {
       chrome.tabs.sendMessage(tabId, reqToContentScript, function (response) {

@@ -1,3 +1,4 @@
+var jquery = require('jquery-deferred')
 var SelectorElementScroll = {
 
   canReturnMultipleRecords: function () {
@@ -23,7 +24,7 @@ var SelectorElementScroll = {
   },
   _getData: function (parentElement) {
     var delay = parseInt(this.delay) || 0
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var foundElements = []
 
 		// initially scroll down and wait

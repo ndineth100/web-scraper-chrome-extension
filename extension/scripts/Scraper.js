@@ -1,6 +1,6 @@
-if (typeof require !== 'undefined') {
-  require('./../assets/jquery.whencallsequentially')
-}
+var jquery = require('jquery-deferred')
+var whenCallSequentially = require('../assets/jquery.whencallsequentially')
+var Base64 = require('../assets/base64')
 var Job = require('./Job')
 
 var Scraper = function (options) {
@@ -73,7 +73,7 @@ Scraper.prototype = {
 	 * @param record
 	 */
   saveImages: function (record) {
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var deferredImageStoreCalls = []
     var prefixLength = '_imageBase64-'.length
 
@@ -82,7 +82,7 @@ Scraper.prototype = {
         var selectorId = attr.substring(prefixLength, attr.length)
         deferredImageStoreCalls.push(function (selectorId) {
           var imageBase64 = record['_imageBase64-' + selectorId]
-          var deferredDownloadDone = $.Deferred()
+          var deferredDownloadDone = jquery.Deferred()
 
           var deferredBlob = Base64.base64ToBlob(imageBase64, record['_imageMimeType-' + selectorId])
 
@@ -122,7 +122,7 @@ Scraper.prototype = {
       }
     }
 
-    $.whenCallSequentially(deferredImageStoreCalls).done(function () {
+    whenCallSequentially(deferredImageStoreCalls).done(function () {
       deferredResponse.resolve()
     })
 
@@ -174,7 +174,7 @@ Scraper.prototype = {
         }
       }.bind(this))
 
-      $.whenCallSequentially(deferredDatamanipulations).done(function () {
+      whenCallSequentially(deferredDatamanipulations).done(function () {
         this.resultWriter.writeDocs(scrapedRecords, function () {
           var now = (new Date()).getTime()
 					// delay next job if needed

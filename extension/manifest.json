@@ -24,9 +24,7 @@
 	"background": {
 		"scripts": [
 			"assets/jquery-2.0.3.js",
-			"assets/jquery.whencallsequentially.js",
 			"assets/pouchdb-nightly.min.js",
-			"assets/base64.js",
 			"generated/background-scraper.js"
 		]
 	},
@@ -42,10 +40,8 @@
 			"matches": ["*://*/*"],
 			"js": [
 				"assets/jquery-2.0.3.js",
-				"assets/jquery.whencallsequentially.js",
 				"assets/sugar-1.4.1.js",
 				"assets/css-selector/lib/CssSelector.js",
-				"assets/base64.js",
 				"generated/content-scraper.js",
 				"content_script/content_script.js"
 			],

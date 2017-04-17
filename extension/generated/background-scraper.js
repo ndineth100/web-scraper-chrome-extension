@@ -1,61 +1,53 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.backgroundScraper = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function (global){
-if (typeof require !== 'undefined' && typeof $ === 'undefined') {
-	var jquery = require('jquery-deferred')
-  global.$ = {
-		Deferred: jquery.Deferred
-	}
-}
+var jqueryDeferred = require('jquery-deferred')
 /**
  * @author Martins Balodis
  *
  * An alternative version of $.when which can be used to execute asynchronous
  * calls sequentially one after another.
  *
- * @returns $.Deferred().promise()
+ * @returns jqueryDeferred().promise()
  */
-$.whenCallSequentially = function (functionCalls) {
-
-	var deferredResonse = $.Deferred();
-	var resultData = new Array();
+module.exports = function whenCallSequentially (functionCalls) {
+  var deferredResonse = jqueryDeferred()
+  var resultData = []
 
 	// nothing to do
-	if (functionCalls.length === 0) {
-		return deferredResonse.resolve(resultData).promise();
-	}
+  if (functionCalls.length === 0) {
+    return deferredResonse.resolve(resultData).promise()
+  }
 
-	var currentDeferred = functionCalls.shift()();
+  var currentDeferred = functionCalls.shift()()
 	// execute synchronous calls synchronously
-	while (currentDeferred.state() === 'resolved') {
-		currentDeferred.done(function (data) {
-			resultData.push(data);
-		});
-		if (functionCalls.length === 0) {
-			return deferredResonse.resolve(resultData).promise();
-		}
-		currentDeferred = functionCalls.shift()();
-	}
+  while (currentDeferred.state() === 'resolved') {
+    currentDeferred.done(function (data) {
+      resultData.push(data)
+    })
+    if (functionCalls.length === 0) {
+      return deferredResonse.resolve(resultData).promise()
+    }
+    currentDeferred = functionCalls.shift()()
+  }
 
 	// handle async calls
-	var interval = setInterval(function () {
+  var interval = setInterval(function () {
 		// handle mixed sync calls
-		while (currentDeferred.state() === 'resolved') {
-			currentDeferred.done(function (data) {
-				resultData.push(data);
-			});
-			if (functionCalls.length === 0) {
-				clearInterval(interval);
-				deferredResonse.resolve(resultData);
-				break;
-			}
-			currentDeferred = functionCalls.shift()();
-		}
-	}, 10);
+    while (currentDeferred.state() === 'resolved') {
+      currentDeferred.done(function (data) {
+        resultData.push(data)
+      })
+      if (functionCalls.length === 0) {
+        clearInterval(interval)
+        deferredResonse.resolve(resultData)
+        break
+      }
+      currentDeferred = functionCalls.shift()()
+    }
+  }, 10)
 
-	return deferredResonse.promise();
-};
+  return deferredResonse.promise()
+}
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"jquery-deferred":28}],2:[function(require,module,exports){
 var Config = require('../scripts/Config')
 var Store = require('../scripts/Store')
@@ -308,6 +300,8 @@ ChromePopupBrowser.prototype = {
     }, this)
   }
 }
+
+module.exports = ChromePopupBrowser
 
 },{}],5:[function(require,module,exports){
 var Config = function () {

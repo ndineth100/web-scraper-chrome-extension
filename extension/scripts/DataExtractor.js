@@ -1,5 +1,7 @@
 var SelectorList = require('./SelectorList')
 var Sitemap = require('./Sitemap')
+var whenCallSequentially = require('../assets/jquery.whencallsequentially')
+var jquery = require('jquery-deferred')
 
 var DataExtractor = function (options) {
   if (options.sitemap instanceof Sitemap) {
@@ -113,8 +115,8 @@ DataExtractor.prototype = {
       }
     }.bind(this))
 
-    var deferredResponse = $.Deferred()
-    $.whenCallSequentially(deferredDataCalls).done(function (responses) {
+    var deferredResponse = jquery.Deferred()
+    whenCallSequentially(deferredDataCalls).done(function (responses) {
       var commonData = {}
       responses.forEach(function (data) {
         commonData = Object.merge(commonData, data)
@@ -126,7 +128,7 @@ DataExtractor.prototype = {
   },
 
   getSelectorCommonData: function (selectors, selector, parentElement) {
-    var d = $.Deferred()
+    var d = jquery.Deferred()
     var deferredData = selector.getData(parentElement)
     deferredData.done(function (data) {
       if (selector.willReturnElements()) {
@@ -147,7 +149,7 @@ DataExtractor.prototype = {
 	 * Returns all data records for a selector that can return multiple records
 	 */
   getMultiSelectorData: function (selectors, selector, parentElement, commonData) {
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var deferredData
 		// if the selector is not an Element selector then its fetched data is the result.
     if (!selector.willReturnElements()) {
@@ -176,7 +178,7 @@ DataExtractor.prototype = {
         deferredDataCalls.push(childRecordDeferredCall)
       }.bind(this))
 
-      $.whenCallSequentially(deferredDataCalls).done(function (responses) {
+      whenCallSequentially(deferredDataCalls).done(function (responses) {
         var resultData = []
         responses.forEach(function (childRecordList) {
           childRecordList.forEach(function (childRecord) {
@@ -195,7 +197,7 @@ DataExtractor.prototype = {
   getSelectorTreeData: function (selectors, parentSelectorId, parentElement, commonData) {
     var childSelectors = selectors.getDirectChildSelectors(parentSelectorId)
     var childCommonDataDeferred = this.getSelectorTreeCommonData(selectors, parentSelectorId, parentElement)
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
 
     childCommonDataDeferred.done(function (childCommonData) {
       commonData = Object.merge(commonData, childCommonData)
@@ -211,7 +213,7 @@ DataExtractor.prototype = {
       }.bind(this))
 
 			// merge all data records together
-      $.whenCallSequentially(dataDeferredCalls).done(function (responses) {
+      whenCallSequentially(dataDeferredCalls).done(function (responses) {
         var resultData = []
         responses.forEach(function (childRecords) {
           childRecords.forEach(function (childRecord) {
@@ -247,8 +249,8 @@ DataExtractor.prototype = {
       dataDeferredCalls.push(deferredTreeDataCall)
     }.bind(this))
 
-    var responseDeferred = $.Deferred()
-    $.whenCallSequentially(dataDeferredCalls).done(function (responses) {
+    var responseDeferred = jquery.Deferred()
+    whenCallSequentially(dataDeferredCalls).done(function (responses) {
       var results = []
       responses.forEach(function (dataResults) {
         results = results.concat(dataResults)

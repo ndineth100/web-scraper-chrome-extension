@@ -1,3 +1,4 @@
+var jquery = require('jquery-deferred')
 var SelectorElementAttribute = {
   canReturnMultipleRecords: function () {
     return true
@@ -18,7 +19,7 @@ var SelectorElementAttribute = {
     return false
   },
   _getData: function (parentElement) {
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
     var elements = this.getDataElements(parentElement)
 

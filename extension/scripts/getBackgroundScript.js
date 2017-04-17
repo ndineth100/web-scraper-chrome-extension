@@ -1,3 +1,4 @@
+var jquery = require('jquery-deferred')
 var BackgroundScript = require('./BackgroundScript')
 /**
  * @param location	configure from where the content script is being accessed (ContentScript, BackgroundPage, DevTools)
@@ -20,7 +21,7 @@ var getBackgroundScript = function (location) {
             request: request
           }
 
-          var deferredResponse = $.Deferred()
+          var deferredResponse = jquery.Deferred()
 
           chrome.runtime.sendMessage(reqToBackgroundScript, function (response) {
             deferredResponse.resolve(response)

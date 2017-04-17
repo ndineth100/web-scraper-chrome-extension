@@ -1,4 +1,5 @@
 var ElementQuery = require('./ElementQuery')
+var jquery = require('jquery-deferred')
 /**
  * @param options.parentCSSSelector	Elements can be only selected within this element
  * @param options.allowedElements	Elements that can only be selected
@@ -6,7 +7,7 @@ var ElementQuery = require('./ElementQuery')
  */
 var ContentSelector = function (options) {
 	// deferred response
-  this.deferredCSSSelectorResponse = $.Deferred()
+  this.deferredCSSSelectorResponse = jquery.Deferred()
 
   this.allowedElements = options.allowedElements
   this.parentCSSSelector = options.parentCSSSelector.trim()

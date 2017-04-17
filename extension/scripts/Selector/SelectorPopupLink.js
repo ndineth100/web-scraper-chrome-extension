@@ -1,3 +1,6 @@
+var whenCallSequentially = require('../assets/jquery.whencallsequentially')
+var jquery = require('jquery-deferred')
+
 var SelectorPopupLink = {
   canReturnMultipleRecords: function () {
     return true
@@ -20,7 +23,7 @@ var SelectorPopupLink = {
   _getData: function (parentElement) {
     var elements = this.getDataElements(parentElement)
 
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
 		// return empty record if not multiple type and no elements found
     if (this.multiple === false && elements.length === 0) {
@@ -34,7 +37,7 @@ var SelectorPopupLink = {
     var deferredDataExtractionCalls = []
     $(elements).each(function (k, element) {
       deferredDataExtractionCalls.push(function (element) {
-        var deferredData = $.Deferred()
+        var deferredData = jquery.Deferred()
 
         var data = {}
         data[this.id] = $(element).text()
@@ -51,7 +54,7 @@ var SelectorPopupLink = {
       }.bind(this, element))
     }.bind(this))
 
-    $.whenCallSequentially(deferredDataExtractionCalls).done(function (responses) {
+    whenCallSequentially(deferredDataExtractionCalls).done(function (responses) {
       var result = []
       responses.forEach(function (dataResult) {
         result.push(dataResult)
@@ -95,7 +98,7 @@ var SelectorPopupLink = {
     document.body.appendChild(script)
 
 		// wait for url to be available
-    var deferredURL = $.Deferred()
+    var deferredURL = jquery.Deferred()
     var timeout = Math.abs(5000 / 30) // 5s timeout to generate an url for popup
     var interval = setInterval(function () {
       var url = $(element).data('web-scraper-extract-url')

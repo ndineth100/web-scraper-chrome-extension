@@ -1,3 +1,4 @@
+var jquery = require('jquery-deferred')
 var SelectorGroup = {
 
   canReturnMultipleRecords: function () {
@@ -19,7 +20,7 @@ var SelectorGroup = {
     return false
   },
   _getData: function (parentElement) {
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
 		// cannot reuse this.getDataElements because it depends on *multiple* property
     var elements = $(this.selector, parentElement)
