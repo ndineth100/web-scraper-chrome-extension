@@ -1,87 +1,84 @@
-describe("Group Selector", function () {
+describe('Group Selector', function () {
+  beforeEach(function () {
 
-	beforeEach(function () {
+  })
 
-	});
+  it('should extract text data', function () {
+    var selector = new Selector({
+      id: 'a',
+      type: 'SelectorGroup',
+      multiple: false,
+      selector: 'div'
+    })
 
-	it("should extract text data", function () {
+    var dataDeferred = selector.getData($('#selector-group-text'))
 
-		var selector = new Selector({
-			id: 'a',
-			type: 'SelectorGroup',
-			multiple: false,
-			selector: "div"
-		});
+    waitsFor(function () {
+      return dataDeferred.state() === 'resolved'
+    }, 'wait for data extraction', 5000)
 
-		var dataDeferred = selector.getData($("#selector-group-text"));
+    runs(function () {
+      dataDeferred.done(function (data) {
+        expect(data).toEqual([
+          {
+            a: [
+              {
+                a: 'a'
+              },
+              {
+                a: 'b'
+              }
+            ]
+          }
+        ])
+      })
+    })
+  })
 
-		waitsFor(function() {
-			return dataDeferred.state() === 'resolved';
-		}, "wait for data extraction", 5000);
+  it('should extract link urls', function () {
+    var selector = new Selector({
+      id: 'a',
+      type: 'SelectorGroup',
+      multiple: false,
+      selector: 'a',
+      extractAttribute: 'href'
+    })
 
-		runs(function () {
-			dataDeferred.done(function(data) {
-				expect(data).toEqual([
-					{
-						a: [
-							{
-								a: "a"
-							},
-							{
-								a: "b"
-							}
-						]
-					}
-				]);
-			});
-		});
-	});
+    var dataDeferred = selector.getData($('#selector-group-url'))
 
-	it("should extract link urls", function () {
+    waitsFor(function () {
+      return dataDeferred.state() === 'resolved'
+    }, 'wait for data extraction', 5000)
 
-		var selector = new Selector({
-			id: 'a',
-			type: 'SelectorGroup',
-			multiple: false,
-			selector: "a",
-			extractAttribute: 'href'
-		});
+    runs(function () {
+      dataDeferred.done(function (data) {
+        expect(data).toEqual([
+          {
+            a: [
+              {
+                a: 'a',
+                'a-href': 'http://aa/'
+              },
+              {
+                a: 'b',
+                'a-href': 'http://bb/'
+              }
+            ]
+          }
+        ])
+      })
+    })
+  })
 
-		var dataDeferred = selector.getData($("#selector-group-url"));
+  it('should return only one data column', function () {
+    var selector = new Selector({
+      id: 'id',
+      type: 'SelectorGroup',
+      multiple: true,
+      selector: 'div'
+    })
 
-		waitsFor(function() {
-			return dataDeferred.state() === 'resolved';
-		}, "wait for data extraction", 5000);
-
-		runs(function () {
-			dataDeferred.done(function(data) {
-				expect(data).toEqual([
-					{
-						a: [
-							{
-								a: "a",
-								'a-href': "http://aa/"
-							},
-							{
-								a: "b",
-								'a-href': "http://bb/"
-							}
-						]
-					}
-				]);
-			});
-		});
-	});
-
-	it("should return only one data column", function () {
-		var selector = new Selector({
-			id: 'id',
-			type: 'SelectorGroup',
-			multiple: true,
-			selector: "div"
-		});
-
-		var columns = selector.getDataColumns();
-		expect(columns).toEqual(['id']);
-	});
-});
+    var columns = selector.getDataColumns()
+    expect(columns).toEqual(['id'])
+  })
+})

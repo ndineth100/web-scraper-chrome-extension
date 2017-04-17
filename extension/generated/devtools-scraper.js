@@ -1,4 +1,93 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.devtoolsApp = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var jquery = require('jquery-deferred')
+/**
+ * @url http://jsperf.com/blob-base64-conversion
+ * @type {{blobToBase64: blobToBase64, base64ToBlob: base64ToBlob}}
+ */
+var Base64 = {
+
+  blobToBase64: function (blob) {
+    var deferredResponse = jquery.Deferred()
+    var reader = new FileReader()
+    reader.onload = function () {
+      var dataUrl = reader.result
+      var base64 = dataUrl.split(',')[1]
+      deferredResponse.resolve(base64)
+    }
+    reader.readAsDataURL(blob)
+
+    return deferredResponse.promise()
+  },
+
+  base64ToBlob: function (base64, mimeType) {
+    var deferredResponse = jquery.Deferred()
+    var binary = atob(base64)
+    var len = binary.length
+    var buffer = new ArrayBuffer(len)
+    var view = new Uint8Array(buffer)
+    for (var i = 0; i < len; i++) {
+      view[i] = binary.charCodeAt(i)
+    }
+    var blob = new Blob([view], {type: mimeType})
+    deferredResponse.resolve(blob)
+
+    return deferredResponse.promise()
+  }
+}
+
+module.exports = Base64
+
+},{"jquery-deferred":29}],2:[function(require,module,exports){
+var jquery = require('jquery-deferred')
+/**
+ * @author Martins Balodis
+ *
+ * An alternative version of $.when which can be used to execute asynchronous
+ * calls sequentially one after another.
+ *
+ * @returns jqueryDeferred().promise()
+ */
+module.exports = function whenCallSequentially (functionCalls) {
+  var deferredResonse = jquery.Deferred()
+  var resultData = []
+
+	// nothing to do
+  if (functionCalls.length === 0) {
+    return deferredResonse.resolve(resultData).promise()
+  }
+
+  var currentDeferred = functionCalls.shift()()
+	// execute synchronous calls synchronously
+  while (currentDeferred.state() === 'resolved') {
+    currentDeferred.done(function (data) {
+      resultData.push(data)
+    })
+    if (functionCalls.length === 0) {
+      return deferredResonse.resolve(resultData).promise()
+    }
+    currentDeferred = functionCalls.shift()()
+  }
+
+	// handle async calls
+  var interval = setInterval(function () {
+		// handle mixed sync calls
+    while (currentDeferred.state() === 'resolved') {
+      currentDeferred.done(function (data) {
+        resultData.push(data)
+      })
+      if (functionCalls.length === 0) {
+        clearInterval(interval)
+        deferredResonse.resolve(resultData)
+        break
+      }
+      currentDeferred = functionCalls.shift()()
+    }
+  }, 10)
+
+  return deferredResonse.promise()
+}
+
+},{"jquery-deferred":29}],3:[function(require,module,exports){
 var StoreDevtools = require('./StoreDevtools')
 var SitemapController = require('./Controller')
 
@@ -13,22 +102,23 @@ $(function () {
   })
 })
 
-},{"./Controller":5,"./StoreDevtools":23}],2:[function(require,module,exports){
+},{"./Controller":7,"./StoreDevtools":25}],4:[function(require,module,exports){
+var jquery = require('jquery-deferred')
 /**
  * ContentScript that can be called from anywhere within the extension
  */
 var BackgroundScript = {
 
   dummy: function () {
-    return $.Deferred().resolve('dummy').promise()
+    return jquery.Deferred().resolve('dummy').promise()
   },
 
 	/**
 	 * Returns the id of the tab that is visible to user
-	 * @returns $.Deferred() integer
+	 * @returns jquery.Deferred() integer
 	 */
   getActiveTabId: function () {
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
 
     chrome.tabs.query({
       active: true,
@@ -56,7 +146,7 @@ var BackgroundScript = {
       fn: request.fn,
       request: request.request
     }
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var deferredActiveTabId = this.getActiveTabId()
     deferredActiveTabId.done(function (tabId) {
       chrome.tabs.sendMessage(tabId, reqToContentScript, function (response) {
@@ -70,9 +160,9 @@ var BackgroundScript = {
 
 module.exports = BackgroundScript
 
-},{}],3:[function(require,module,exports){
+},{"jquery-deferred":29}],5:[function(require,module,exports){
 var ContentSelector = require('./ContentSelector')
-
+var jquery = require('jquery-deferred')
 /**
  * ContentScript that can be called from anywhere within the extension
  */
@@ -81,10 +171,10 @@ var ContentScript = {
 	/**
 	 * Fetch
 	 * @param request.CSSSelector	css selector as string
-	 * @returns $.Deferred()
+	 * @returns jquery.Deferred()
 	 */
   getHTML: function (request) {
-    var deferredHTML = $.Deferred()
+    var deferredHTML = jquery.Deferred()
     var html = $(request.CSSSelector).clone().wrap('<p>').parent().html()
     deferredHTML.resolve(html)
     return deferredHTML.promise()
@@ -92,10 +182,10 @@ var ContentScript = {
 
 	/**
 	 * Removes current content selector if is in use within the page
-	 * @returns $.Deferred()
+	 * @returns jquery.Deferred()
 	 */
   removeCurrentContentSelector: function () {
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var contentSelector = window.cs
     if (contentSelector === undefined) {
       deferredResponse.resolve()
@@ -114,7 +204,7 @@ var ContentScript = {
 	 * @param request.allowedElements
 	 */
   selectSelector: function (request) {
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
 
     this.removeCurrentContentSelector().done(function () {
       var contentSelector = new ContentSelector({
@@ -144,7 +234,7 @@ var ContentScript = {
 	 * @param request.elementCSSSelector
 	 */
   previewSelector: function (request) {
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     this.removeCurrentContentSelector().done(function () {
       var contentSelector = new ContentSelector({
         parentCSSSelector: request.parentCSSSelector
@@ -165,8 +255,9 @@ var ContentScript = {
 
 module.exports = ContentScript
 
-},{"./ContentSelector":4}],4:[function(require,module,exports){
+},{"./ContentSelector":6,"jquery-deferred":29}],6:[function(require,module,exports){
 var ElementQuery = require('./ElementQuery')
+var jquery = require('jquery-deferred')
 /**
  * @param options.parentCSSSelector	Elements can be only selected within this element
  * @param options.allowedElements	Elements that can only be selected
@@ -174,7 +265,7 @@ var ElementQuery = require('./ElementQuery')
  */
 var ContentSelector = function (options) {
 	// deferred response
-  this.deferredCSSSelectorResponse = $.Deferred()
+  this.deferredCSSSelectorResponse = jquery.Deferred()
 
   this.allowedElements = options.allowedElements
   this.parentCSSSelector = options.parentCSSSelector.trim()
@@ -533,7 +624,7 @@ ContentSelector.prototype = {
 
 module.exports = ContentSelector
 
-},{"./ElementQuery":6}],5:[function(require,module,exports){
+},{"./ElementQuery":8,"jquery-deferred":29}],7:[function(require,module,exports){
 var selectors = require('./Selectors')
 var Selector = require('./Selector')
 var SelectorTable = selectors.SelectorTable
@@ -1890,7 +1981,7 @@ SitemapController.prototype = {
 
 module.exports = SitemapController
 
-},{"./Selector":7,"./SelectorGraphv2":19,"./Selectors":21,"./Sitemap":22,"./getBackgroundScript":25,"./getContentScript":26}],6:[function(require,module,exports){
+},{"./Selector":9,"./SelectorGraphv2":21,"./Selectors":23,"./Sitemap":24,"./getBackgroundScript":27,"./getContentScript":28}],8:[function(require,module,exports){
 /**
  * Element selector. Uses jQuery as base and adds some more features
  * @param parentElement
@@ -1949,9 +2040,10 @@ ElementQuery.getSelectorParts = function (CSSSelector) {
 
 module.exports = ElementQuery
 
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var selectors = require('./Selectors')
 var ElementQuery = require('./ElementQuery')
+var jquery = require('jquery-deferred')
 
 var Selector = function (selector) {
   this.updateData(selector)
@@ -2049,10 +2141,10 @@ Selector.prototype = {
   },
 
   getData: function (parentElement) {
-    var d = $.Deferred()
+    var d = jquery.Deferred()
     var timeout = this.delay || 0
 
-		// this works much faster because $.whenCallSequentially isn't running next data extraction immediately
+		// this works much faster because whenCallSequentally isn't running next data extraction immediately
     if (timeout === 0) {
       var deferredData = this._getData(parentElement)
       deferredData.done(function (data) {
@@ -2073,7 +2165,9 @@ Selector.prototype = {
 
 module.exports = Selector
 
-},{"./ElementQuery":6,"./Selectors":21}],8:[function(require,module,exports){
+},{"./ElementQuery":8,"./Selectors":23,"jquery-deferred":29}],10:[function(require,module,exports){
+var jquery = require('jquery-deferred')
+
 var SelectorElement = {
 
   canReturnMultipleRecords: function () {
@@ -2096,7 +2190,7 @@ var SelectorElement = {
   },
 
   _getData: function (parentElement) {
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
     var elements = this.getDataElements(parentElement)
     dfd.resolve(jQuery.makeArray(elements))
@@ -2115,7 +2209,8 @@ var SelectorElement = {
 
 module.exports = SelectorElement
 
-},{}],9:[function(require,module,exports){
+},{"jquery-deferred":29}],11:[function(require,module,exports){
+var jquery = require('jquery-deferred')
 var SelectorElementAttribute = {
   canReturnMultipleRecords: function () {
     return true
@@ -2136,7 +2231,7 @@ var SelectorElementAttribute = {
     return false
   },
   _getData: function (parentElement) {
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
     var elements = this.getDataElements(parentElement)
 
@@ -2169,7 +2264,8 @@ var SelectorElementAttribute = {
 
 module.exports = SelectorElementAttribute
 
-},{}],10:[function(require,module,exports){
+},{"jquery-deferred":29}],12:[function(require,module,exports){
+var jquery = require('jquery-deferred')
 var UniqueElementList = require('./../UniqueElementList')
 var ElementQuery = require('./../ElementQuery')
 var SelectorElementClick = {
@@ -2235,7 +2331,7 @@ var SelectorElementClick = {
 
   _getData: function (parentElement) {
     var delay = parseInt(this.delay) || 0
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var foundElements = new UniqueElementList('uniqueText')
     var clickElements = this.getClickElements(parentElement)
     var doneClickingElements = new UniqueElementList(this.getClickElementUniquenessType())
@@ -2326,7 +2422,8 @@ var SelectorElementClick = {
 
 module.exports = SelectorElementClick
 
-},{"./../ElementQuery":6,"./../UniqueElementList":24}],11:[function(require,module,exports){
+},{"./../ElementQuery":8,"./../UniqueElementList":26,"jquery-deferred":29}],13:[function(require,module,exports){
+var jquery = require('jquery-deferred')
 var SelectorElementScroll = {
 
   canReturnMultipleRecords: function () {
@@ -2352,7 +2449,7 @@ var SelectorElementScroll = {
   },
   _getData: function (parentElement) {
     var delay = parseInt(this.delay) || 0
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var foundElements = []
 
 		// initially scroll down and wait
@@ -2394,7 +2491,8 @@ var SelectorElementScroll = {
 
 module.exports = SelectorElementScroll
 
-},{}],12:[function(require,module,exports){
+},{"jquery-deferred":29}],14:[function(require,module,exports){
+var jquery = require('jquery-deferred')
 var SelectorGroup = {
 
   canReturnMultipleRecords: function () {
@@ -2416,7 +2514,7 @@ var SelectorGroup = {
     return false
   },
   _getData: function (parentElement) {
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
 		// cannot reuse this.getDataElements because it depends on *multiple* property
     var elements = $(this.selector, parentElement)
@@ -2452,7 +2550,8 @@ var SelectorGroup = {
 
 module.exports = SelectorGroup
 
-},{}],13:[function(require,module,exports){
+},{"jquery-deferred":29}],15:[function(require,module,exports){
+var jquery = require('jquery-deferred')
 var SelectorHTML = {
 
   canReturnMultipleRecords: function () {
@@ -2474,7 +2573,7 @@ var SelectorHTML = {
     return false
   },
   _getData: function (parentElement) {
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
     var elements = this.getDataElements(parentElement)
 
@@ -2517,7 +2616,10 @@ var SelectorHTML = {
 
 module.exports = SelectorHTML
 
-},{}],14:[function(require,module,exports){
+},{"jquery-deferred":29}],16:[function(require,module,exports){
+var jquery = require('jquery-deferred')
+var whenCallSequentially = require('../../assets/jquery.whencallsequentially')
+var Base64 = require('../../assets/base64')
 var SelectorImage = {
   canReturnMultipleRecords: function () {
     return true
@@ -2538,14 +2640,14 @@ var SelectorImage = {
     return false
   },
   _getData: function (parentElement) {
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
     var elements = this.getDataElements(parentElement)
 
     var deferredDataCalls = []
     $(elements).each(function (i, element) {
       deferredDataCalls.push(function () {
-        var deferredData = $.Deferred()
+        var deferredData = jquery.Deferred()
 
         var data = {}
         data[this.id + '-src'] = element.src
@@ -2572,7 +2674,7 @@ var SelectorImage = {
       }.bind(this))
     }.bind(this))
 
-    $.whenCallSequentially(deferredDataCalls).done(function (dataResults) {
+    whenCallSequentially(deferredDataCalls).done(function (dataResults) {
       if (this.multiple === false && elements.length === 0) {
         var data = {}
         data[this.id + '-src'] = null
@@ -2586,7 +2688,7 @@ var SelectorImage = {
   },
 
   downloadFileAsBlob: function (url) {
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var xhr = new XMLHttpRequest()
     xhr.onreadystatechange = function () {
       if (this.readyState == 4) {
@@ -2606,7 +2708,7 @@ var SelectorImage = {
   },
 
   downloadImageBase64: function (url) {
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var deferredDownload = this.downloadFileAsBlob(url)
     deferredDownload.done(function (blob) {
       var mimeType = blob.type
@@ -2636,7 +2738,10 @@ var SelectorImage = {
 
 module.exports = SelectorImage
 
-},{}],15:[function(require,module,exports){
+},{"../../assets/base64":1,"../../assets/jquery.whencallsequentially":2,"jquery-deferred":29}],17:[function(require,module,exports){
+var jquery = require('jquery-deferred')
+var whenCallSequentially = require('../../assets/jquery.whencallsequentially')
+
 var SelectorLink = {
   canReturnMultipleRecords: function () {
     return true
@@ -2659,7 +2764,7 @@ var SelectorLink = {
   _getData: function (parentElement) {
     var elements = this.getDataElements(parentElement)
 
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
 		// return empty record if not multiple type and no elements found
     if (this.multiple === false && elements.length === 0) {
@@ -2673,7 +2778,7 @@ var SelectorLink = {
     var deferredDataExtractionCalls = []
     $(elements).each(function (k, element) {
       deferredDataExtractionCalls.push(function (element) {
-        var deferredData = $.Deferred()
+        var deferredData = jquery.Deferred()
 
         var data = {}
         data[this.id] = $(element).text()
@@ -2686,7 +2791,7 @@ var SelectorLink = {
       }.bind(this, element))
     }.bind(this))
 
-    $.whenCallSequentially(deferredDataExtractionCalls).done(function (responses) {
+    whenCallSequentially(deferredDataExtractionCalls).done(function (responses) {
       var result = []
       responses.forEach(function (dataResult) {
         result.push(dataResult)
@@ -2712,7 +2817,10 @@ var SelectorLink = {
 
 module.exports = SelectorLink
 
-},{}],16:[function(require,module,exports){
+},{"../../assets/jquery.whencallsequentially":2,"jquery-deferred":29}],18:[function(require,module,exports){
+var whenCallSequentially = require('../../assets/jquery.whencallsequentially')
+var jquery = require('jquery-deferred')
+
 var SelectorPopupLink = {
   canReturnMultipleRecords: function () {
     return true
@@ -2735,7 +2843,7 @@ var SelectorPopupLink = {
   _getData: function (parentElement) {
     var elements = this.getDataElements(parentElement)
 
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
 		// return empty record if not multiple type and no elements found
     if (this.multiple === false && elements.length === 0) {
@@ -2749,7 +2857,7 @@ var SelectorPopupLink = {
     var deferredDataExtractionCalls = []
     $(elements).each(function (k, element) {
       deferredDataExtractionCalls.push(function (element) {
-        var deferredData = $.Deferred()
+        var deferredData = jquery.Deferred()
 
         var data = {}
         data[this.id] = $(element).text()
@@ -2766,7 +2874,7 @@ var SelectorPopupLink = {
       }.bind(this, element))
     }.bind(this))
 
-    $.whenCallSequentially(deferredDataExtractionCalls).done(function (responses) {
+    whenCallSequentially(deferredDataExtractionCalls).done(function (responses) {
       var result = []
       responses.forEach(function (dataResult) {
         result.push(dataResult)
@@ -2810,7 +2918,7 @@ var SelectorPopupLink = {
     document.body.appendChild(script)
 
 		// wait for url to be available
-    var deferredURL = $.Deferred()
+    var deferredURL = jquery.Deferred()
     var timeout = Math.abs(5000 / 30) // 5s timeout to generate an url for popup
     var interval = setInterval(function () {
       var url = $(element).data('web-scraper-extract-url')
@@ -2844,7 +2952,9 @@ var SelectorPopupLink = {
 
 module.exports = SelectorPopupLink
 
-},{}],17:[function(require,module,exports){
+},{"../../assets/jquery.whencallsequentially":2,"jquery-deferred":29}],19:[function(require,module,exports){
+var jquery = require('jquery-deferred')
+
 var SelectorTable = {
 
   canReturnMultipleRecords: function () {
@@ -2880,7 +2990,7 @@ var SelectorTable = {
     return columns
   },
   _getData: function (parentElement) {
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
     var tables = this.getDataElements(parentElement)
 
@@ -3007,7 +3117,8 @@ var SelectorTable = {
 
 module.exports = SelectorTable
 
-},{}],18:[function(require,module,exports){
+},{"jquery-deferred":29}],20:[function(require,module,exports){
+var jquery = require('jquery-deferred')
 var SelectorText = {
 
   canReturnMultipleRecords: function () {
@@ -3029,7 +3140,7 @@ var SelectorText = {
     return false
   },
   _getData: function (parentElement) {
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
     var elements = this.getDataElements(parentElement)
 
@@ -3078,7 +3189,7 @@ var SelectorText = {
 
 module.exports = SelectorText
 
-},{}],19:[function(require,module,exports){
+},{"jquery-deferred":29}],21:[function(require,module,exports){
 var SelectorGraphv2 = function (sitemap) {
   this.sitemap = sitemap
 }
@@ -3291,7 +3402,7 @@ SelectorGraphv2.prototype = {
   }
 }
 
-},{}],20:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 var Selector = require('./Selector')
 
 var SelectorList = function (selectors) {
@@ -3562,7 +3673,7 @@ SelectorList.prototype.hasRecursiveElementSelectors = function () {
 
 module.exports = SelectorList
 
-},{"./Selector":7}],21:[function(require,module,exports){
+},{"./Selector":9}],23:[function(require,module,exports){
 var SelectorElement = require('./Selector/SelectorElement')
 var SelectorElementAttribute = require('./Selector/SelectorElementAttribute')
 var SelectorElementClick = require('./Selector/SelectorElementClick')
@@ -3589,7 +3700,7 @@ module.exports = {
   SelectorText
 }
 
-},{"./Selector/SelectorElement":8,"./Selector/SelectorElementAttribute":9,"./Selector/SelectorElementClick":10,"./Selector/SelectorElementScroll":11,"./Selector/SelectorGroup":12,"./Selector/SelectorHTML":13,"./Selector/SelectorImage":14,"./Selector/SelectorLink":15,"./Selector/SelectorPopupLink":16,"./Selector/SelectorTable":17,"./Selector/SelectorText":18}],22:[function(require,module,exports){
+},{"./Selector/SelectorElement":10,"./Selector/SelectorElementAttribute":11,"./Selector/SelectorElementClick":12,"./Selector/SelectorElementScroll":13,"./Selector/SelectorGroup":14,"./Selector/SelectorHTML":15,"./Selector/SelectorImage":16,"./Selector/SelectorLink":17,"./Selector/SelectorPopupLink":18,"./Selector/SelectorTable":19,"./Selector/SelectorText":20}],24:[function(require,module,exports){
 var Selector = require('./Selector')
 var SelectorList = require('./SelectorList')
 var Sitemap = function (sitemapObj) {
@@ -3801,7 +3912,7 @@ Sitemap.prototype = {
 
 module.exports = Sitemap
 
-},{"./Selector":7,"./SelectorList":20}],23:[function(require,module,exports){
+},{"./Selector":9,"./SelectorList":22}],25:[function(require,module,exports){
 var Sitemap = require('./Sitemap')
 
 /**
@@ -3876,7 +3987,7 @@ StoreDevtools.prototype = {
 
 module.exports = StoreDevtools
 
-},{"./Sitemap":22}],24:[function(require,module,exports){
+},{"./Sitemap":24}],26:[function(require,module,exports){
 /**
  * Only Elements unique will be added to this array
  * @constructor
@@ -3944,7 +4055,8 @@ UniqueElementList.prototype.isAdded = function (element) {
   return isAdded
 }
 
-},{}],25:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
+var jquery = require('jquery-deferred')
 var BackgroundScript = require('./BackgroundScript')
 /**
  * @param location	configure from where the content script is being accessed (ContentScript, BackgroundPage, DevTools)
@@ -3967,7 +4079,7 @@ var getBackgroundScript = function (location) {
             request: request
           }
 
-          var deferredResponse = $.Deferred()
+          var deferredResponse = jquery.Deferred()
 
           chrome.runtime.sendMessage(reqToBackgroundScript, function (response) {
             deferredResponse.resolve(response)
@@ -3988,7 +4100,7 @@ var getBackgroundScript = function (location) {
 
 module.exports = getBackgroundScript
 
-},{"./BackgroundScript":2}],26:[function(require,module,exports){
+},{"./BackgroundScript":4,"jquery-deferred":29}],28:[function(require,module,exports){
 var getBackgroundScript = require('./getBackgroundScript')
 var ContentScript = require('./ContentScript')
 /**
@@ -4034,5 +4146,538 @@ var getContentScript = function (location) {
 
 module.exports = getContentScript
 
-},{"./ContentScript":3,"./getBackgroundScript":25}]},{},[1])(1)
+},{"./ContentScript":5,"./getBackgroundScript":27}],29:[function(require,module,exports){
+
+module.exports = require('./lib/jquery-deferred');
+},{"./lib/jquery-deferred":32}],30:[function(require,module,exports){
+var jQuery = module.exports = require("./jquery-core.js"),
+	core_rspace = /\s+/;
+/**
+* jQuery Callbacks
+*
+* Code from: https://github.com/jquery/jquery/blob/master/src/callbacks.js
+*
+*/
+
+
+// String to Object options format cache
+var optionsCache = {};
+
+// Convert String-formatted options into Object-formatted ones and store in cache
+function createOptions( options ) {
+	var object = optionsCache[ options ] = {};
+	jQuery.each( options.split( core_rspace ), function( _, flag ) {
+		object[ flag ] = true;
+	});
+	return object;
+}
+
+/*
+ * Create a callback list using the following parameters:
+ *
+ *	options: an optional list of space-separated options that will change how
+ *			the callback list behaves or a more traditional option object
+ *
+ * By default a callback list will act like an event callback list and can be
+ * "fired" multiple times.
+ *
+ * Possible options:
+ *
+ *	once:			will ensure the callback list can only be fired once (like a Deferred)
+ *
+ *	memory:			will keep track of previous values and will call any callback added
+ *					after the list has been fired right away with the latest "memorized"
+ *					values (like a Deferred)
+ *
+ *	unique:			will ensure a callback can only be added once (no duplicate in the list)
+ *
+ *	stopOnFalse:	interrupt callings when a callback returns false
+ *
+ */
+jQuery.Callbacks = function( options ) {
+
+	// Convert options from String-formatted to Object-formatted if needed
+	// (we check in cache first)
+	options = typeof options === "string" ?
+		( optionsCache[ options ] || createOptions( options ) ) :
+		jQuery.extend( {}, options );
+
+	var // Last fire value (for non-forgettable lists)
+		memory,
+		// Flag to know if list was already fired
+		fired,
+		// Flag to know if list is currently firing
+		firing,
+		// First callback to fire (used internally by add and fireWith)
+		firingStart,
+		// End of the loop when firing
+		firingLength,
+		// Index of currently firing callback (modified by remove if needed)
+		firingIndex,
+		// Actual callback list
+		list = [],
+		// Stack of fire calls for repeatable lists
+		stack = !options.once && [],
+		// Fire callbacks
+		fire = function( data ) {
+			memory = options.memory && data;
+			fired = true;
+			firingIndex = firingStart || 0;
+			firingStart = 0;
+			firingLength = list.length;
+			firing = true;
+			for ( ; list && firingIndex < firingLength; firingIndex++ ) {
+				if ( list[ firingIndex ].apply( data[ 0 ], data[ 1 ] ) === false && options.stopOnFalse ) {
+					memory = false; // To prevent further calls using add
+					break;
+				}
+			}
+			firing = false;
+			if ( list ) {
+				if ( stack ) {
+					if ( stack.length ) {
+						fire( stack.shift() );
+					}
+				} else if ( memory ) {
+					list = [];
+				} else {
+					self.disable();
+				}
+			}
+		},
+		// Actual Callbacks object
+		self = {
+			// Add a callback or a collection of callbacks to the list
+			add: function() {
+				if ( list ) {
+					// First, we save the current length
+					var start = list.length;
+					(function add( args ) {
+						jQuery.each( args, function( _, arg ) {
+							var type = jQuery.type( arg );
+							if ( type === "function" ) {
+								if ( !options.unique || !self.has( arg ) ) {
+									list.push( arg );
+								}
+							} else if ( arg && arg.length && type !== "string" ) {
+								// Inspect recursively
+								add( arg );
+							}
+						});
+					})( arguments );
+					// Do we need to add the callbacks to the
+					// current firing batch?
+					if ( firing ) {
+						firingLength = list.length;
+					// With memory, if we're not firing then
+					// we should call right away
+					} else if ( memory ) {
+						firingStart = start;
+						fire( memory );
+					}
+				}
+				return this;
+			},
+			// Remove a callback from the list
+			remove: function() {
+				if ( list ) {
+					jQuery.each( arguments, function( _, arg ) {
+						var index;
+						while( ( index = jQuery.inArray( arg, list, index ) ) > -1 ) {
+							list.splice( index, 1 );
+							// Handle firing indexes
+							if ( firing ) {
+								if ( index <= firingLength ) {
+									firingLength--;
+								}
+								if ( index <= firingIndex ) {
+									firingIndex--;
+								}
+							}
+						}
+					});
+				}
+				return this;
+			},
+			// Control if a given callback is in the list
+			has: function( fn ) {
+				return jQuery.inArray( fn, list ) > -1;
+			},
+			// Remove all callbacks from the list
+			empty: function() {
+				list = [];
+				return this;
+			},
+			// Have the list do nothing anymore
+			disable: function() {
+				list = stack = memory = undefined;
+				return this;
+			},
+			// Is it disabled?
+			disabled: function() {
+				return !list;
+			},
+			// Lock the list in its current state
+			lock: function() {
+				stack = undefined;
+				if ( !memory ) {
+					self.disable();
+				}
+				return this;
+			},
+			// Is it locked?
+			locked: function() {
+				return !stack;
+			},
+			// Call all callbacks with the given context and arguments
+			fireWith: function( context, args ) {
+				args = args || [];
+				args = [ context, args.slice ? args.slice() : args ];
+				if ( list && ( !fired || stack ) ) {
+					if ( firing ) {
+						stack.push( args );
+					} else {
+						fire( args );
+					}
+				}
+				return this;
+			},
+			// Call all the callbacks with the given arguments
+			fire: function() {
+				self.fireWith( this, arguments );
+				return this;
+			},
+			// To know if the callbacks have already been called at least once
+			fired: function() {
+				return !!fired;
+			}
+		};
+
+	return self;
+};
+
+
+},{"./jquery-core.js":31}],31:[function(require,module,exports){
+/**
+* jQuery core object.
+*
+* Worker with jQuery deferred
+*
+* Code from: https://github.com/jquery/jquery/blob/master/src/core.js
+*
+*/
+
+var jQuery = module.exports = {
+	type: type
+	, isArray: isArray
+	, isFunction: isFunction
+	, isPlainObject: isPlainObject
+	, each: each
+	, extend: extend
+	, noop: function() {}
+};
+
+var toString = Object.prototype.toString;
+
+var class2type = {};
+// Populate the class2type map
+"Boolean Number String Function Array Date RegExp Object".split(" ").forEach(function(name) {
+	class2type[ "[object " + name + "]" ] = name.toLowerCase();
+});
+
+
+function type( obj ) {
+	return obj == null ?
+		String( obj ) :
+			class2type[ toString.call(obj) ] || "object";
+}
+
+function isFunction( obj ) {
+	return jQuery.type(obj) === "function";
+}
+
+function isArray( obj ) {
+	return jQuery.type(obj) === "array";
+}
+
+function each( object, callback, args ) {
+	var name, i = 0,
+	length = object.length,
+	isObj = length === undefined || isFunction( object );
+
+	if ( args ) {
+		if ( isObj ) {
+			for ( name in object ) {
+				if ( callback.apply( object[ name ], args ) === false ) {
+					break;
+				}
+			}
+		} else {
+			for ( ; i < length; ) {
+				if ( callback.apply( object[ i++ ], args ) === false ) {
+					break;
+				}
+			}
+		}
+
+		// A special, fast, case for the most common use of each
+	} else {
+		if ( isObj ) {
+			for ( name in object ) {
+				if ( callback.call( object[ name ], name, object[ name ] ) === false ) {
+					break;
+				}
+			}
+		} else {
+			for ( ; i < length; ) {
+				if ( callback.call( object[ i ], i, object[ i++ ] ) === false ) {
+					break;
+				}
+			}
+		}
+	}
+
+	return object;
+}
+
+function isPlainObject( obj ) {
+	// Must be an Object.
+	if ( !obj || jQuery.type(obj) !== "object" ) {
+		return false;
+	}
+	return true;
+}
+
+function extend() {
+	var options, name, src, copy, copyIsArray, clone,
+	target = arguments[0] || {},
+	i = 1,
+	length = arguments.length,
+	deep = false;
+
+	// Handle a deep copy situation
+	if ( typeof target === "boolean" ) {
+		deep = target;
+		target = arguments[1] || {};
+		// skip the boolean and the target
+		i = 2;
+	}
+
+	// Handle case when target is a string or something (possible in deep copy)
+	if ( typeof target !== "object" && !jQuery.isFunction(target) ) {
+		target = {};
+	}
+
+	// extend jQuery itself if only one argument is passed
+	if ( length === i ) {
+		target = this;
+		--i;
+	}
+
+	for ( ; i < length; i++ ) {
+		// Only deal with non-null/undefined values
+		if ( (options = arguments[ i ]) != null ) {
+			// Extend the base object
+			for ( name in options ) {
+				src = target[ name ];
+				copy = options[ name ];
+
+				// Prevent never-ending loop
+				if ( target === copy ) {
+					continue;
+				}
+
+				// Recurse if we're merging plain objects or arrays
+				if ( deep && copy && ( jQuery.isPlainObject(copy) || (copyIsArray = jQuery.isArray(copy)) ) ) {
+					if ( copyIsArray ) {
+						copyIsArray = false;
+						clone = src && jQuery.isArray(src) ? src : [];
+
+					} else {
+						clone = src && jQuery.isPlainObject(src) ? src : {};
+					}
+
+					// Never move original objects, clone them
+					target[ name ] = jQuery.extend( deep, clone, copy );
+
+					// Don't bring in undefined values
+				} else if ( copy !== undefined ) {
+					target[ name ] = copy;
+				}
+			}
+		}
+	}
+
+	// Return the modified object
+	return target;
+};
+
+
+
+},{}],32:[function(require,module,exports){
+
+/*!
+* jquery-deferred
+* Copyright(c) 2011 Hidden <zzdhidden@gmail.com>
+* MIT Licensed
+*/
+
+/**
+* Library version.
+*/
+
+var jQuery = module.exports = require("./jquery-callbacks.js"),
+	core_slice = Array.prototype.slice;
+
+/**
+* jQuery deferred
+*
+* Code from: https://github.com/jquery/jquery/blob/master/src/deferred.js
+* Doc: http://api.jquery.com/category/deferred-object/
+*
+*/
+
+jQuery.extend({
+
+	Deferred: function( func ) {
+		var tuples = [
+				// action, add listener, listener list, final state
+				[ "resolve", "done", jQuery.Callbacks("once memory"), "resolved" ],
+				[ "reject", "fail", jQuery.Callbacks("once memory"), "rejected" ],
+				[ "notify", "progress", jQuery.Callbacks("memory") ]
+			],
+			state = "pending",
+			promise = {
+				state: function() {
+					return state;
+				},
+				always: function() {
+					deferred.done( arguments ).fail( arguments );
+					return this;
+				},
+				then: function( /* fnDone, fnFail, fnProgress */ ) {
+					var fns = arguments;
+					return jQuery.Deferred(function( newDefer ) {
+						jQuery.each( tuples, function( i, tuple ) {
+							var action = tuple[ 0 ],
+								fn = fns[ i ];
+							// deferred[ done | fail | progress ] for forwarding actions to newDefer
+							deferred[ tuple[1] ]( jQuery.isFunction( fn ) ?
+								function() {
+									var returned = fn.apply( this, arguments );
+									if ( returned && jQuery.isFunction( returned.promise ) ) {
+										returned.promise()
+											.done( newDefer.resolve )
+											.fail( newDefer.reject )
+											.progress( newDefer.notify );
+									} else {
+										newDefer[ action + "With" ]( this === deferred ? newDefer : this, [ returned ] );
+									}
+								} :
+								newDefer[ action ]
+							);
+						});
+						fns = null;
+					}).promise();
+				},
+				// Get a promise for this deferred
+				// If obj is provided, the promise aspect is added to the object
+				promise: function( obj ) {
+					return obj != null ? jQuery.extend( obj, promise ) : promise;
+				}
+			},
+			deferred = {};
+
+		// Keep pipe for back-compat
+		promise.pipe = promise.then;
+
+		// Add list-specific methods
+		jQuery.each( tuples, function( i, tuple ) {
+			var list = tuple[ 2 ],
+				stateString = tuple[ 3 ];
+
+			// promise[ done | fail | progress ] = list.add
+			promise[ tuple[1] ] = list.add;
+
+			// Handle state
+			if ( stateString ) {
+				list.add(function() {
+					// state = [ resolved | rejected ]
+					state = stateString;
+
+				// [ reject_list | resolve_list ].disable; progress_list.lock
+				}, tuples[ i ^ 1 ][ 2 ].disable, tuples[ 2 ][ 2 ].lock );
+			}
+
+			// deferred[ resolve | reject | notify ] = list.fire
+			deferred[ tuple[0] ] = list.fire;
+			deferred[ tuple[0] + "With" ] = list.fireWith;
+		});
+
+		// Make the deferred a promise
+		promise.promise( deferred );
+
+		// Call given func if any
+		if ( func ) {
+			func.call( deferred, deferred );
+		}
+
+		// All done!
+		return deferred;
+	},
+
+	// Deferred helper
+	when: function( subordinate /* , ..., subordinateN */ ) {
+		var i = 0,
+			resolveValues = core_slice.call( arguments ),
+			length = resolveValues.length,
+
+			// the count of uncompleted subordinates
+			remaining = length !== 1 || ( subordinate && jQuery.isFunction( subordinate.promise ) ) ? length : 0,
+
+			// the master Deferred. If resolveValues consist of only a single Deferred, just use that.
+			deferred = remaining === 1 ? subordinate : jQuery.Deferred(),
+
+			// Update function for both resolve and progress values
+			updateFunc = function( i, contexts, values ) {
+				return function( value ) {
+					contexts[ i ] = this;
+					values[ i ] = arguments.length > 1 ? core_slice.call( arguments ) : value;
+					if( values === progressValues ) {
+						deferred.notifyWith( contexts, values );
+					} else if ( !( --remaining ) ) {
+						deferred.resolveWith( contexts, values );
+					}
+				};
+			},
+
+			progressValues, progressContexts, resolveContexts;
+
+		// add listeners to Deferred subordinates; treat others as resolved
+		if ( length > 1 ) {
+			progressValues = new Array( length );
+			progressContexts = new Array( length );
+			resolveContexts = new Array( length );
+			for ( ; i < length; i++ ) {
+				if ( resolveValues[ i ] && jQuery.isFunction( resolveValues[ i ].promise ) ) {
+					resolveValues[ i ].promise()
+						.done( updateFunc( i, resolveContexts, resolveValues ) )
+						.fail( deferred.reject )
+						.progress( updateFunc( i, progressContexts, progressValues ) );
+				} else {
+					--remaining;
+				}
+			}
+		}
+
+		// if we're not waiting on anything, resolve the master
+		if ( !remaining ) {
+			deferred.resolveWith( resolveContexts, resolveValues );
+		}
+
+		return deferred.promise();
+	}
+});
+
+},{"./jquery-callbacks.js":30}]},{},[3])(3)
 });

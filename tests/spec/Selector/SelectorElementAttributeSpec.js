@@ -1,125 +1,120 @@
-describe("Element Attribute Selector", function () {
+describe('Element Attribute Selector', function () {
+  var $el
 
-	var $el;
+  beforeEach(function () {
+    this.addMatchers(selectorMatchers)
 
-	beforeEach(function () {
+    $el = jQuery('#tests').html('')
+    if ($el.length === 0) {
+      $el = $("<div id='tests' style='display:none'></div>").appendTo('body')
+    }
+  })
 
-		this.addMatchers(selectorMatchers);
+  it('should extract image src tag', function () {
+    var selector = new Selector({
+      id: 'img',
+      type: 'SelectorElementAttribute',
+      multiple: false,
+      extractAttribute: 'src',
+      selector: 'img'
+    })
 
-		$el = jQuery("#tests").html("");
-		if($el.length === 0) {
-			$el = $("<div id='tests' style='display:none'></div>").appendTo("body");
-		}
-	});
+    var dataDeferred = selector.getData($('#selector-image-one-image'))
 
-	it("should extract image src tag", function () {
+    waitsFor(function () {
+      return dataDeferred.state() === 'resolved'
+    }, 'wait for data extraction', 5000)
 
-		var selector = new Selector({
-			id: 'img',
-			type: 'SelectorElementAttribute',
-			multiple: false,
-			extractAttribute: "src",
-			selector: "img"
-		});
+    runs(function () {
+      dataDeferred.done(function (data) {
+        expect(data).toEqual([
+          {
+            'img': 'http://aa/'
+          }
+        ])
+      })
+    })
+  })
 
-		var dataDeferred = selector.getData($("#selector-image-one-image"));
+  it('should extract multiple src tags', function () {
+    var selector = new Selector({
+      id: 'img',
+      type: 'SelectorElementAttribute',
+      multiple: true,
+      extractAttribute: 'src',
+      selector: 'img'
+    })
 
-		waitsFor(function() {
-			return dataDeferred.state() === 'resolved';
-		}, "wait for data extraction", 5000);
+    var dataDeferred = selector.getData($('#selector-image-multiple-images'))
 
-		runs(function () {
-			dataDeferred.done(function(data) {
-				expect(data).toEqual([
-					{
-						'img': "http://aa/"
-					}
-				]);
-			});
-		});
-	});
+    waitsFor(function () {
+      return dataDeferred.state() === 'resolved'
+    }, 'wait for data extraction', 5000)
 
-	it("should extract multiple src tags", function () {
+    runs(function () {
+      dataDeferred.done(function (data) {
+        expect(data).toEqual([
+          {
+            'img': 'http://aa/'
+          },
+          {
+            'img': 'http://bb/'
+          }
+        ])
+      })
+    })
+  })
 
-		var selector = new Selector({
-			id: 'img',
-			type: 'SelectorElementAttribute',
-			multiple: true,
-			extractAttribute: "src",
-			selector: "img"
-		});
+  it('should return only one data column', function () {
+    var selector = new Selector({
+      id: 'id',
+      type: 'SelectorElementAttribute',
+      multiple: true,
+      selector: 'img'
+    })
 
-		var dataDeferred = selector.getData($("#selector-image-multiple-images"));
+    var columns = selector.getDataColumns()
+    expect(columns).toEqual(['id'])
+  })
 
-		waitsFor(function() {
-			return dataDeferred.state() === 'resolved';
-		}, "wait for data extraction", 5000);
+  it('should return empty array when no images are found', function () {
+    var selector = new Selector({
+      id: 'img',
+      type: 'SelectorElementAttribute',
+      multiple: true,
+      selector: 'img.not-exist',
+      extractAttribute: 'src'
+    })
 
-		runs(function () {
-			dataDeferred.done(function(data) {
-				expect(data).toEqual([
-					{
-						'img': "http://aa/"
-					},
-					{
-						'img': "http://bb/"
-					}
-				]);
-			});
-		});
-	});
+    var dataDeferred = selector.getData($('#not-exist'))
 
-	it("should return only one data column", function () {
-		var selector = new Selector({
-			id: 'id',
-			type: 'SelectorElementAttribute',
-			multiple: true,
-			selector: "img"
-		});
+    waitsFor(function () {
+      return dataDeferred.state() === 'resolved'
+    }, 'wait for data extraction', 5000)
 
-		var columns = selector.getDataColumns();
-		expect(columns).toEqual(['id']);
-	});
+    runs(function () {
+      dataDeferred.done(function (data) {
+        expect(data).toEqual([])
+      })
+    })
+  })
 
-	it("should return empty array when no images are found", function () {
-		var selector = new Selector({
-			id: 'img',
-			type: 'SelectorElementAttribute',
-			multiple: true,
-			selector: "img.not-exist",
-			extractAttribute: "src"
-		});
+  it('should be able to select data- attributes', function () {
+    var html = '<ul><li data-type="dog"></li></ul>'
+    $el.append(html)
 
-		var dataDeferred = selector.getData($("#not-exist"));
+    var selector = new Selector({
+      id: 'type',
+      type: 'SelectorElementAttribute',
+      multiple: true,
+      selector: 'li',
+      extractAttribute: 'data-type'
+    })
 
-		waitsFor(function() {
-			return dataDeferred.state() === 'resolved';
-		}, "wait for data extraction", 5000);
+    var dataDeferred = selector.getData($el)
 
-		runs(function () {
-			dataDeferred.done(function(data) {
-				expect(data).toEqual([]);
-			});
-		});
-	});
-
-	it("should be able to select data- attributes", function () {
-
-		var html = '<ul><li data-type="dog"></li></ul>';
-		$el.append(html);
-
-		var selector = new Selector({
-			id: 'type',
-			type: 'SelectorElementAttribute',
-			multiple: true,
-			selector: "li",
-			extractAttribute: "data-type"
-		});
-
-		var dataDeferred = selector.getData($el);
-
-		expect(dataDeferred).deferredToEqual([{
-			'type': 'dog'
-		}]);
-	});
-});
+    expect(dataDeferred).deferredToEqual([{
+      'type': 'dog'
+    }])
+  })
+})

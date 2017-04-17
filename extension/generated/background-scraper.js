@@ -977,7 +977,7 @@ var SelectorElementAttribute = {
     return false
   },
   _getData: function (parentElement) {
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
     var elements = this.getDataElements(parentElement)
 
@@ -1010,7 +1010,8 @@ var SelectorElementAttribute = {
 
 module.exports = SelectorElementAttribute
 
-},{}],13:[function(require,module,exports){
+},{"jquery-deferred":29}],14:[function(require,module,exports){
+var jquery = require('jquery-deferred')
 var UniqueElementList = require('./../UniqueElementList')
 var ElementQuery = require('./../ElementQuery')
 var SelectorElementClick = {
@@ -1076,7 +1077,7 @@ var SelectorElementClick = {
 
   _getData: function (parentElement) {
     var delay = parseInt(this.delay) || 0
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var foundElements = new UniqueElementList('uniqueText')
     var clickElements = this.getClickElements(parentElement)
     var doneClickingElements = new UniqueElementList(this.getClickElementUniquenessType())
@@ -1167,7 +1168,8 @@ var SelectorElementClick = {
 
 module.exports = SelectorElementClick
 
-},{"./../ElementQuery":6,"./../UniqueElementList":26}],14:[function(require,module,exports){
+},{"./../ElementQuery":7,"./../UniqueElementList":27,"jquery-deferred":29}],15:[function(require,module,exports){
+var jquery = require('jquery-deferred')
 var SelectorElementScroll = {
 
   canReturnMultipleRecords: function () {
@@ -1193,7 +1195,7 @@ var SelectorElementScroll = {
   },
   _getData: function (parentElement) {
     var delay = parseInt(this.delay) || 0
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var foundElements = []
 
 		// initially scroll down and wait
@@ -1235,7 +1237,8 @@ var SelectorElementScroll = {
 
 module.exports = SelectorElementScroll
 
-},{}],15:[function(require,module,exports){
+},{"jquery-deferred":29}],16:[function(require,module,exports){
+var jquery = require('jquery-deferred')
 var SelectorGroup = {
 
   canReturnMultipleRecords: function () {
@@ -1257,7 +1260,7 @@ var SelectorGroup = {
     return false
   },
   _getData: function (parentElement) {
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
 		// cannot reuse this.getDataElements because it depends on *multiple* property
     var elements = $(this.selector, parentElement)
@@ -1293,7 +1296,8 @@ var SelectorGroup = {
 
 module.exports = SelectorGroup
 
-},{}],16:[function(require,module,exports){
+},{"jquery-deferred":29}],17:[function(require,module,exports){
+var jquery = require('jquery-deferred')
 var SelectorHTML = {
 
   canReturnMultipleRecords: function () {
@@ -1315,7 +1319,7 @@ var SelectorHTML = {
     return false
   },
   _getData: function (parentElement) {
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
     var elements = this.getDataElements(parentElement)
 
@@ -1358,7 +1362,10 @@ var SelectorHTML = {
 
 module.exports = SelectorHTML
 
-},{}],17:[function(require,module,exports){
+},{"jquery-deferred":29}],18:[function(require,module,exports){
+var jquery = require('jquery-deferred')
+var whenCallSequentially = require('../../assets/jquery.whencallsequentially')
+var Base64 = require('../../assets/base64')
 var SelectorImage = {
   canReturnMultipleRecords: function () {
     return true
@@ -1379,14 +1386,14 @@ var SelectorImage = {
     return false
   },
   _getData: function (parentElement) {
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
     var elements = this.getDataElements(parentElement)
 
     var deferredDataCalls = []
     $(elements).each(function (i, element) {
       deferredDataCalls.push(function () {
-        var deferredData = $.Deferred()
+        var deferredData = jquery.Deferred()
 
         var data = {}
         data[this.id + '-src'] = element.src
@@ -1413,7 +1420,7 @@ var SelectorImage = {
       }.bind(this))
     }.bind(this))
 
-    $.whenCallSequentially(deferredDataCalls).done(function (dataResults) {
+    whenCallSequentially(deferredDataCalls).done(function (dataResults) {
       if (this.multiple === false && elements.length === 0) {
         var data = {}
         data[this.id + '-src'] = null
@@ -1427,7 +1434,7 @@ var SelectorImage = {
   },
 
   downloadFileAsBlob: function (url) {
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var xhr = new XMLHttpRequest()
     xhr.onreadystatechange = function () {
       if (this.readyState == 4) {
@@ -1447,7 +1454,7 @@ var SelectorImage = {
   },
 
   downloadImageBase64: function (url) {
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var deferredDownload = this.downloadFileAsBlob(url)
     deferredDownload.done(function (blob) {
       var mimeType = blob.type
@@ -1477,7 +1484,10 @@ var SelectorImage = {
 
 module.exports = SelectorImage
 
-},{}],18:[function(require,module,exports){
+},{"../../assets/base64":1,"../../assets/jquery.whencallsequentially":2,"jquery-deferred":29}],19:[function(require,module,exports){
+var jquery = require('jquery-deferred')
+var whenCallSequentially = require('../../assets/jquery.whencallsequentially')
+
 var SelectorLink = {
   canReturnMultipleRecords: function () {
     return true
@@ -1500,7 +1510,7 @@ var SelectorLink = {
   _getData: function (parentElement) {
     var elements = this.getDataElements(parentElement)
 
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
 		// return empty record if not multiple type and no elements found
     if (this.multiple === false && elements.length === 0) {
@@ -1514,7 +1524,7 @@ var SelectorLink = {
     var deferredDataExtractionCalls = []
     $(elements).each(function (k, element) {
       deferredDataExtractionCalls.push(function (element) {
-        var deferredData = $.Deferred()
+        var deferredData = jquery.Deferred()
 
         var data = {}
         data[this.id] = $(element).text()
@@ -1527,7 +1537,7 @@ var SelectorLink = {
       }.bind(this, element))
     }.bind(this))
 
-    $.whenCallSequentially(deferredDataExtractionCalls).done(function (responses) {
+    whenCallSequentially(deferredDataExtractionCalls).done(function (responses) {
       var result = []
       responses.forEach(function (dataResult) {
         result.push(dataResult)
@@ -1553,7 +1563,10 @@ var SelectorLink = {
 
 module.exports = SelectorLink
 
-},{}],19:[function(require,module,exports){
+},{"../../assets/jquery.whencallsequentially":2,"jquery-deferred":29}],20:[function(require,module,exports){
+var whenCallSequentially = require('../../assets/jquery.whencallsequentially')
+var jquery = require('jquery-deferred')
+
 var SelectorPopupLink = {
   canReturnMultipleRecords: function () {
     return true
@@ -1576,7 +1589,7 @@ var SelectorPopupLink = {
   _getData: function (parentElement) {
     var elements = this.getDataElements(parentElement)
 
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
 		// return empty record if not multiple type and no elements found
     if (this.multiple === false && elements.length === 0) {
@@ -1590,7 +1603,7 @@ var SelectorPopupLink = {
     var deferredDataExtractionCalls = []
     $(elements).each(function (k, element) {
       deferredDataExtractionCalls.push(function (element) {
-        var deferredData = $.Deferred()
+        var deferredData = jquery.Deferred()
 
         var data = {}
         data[this.id] = $(element).text()
@@ -1607,7 +1620,7 @@ var SelectorPopupLink = {
       }.bind(this, element))
     }.bind(this))
 
-    $.whenCallSequentially(deferredDataExtractionCalls).done(function (responses) {
+    whenCallSequentially(deferredDataExtractionCalls).done(function (responses) {
       var result = []
       responses.forEach(function (dataResult) {
         result.push(dataResult)
@@ -1651,7 +1664,7 @@ var SelectorPopupLink = {
     document.body.appendChild(script)
 
 		// wait for url to be available
-    var deferredURL = $.Deferred()
+    var deferredURL = jquery.Deferred()
     var timeout = Math.abs(5000 / 30) // 5s timeout to generate an url for popup
     var interval = setInterval(function () {
       var url = $(element).data('web-scraper-extract-url')
@@ -1685,7 +1698,9 @@ var SelectorPopupLink = {
 
 module.exports = SelectorPopupLink
 
-},{}],20:[function(require,module,exports){
+},{"../../assets/jquery.whencallsequentially":2,"jquery-deferred":29}],21:[function(require,module,exports){
+var jquery = require('jquery-deferred')
+
 var SelectorTable = {
 
   canReturnMultipleRecords: function () {
@@ -1721,7 +1736,7 @@ var SelectorTable = {
     return columns
   },
   _getData: function (parentElement) {
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
     var tables = this.getDataElements(parentElement)
 
@@ -1848,7 +1863,8 @@ var SelectorTable = {
 
 module.exports = SelectorTable
 
-},{}],21:[function(require,module,exports){
+},{"jquery-deferred":29}],22:[function(require,module,exports){
+var jquery = require('jquery-deferred')
 var SelectorText = {
 
   canReturnMultipleRecords: function () {
@@ -1870,7 +1886,7 @@ var SelectorText = {
     return false
   },
   _getData: function (parentElement) {
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
     var elements = this.getDataElements(parentElement)
 
@@ -1919,7 +1935,7 @@ var SelectorText = {
 
 module.exports = SelectorText
 
-},{}],22:[function(require,module,exports){
+},{"jquery-deferred":29}],23:[function(require,module,exports){
 var Selector = require('./Selector')
 
 var SelectorList = function (selectors) {
@@ -2190,7 +2206,7 @@ SelectorList.prototype.hasRecursiveElementSelectors = function () {
 
 module.exports = SelectorList
 
-},{"./Selector":10}],23:[function(require,module,exports){
+},{"./Selector":11}],24:[function(require,module,exports){
 var SelectorElement = require('./Selector/SelectorElement')
 var SelectorElementAttribute = require('./Selector/SelectorElementAttribute')
 var SelectorElementClick = require('./Selector/SelectorElementClick')
@@ -2217,7 +2233,7 @@ module.exports = {
   SelectorText
 }
 
-},{"./Selector/SelectorElement":11,"./Selector/SelectorElementAttribute":12,"./Selector/SelectorElementClick":13,"./Selector/SelectorElementScroll":14,"./Selector/SelectorGroup":15,"./Selector/SelectorHTML":16,"./Selector/SelectorImage":17,"./Selector/SelectorLink":18,"./Selector/SelectorPopupLink":19,"./Selector/SelectorTable":20,"./Selector/SelectorText":21}],24:[function(require,module,exports){
+},{"./Selector/SelectorElement":12,"./Selector/SelectorElementAttribute":13,"./Selector/SelectorElementClick":14,"./Selector/SelectorElementScroll":15,"./Selector/SelectorGroup":16,"./Selector/SelectorHTML":17,"./Selector/SelectorImage":18,"./Selector/SelectorLink":19,"./Selector/SelectorPopupLink":20,"./Selector/SelectorTable":21,"./Selector/SelectorText":22}],25:[function(require,module,exports){
 var Selector = require('./Selector')
 var SelectorList = require('./SelectorList')
 var Sitemap = function (sitemapObj) {
@@ -2429,7 +2445,7 @@ Sitemap.prototype = {
 
 module.exports = Sitemap
 
-},{"./Selector":10,"./SelectorList":22}],25:[function(require,module,exports){
+},{"./Selector":11,"./SelectorList":23}],26:[function(require,module,exports){
 var Sitemap = require('./Sitemap')
 
 var Store = function (config) {
@@ -2560,7 +2576,7 @@ Store.prototype = {
 
 module.exports = Store
 
-},{"./Sitemap":24}],26:[function(require,module,exports){
+},{"./Sitemap":25}],27:[function(require,module,exports){
 /**
  * Only Elements unique will be added to this array
  * @constructor
@@ -2628,7 +2644,8 @@ UniqueElementList.prototype.isAdded = function (element) {
   return isAdded
 }
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
+var jquery = require('jquery-deferred')
 var BackgroundScript = require('./BackgroundScript')
 /**
  * @param location	configure from where the content script is being accessed (ContentScript, BackgroundPage, DevTools)
@@ -2651,7 +2668,7 @@ var getBackgroundScript = function (location) {
             request: request
           }
 
-          var deferredResponse = $.Deferred()
+          var deferredResponse = jquery.Deferred()
 
           chrome.runtime.sendMessage(reqToBackgroundScript, function (response) {
             deferredResponse.resolve(response)
@@ -2672,10 +2689,10 @@ var getBackgroundScript = function (location) {
 
 module.exports = getBackgroundScript
 
-},{"./BackgroundScript":3}],28:[function(require,module,exports){
+},{"./BackgroundScript":4,"jquery-deferred":29}],29:[function(require,module,exports){
 
 module.exports = require('./lib/jquery-deferred');
-},{"./lib/jquery-deferred":31}],29:[function(require,module,exports){
+},{"./lib/jquery-deferred":32}],30:[function(require,module,exports){
 var jQuery = module.exports = require("./jquery-core.js"),
 	core_rspace = /\s+/;
 /**
@@ -2883,7 +2900,7 @@ jQuery.Callbacks = function( options ) {
 };
 
 
-},{"./jquery-core.js":30}],30:[function(require,module,exports){
+},{"./jquery-core.js":31}],31:[function(require,module,exports){
 /**
 * jQuery core object.
 *
@@ -3040,7 +3057,7 @@ function extend() {
 
 
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 
 /*!
 * jquery-deferred
@@ -3205,5 +3222,5 @@ jQuery.extend({
 	}
 });
 
-},{"./jquery-callbacks.js":29}]},{},[2])(2)
+},{"./jquery-callbacks.js":30}]},{},[3])(3)
 });

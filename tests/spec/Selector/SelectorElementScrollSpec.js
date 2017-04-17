@@ -1,123 +1,118 @@
-describe("Scroll Element Selector", function () {
+describe('Scroll Element Selector', function () {
+  var $el
 
-	var $el;
+  beforeEach(function () {
+    $el = jQuery('#tests').html('')
+    if ($el.length === 0) {
+      $el = $("<div id='tests' style='display:none'></div>").appendTo('body')
+    }
+  })
 
-	beforeEach(function () {
-		$el = jQuery("#tests").html("");
-		if($el.length === 0) {
-			$el = $("<div id='tests' style='display:none'></div>").appendTo("body");
-		}
-	});
+  it('should return one element', function () {
+    $el.append('<div>a</div><div>b</div>')
+    var selector = new Selector({
+      id: 'a',
+      type: 'SelectorElementScroll',
+      multiple: false,
+      selector: 'div'
+    })
 
-	it("should return one element", function () {
+    var dataDeferred = selector.getData($el[0])
 
-		$el.append("<div>a</div><div>b</div>");
-		var selector = new Selector({
-			id: 'a',
-			type: 'SelectorElementScroll',
-			multiple: false,
-			selector: "div"
-		});
+    waitsFor(function () {
+      return dataDeferred.state() === 'resolved'
+    }, 'wait for data extraction', 5000)
 
-		var dataDeferred = selector.getData($el[0]);
+    runs(function () {
+      dataDeferred.done(function (data) {
+        expect(data).toEqual([$el.find('div')[0]])
+      })
+    })
+  })
 
-		waitsFor(function() {
-			return dataDeferred.state() === 'resolved';
-		}, "wait for data extraction", 5000);
+  it('should return multiple elements', function () {
+    $el.append('<div>a</div><div>b</div>')
+    var selector = new Selector({
+      id: 'a',
+      type: 'SelectorElementScroll',
+      multiple: true,
+      selector: 'div'
+    })
 
-		runs(function () {
-			dataDeferred.done(function(data) {
-				expect(data).toEqual([$el.find("div")[0]]);
-			});
-		});
-	});
+    var dataDeferred = selector.getData($el[0])
 
-	it("should return multiple elements", function () {
+    waitsFor(function () {
+      return dataDeferred.state() === 'resolved'
+    }, 'wait for data extraction', 5000)
 
-		$el.append("<div>a</div><div>b</div>");
-		var selector = new Selector({
-			id: 'a',
-			type: 'SelectorElementScroll',
-			multiple: true,
-			selector: "div"
-		});
+    runs(function () {
+      dataDeferred.done(function (data) {
+        expect(data).toEqual($el.find('div').get())
+      })
+    })
+  })
 
-		var dataDeferred = selector.getData($el[0]);
+  it('should get elements when scrolling is not needed', function () {
+    $el.append($('<a>a</a>'))
+    var selector = new Selector({
+      id: 'a',
+      type: 'SelectorElementScroll',
+      multiple: true,
+      selector: 'a',
+      delay: 100
+    })
 
-		waitsFor(function() {
-			return dataDeferred.state() === 'resolved';
-		}, "wait for data extraction", 5000);
+    var dataDeferred = selector.getData($el[0])
 
-		runs(function () {
-			dataDeferred.done(function(data) {
-				expect(data).toEqual($el.find("div").get());
-			});
-		});
-	});
+    waitsFor(function () {
+      return dataDeferred.state() === 'resolved'
+    }, 'wait for data extraction', 5000)
 
-	it("should get elements when scrolling is not needed", function() {
+    runs(function () {
+      dataDeferred.done(function (data) {
+        expect(data).toEqual($el.find('a').get())
+      })
+    })
+  })
 
-		$el.append($("<a>a</a>"));
-		var selector = new Selector({
-			id: 'a',
-			type: 'SelectorElementScroll',
-			multiple: true,
-			selector: "a",
-			delay: 100
-		});
-
-		var dataDeferred = selector.getData($el[0]);
-
-		waitsFor(function() {
-			return dataDeferred.state() === 'resolved';
-		}, "wait for data extraction", 5000);
-
-		runs(function () {
-			dataDeferred.done(function(data) {
-				expect(data).toEqual($el.find("a").get());
-			});
-		});
-	});
-
-	it("should get elements which are added a delay", function() {
-
-		$el.append($("<a>a</a>"));
+  it('should get elements which are added a delay', function () {
+    $el.append($('<a>a</a>'))
 		// add extra element after a little delay
-		setTimeout(function() {
-			$el.append($("<a>a</a>"));
-		}, 100);
+    setTimeout(function () {
+      $el.append($('<a>a</a>'))
+    }, 100)
 
-		var selector = new Selector({
-			id: 'a',
-			type: 'SelectorElementScroll',
-			multiple: true,
-			selector: "a",
-			delay: 200
-		});
+    var selector = new Selector({
+      id: 'a',
+      type: 'SelectorElementScroll',
+      multiple: true,
+      selector: 'a',
+      delay: 200
+    })
 
-		var dataDeferred = selector.getData($el[0]);
+    var dataDeferred = selector.getData($el[0])
 
-		waitsFor(function() {
-			return dataDeferred.state() === 'resolved';
-		}, "wait for data extraction", 5000);
+    waitsFor(function () {
+      return dataDeferred.state() === 'resolved'
+    }, 'wait for data extraction', 5000)
 
-		runs(function () {
-			dataDeferred.done(function(data) {
-				expect($el.find("a").length).toEqual(2);
-				expect(data).toEqual($el.find("a").get());
-			});
-		});
-	});
+    runs(function () {
+      dataDeferred.done(function (data) {
+        expect($el.find('a').length).toEqual(2)
+        expect(data).toEqual($el.find('a').get())
+      })
+    })
+  })
 
-	it("should return no data columns", function () {
-		var selector = new Selector({
-			id: 'a',
-			type: 'SelectorElementScroll',
-			multiple: true,
-			selector: "div"
-		});
+  it('should return no data columns', function () {
+    var selector = new Selector({
+      id: 'a',
+      type: 'SelectorElementScroll',
+      multiple: true,
+      selector: 'div'
+    })
 
-		var columns = selector.getDataColumns();
-		expect(columns).toEqual([]);
-	});
-});
+    var columns = selector.getDataColumns()
+    expect(columns).toEqual([])
+  })
+})

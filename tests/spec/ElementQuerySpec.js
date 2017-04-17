@@ -1,73 +1,65 @@
-describe("ElementQuery", function () {
+describe('ElementQuery', function () {
+  var $el
 
-	var $el;
+  beforeEach(function () {
+    $el = jQuery('#tests').html('')
+    if ($el.length === 0) {
+      $el = $("<div id='tests' style='display:none'></div>").appendTo('body')
+    }
+  })
 
-	beforeEach(function () {
+  it('should be able to select elements', function () {
+    $el.append('<a></a><span></span>')
 
-		$el = jQuery("#tests").html("");
-		if ($el.length === 0) {
-			$el = $("<div id='tests' style='display:none'></div>").appendTo("body");
-		}
-	});
+    var selectedElements = ElementQuery('a, span', $el)
+    var expectedElements = $('a, span', $el)
 
-	it("should be able to select elements", function () {
+    expect(selectedElements.sort()).toEqual(expectedElements.get().sort())
+  })
 
-		$el.append('<a></a><span></span>');
+  it('should be able to select parent', function () {
+    $el.append('<a></a><span></span>')
 
-		var selectedElements = ElementQuery("a, span", $el);
-		var expectedElements = $("a, span", $el);
+    var selectedElements = ElementQuery('a, span, _parent_', $el)
+    var expectedElements = $('a, span', $el)
+    expectedElements = expectedElements.add($el)
 
-		expect(selectedElements.sort()).toEqual(expectedElements.get().sort());
-	});
+    expect(selectedElements.sort()).toEqual(expectedElements.get().sort())
+  })
 
-	it("should be able to select parent", function () {
+  it('should should not return duplicates', function () {
+    $el.append('<a></a><span></span>')
 
-		$el.append('<a></a><span></span>');
+    var selectedElements = ElementQuery('*, a, span, _parent_', $el)
+    var expectedElements = $('a, span', $el)
+    expectedElements = expectedElements.add($el)
 
-		var selectedElements = ElementQuery("a, span, _parent_", $el);
-		var expectedElements = $("a, span", $el);
-		expectedElements = expectedElements.add($el);
+    expect(selectedElements.length).toEqual(3)
+    expect(selectedElements.sort()).toEqual(expectedElements.get().sort())
+  })
 
-		expect(selectedElements.sort()).toEqual(expectedElements.get().sort());
-	});
+  it('should be able to select parent when parent there are multiple parents', function () {
+    $el.append('<span></span><span></span>')
 
-	it("should should not return duplicates", function () {
+    var selectedElements = ElementQuery('_parent_', $('span', $el))
+    var expectedElements = $('span', $el)
 
-		$el.append('<a></a><span></span>');
+    expect(selectedElements.length).toEqual(2)
+    expect(selectedElements.sort()).toEqual(expectedElements.get().sort())
+  })
 
-		var selectedElements = ElementQuery("*, a, span, _parent_", $el);
-		var expectedElements = $("a, span", $el);
-		expectedElements = expectedElements.add($el);
+  it('should be able to select element with a comma ,', function () {
+    $el.append('<span>,</span>')
 
-		expect(selectedElements.length).toEqual(3);
-		expect(selectedElements.sort()).toEqual(expectedElements.get().sort());
-	});
+    var selectedElements = ElementQuery(":contains(',')", $el)
+    var expectedElements = $('span', $el)
 
-	it("should be able to select parent when parent there are multiple parents", function(){
+    expect(selectedElements.length).toEqual(1)
+    expect(selectedElements.sort()).toEqual(expectedElements.get().sort())
+  })
 
-		$el.append('<span></span><span></span>');
-
-		var selectedElements = ElementQuery("_parent_", $("span", $el));
-		var expectedElements = $("span", $el);
-
-		expect(selectedElements.length).toEqual(2);
-		expect(selectedElements.sort()).toEqual(expectedElements.get().sort());
-	});
-
-	it("should be able to select element with a comma ,", function(){
-
-		$el.append('<span>,</span>');
-
-		var selectedElements = ElementQuery(":contains(',')", $el);
-		var expectedElements = $("span", $el);
-
-		expect(selectedElements.length).toEqual(1);
-		expect(selectedElements.sort()).toEqual(expectedElements.get().sort());
-	});
-
-	it("should preserve spaces", function(){
-
-		var parts = ElementQuery.getSelectorParts('div.well li:nth-of-type(2) a');
-		expect(parts).toEqual(['div.well li:nth-of-type(2) a']);
-	});
-});
+  it('should preserve spaces', function () {
+    var parts = ElementQuery.getSelectorParts('div.well li:nth-of-type(2) a')
+    expect(parts).toEqual(['div.well li:nth-of-type(2) a'])
+  })
+})

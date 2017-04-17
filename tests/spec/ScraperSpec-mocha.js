@@ -11,92 +11,87 @@ if (typeof require !== 'undefined') {
     console.log(util.inspect(object, {showHidden: false, depth: null}))
   }
   var assert = require('assert')
-  process.on("unhandledRejection", function (err) {
+  process.on('unhandledRejection', function (err) {
     console.error(err)
-
   })
-
 }
 
-describe("Scraper", function () {
-
-  var q, store, $el;
+describe('Scraper', function () {
+  var q, store, $el
 
   beforeEach(function () {
-    q = new Queue();
-    store = new FakeStore();
-  });
+    q = new Queue()
+    store = new FakeStore()
+  })
 
-  it.only("should be able to scrape one page", function (done) {
+  it.only('should be able to scrape one page', function (done) {
     this.timeout('60s')
     var sitemap = new Sitemap({
       id: 'test',
       startUrl: 'http://test.lv/',
       selectors: [
         {
-          "id": "a",
-          "selector": "#scraper-test-one-page a",
-          "multiple": false,
+          'id': 'a',
+          'selector': '#scraper-test-one-page a',
+          'multiple': false,
           type: 'SelectorText',
-          "parentSelectors": [
-            "_root"
+          'parentSelectors': [
+            '_root'
           ]
         }
       ]
-    });
+    })
 
     var browser = new ChromeHeadlessBrowser({
       pageLoadDelay: 500
-    });
+    })
 
     var s = new Scraper({
       queue: q,
       sitemap: sitemap,
       browser: browser,
       store: store
-    });
+    })
 
-    var executed = false;
+    var executed = false
     s.run(function () {
-      executed = true;
+      executed = true
       try {
-
-        assert.equal(executed, true);
-        //assert.equal(JSON.stringify(store.data[ 0 ]), JSON.stringify({ a: 'a' }));
+        assert.equal(executed, true)
+        // assert.equal(JSON.stringify(store.data[ 0 ]), JSON.stringify({ a: 'a' }));
         prettyPrint ? prettyPrint(store.data) : console.log(JSON.stringify(store.data))
         done()
       } catch (e) {
         done(e)
       }
-    });
-  });
+    })
+  })
 
-  it("should be able to scrape a child page", function () {
-
+  it('should be able to scrape a child page', function () {
     var sitemap = new Sitemap({
       id: 'test',
       startUrl: 'http://test.lv/',
       selectors: [
         {
-          "id": "link",
-          "selector": "#scraper-test-child-page a",
-          "multiple": true,
-          type: "SelectorLink",
-          "parentSelectors": [ "_root" ]
+          'id': 'link',
+          'selector': '#scraper-test-child-page a',
+          'multiple': true,
+          type: 'SelectorLink',
+          'parentSelectors': [ '_root' ]
         },
         {
-          "id": "b",
-          "selector": "#scraper-test-child-page b",
-          "multiple": false,
-          type: "SelectorText",
-          "parentSelectors": [ "link" ]
+          'id': 'b',
+          'selector': '#scraper-test-child-page b',
+          'multiple': false,
+          type: 'SelectorText',
+          'parentSelectors': [ 'link' ]
         }
       ]
-    });
+    })
 
     var browser = new ChromeHeadlessBrowser({
       pageLoadDelay: 500
-    });
+    })
 
     var s = new Scraper({
       queue: q,
@@ -104,224 +99,213 @@ describe("Scraper", function () {
       browser: browser,
       store: store,
       delay: 0
-    });
+    })
 
-    var executed = false;
+    var executed = false
     runs(function () {
       s.run(function () {
-        executed = true;
-      });
-    });
+        executed = true
+      })
+    })
 
     waitsFor(function () {
-      return executed;
-    }, 3000);
+      return executed
+    }, 3000)
 
     runs(function () {
-      expect(executed).toBe(true);
+      expect(executed).toBe(true)
       expect(store.data).toEqual([
         { 'link': 'test', 'link-href': 'http://test.lv/1/', 'b': 'b' }
-      ]);
-    });
-  });
+      ])
+    })
+  })
 
-  it("should be able to tell whether a data record can have child jobs", function () {
-
+  it('should be able to tell whether a data record can have child jobs', function () {
     var sitemap = new Sitemap({
       id: 'test',
       startUrl: 'http://test.lv/',
       selectors: [
         {
-          "id": "link-w-children",
-          "selector": "a",
-          "multiple": true,
-          type: "SelectorLink",
-          "parentSelectors": [ "_root" ]
+          'id': 'link-w-children',
+          'selector': 'a',
+          'multiple': true,
+          type: 'SelectorLink',
+          'parentSelectors': [ '_root' ]
         },
         {
-          "id": "link-wo-children",
-          "selector": "a",
-          "multiple": true,
-          type: "SelectorLink",
-          "parentSelectors": [ "_root" ]
+          'id': 'link-wo-children',
+          'selector': 'a',
+          'multiple': true,
+          type: 'SelectorLink',
+          'parentSelectors': [ '_root' ]
         },
         {
-          "id": "b",
-          "selector": "#scraper-test-child-page b",
-          "multiple": false,
-          type: "SelectorText",
-          "parentSelectors": [ "link-w-children" ]
+          'id': 'b',
+          'selector': '#scraper-test-child-page b',
+          'multiple': false,
+          type: 'SelectorText',
+          'parentSelectors': [ 'link-w-children' ]
         }
       ]
-    });
+    })
 
     var s = new Scraper({
       queue: q,
       sitemap: sitemap,
       store: store
-    });
+    })
 
     var follow = s.recordCanHaveChildJobs({
       _follow: 'http://example.com/',
       _followSelectorId: 'link-w-children'
-    });
-    expect(follow).toBe(true);
+    })
+    expect(follow).toBe(true)
 
     follow = s.recordCanHaveChildJobs({
       _follow: 'http://example.com/',
       _followSelectorId: 'link-wo-children'
-    });
-    expect(follow).toBe(false);
+    })
+    expect(follow).toBe(false)
+  })
 
-  });
-
-  it("should be able to create multiple start jobs", function () {
-
+  it('should be able to create multiple start jobs', function () {
     var sitemap = new Sitemap({
       startUrl: 'http://test.lv/[1-100].html'
-    });
+    })
 
     var s = new Scraper({
       queue: q,
       sitemap: sitemap,
       store: store
-    });
+    })
 
-    s.initFirstJobs();
-    expect(q.jobs.length).toBe(100);
-  });
+    s.initFirstJobs()
+    expect(q.jobs.length).toBe(100)
+  })
 
-  it("should create multiple start jobs if multiple urls provided", function () {
-
+  it('should create multiple start jobs if multiple urls provided', function () {
     var sitemap = new Sitemap({
       startUrl: [ 'http://example.com/1', 'http://example.com/2', 'http://example.com/3' ]
-    });
+    })
 
     var s = new Scraper({
       queue: q,
       sitemap: sitemap,
       store: store
-    });
+    })
 
-    s.initFirstJobs();
-    expect(q.jobs.length).toBe(3);
-  });
+    s.initFirstJobs()
+    expect(q.jobs.length).toBe(3)
+  })
 
-  it("should extract filename from image url", function () {
+  it('should extract filename from image url', function () {
+    var image = Scraper.prototype.getFileFilename('http://example.com/image.jpg')
+    expect(image).toEqual('image.jpg')
+  })
 
-    var image = Scraper.prototype.getFileFilename("http://example.com/image.jpg");
-    expect(image).toEqual("image.jpg");
-  });
+  it('should extract filename from image url with query string', function () {
+    var image = Scraper.prototype.getFileFilename('http://example.com/image.jpg?a=1&b=2')
+    expect(image).toEqual('image.jpga=1&b=2')
+  })
 
-  it("should extract filename from image url with query string", function () {
-
-    var image = Scraper.prototype.getFileFilename("http://example.com/image.jpg?a=1&b=2");
-    expect(image).toEqual("image.jpga=1&b=2");
-  });
-
-  it("should shorten image file name to 143 symbols", function () {
-
+  it('should shorten image file name to 143 symbols', function () {
     // ext4 max is 254
     // ntfs max is 256
     // ecryptfs 143
     // web scraper allows only 130
 
-    var image = Scraper.prototype.getFileFilename("http://example.com/012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789");
-    expect(image).toEqual("0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789");
-  });
+    var image = Scraper.prototype.getFileFilename('http://example.com/012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789')
+    expect(image).toEqual('0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789')
+  })
 
-  it("should extract filename from image url without http://", function () {
+  it('should extract filename from image url without http://', function () {
+    var image = Scraper.prototype.getFileFilename('image.jpg')
+    expect(image).toEqual('image.jpg')
+  })
 
-    var image = Scraper.prototype.getFileFilename("image.jpg");
-    expect(image).toEqual("image.jpg");
-  });
-
-  it("should store images", function () {
-
+  it('should store images', function () {
     var record = {
-      "_imageBase64-test": "test",
-      "_imageMimeType-test": "test",
-      "test-src": "http://images/image.png"
-    };
+      '_imageBase64-test': 'test',
+      '_imageMimeType-test': 'test',
+      'test-src': 'http://images/image.png'
+    }
 
     var sitemap = new Sitemap({
       id: 'test'
-    });
+    })
 
     var scraper = new Scraper({
       sitemap: sitemap
-    });
+    })
 
-    var deferredSave = scraper.saveImages(record);
-    var downloadAPICalled = false;
+    var deferredSave = scraper.saveImages(record)
+    var downloadAPICalled = false
     chrome.downloads.onChanged.addListener(function () {
-      downloadAPICalled = true;
-    });
-    expect(downloadAPICalled).toEqual(false);
+      downloadAPICalled = true
+    })
+    expect(downloadAPICalled).toEqual(false)
 
     waitsFor(function () {
-      return deferredSave.state() === 'resolved';
-    }, "wait for data extraction", 5000);
+      return deferredSave.state() === 'resolved'
+    }, 'wait for data extraction', 5000)
 
     runs(function () {
-      expect(record[ "_imageBase64-test" ]).toEqual(undefined);
-      expect(record[ "_imageMimeType-test" ]).toEqual(undefined);
-      expect(downloadAPICalled).toEqual(true);
+      expect(record[ '_imageBase64-test' ]).toEqual(undefined)
+      expect(record[ '_imageMimeType-test' ]).toEqual(undefined)
+      expect(downloadAPICalled).toEqual(true)
+    })
+  })
 
-    });
-  });
-
-  xit("should store images while scraping", function () {
-
-    $el.append('<div id="scraper-test-img"><img src="../docs/images/chrome-store-logo.png"></div>');
+  xit('should store images while scraping', function () {
+    $el.append('<div id="scraper-test-img"><img src="../docs/images/chrome-store-logo.png"></div>')
 
     var sitemap = new Sitemap({
       id: 'test',
       startUrl: 'http://test.com/',
       selectors: [
         {
-          "id": "test",
-          "selector": "#scraper-test-img img",
-          "multiple": true,
+          'id': 'test',
+          'selector': '#scraper-test-img img',
+          'multiple': true,
           type: 'SelectorImage',
           downloadImage: true,
-          "parentSelectors": [
-            "_root"
+          'parentSelectors': [
+            '_root'
           ]
         }
       ]
-    });
+    })
 
     var browser = new ChromeHeadlessBrowser({
       pageLoadDelay: 500
-    });
+    })
 
     var s = new Scraper({
       queue: q,
       sitemap: sitemap,
       browser: browser,
       store: store
-    });
+    })
 
-    var downloadAPICalled = false;
+    var downloadAPICalled = false
     chrome.downloads.onChanged.addListener(function () {
-      downloadAPICalled = true;
-    });
+      downloadAPICalled = true
+    })
 
-    var executed = false;
+    var executed = false
     runs(function () {
       s.run(function () {
-        executed = true;
-      });
-    });
+        executed = true
+      })
+    })
 
     waitsFor(function () {
-      return executed;
-    }, 5000);
+      return executed
+    }, 5000)
     runs(function () {
-      expect(executed).toBe(true);
-      expect(store.data[ 0 ][ "test-src" ]).toMatch(/chrome-store-logo.png/);
-      expect(downloadAPICalled).toEqual(true);
-    });
-  });
-});
+      expect(executed).toBe(true)
+      expect(store.data[ 0 ][ 'test-src' ]).toMatch(/chrome-store-logo.png/)
+      expect(downloadAPICalled).toEqual(true)
+    })
+  })
+})
