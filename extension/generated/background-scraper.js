@@ -1,5 +1,44 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.backgroundScraper = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var jqueryDeferred = require('jquery-deferred')
+var jquery = require('jquery-deferred')
+/**
+ * @url http://jsperf.com/blob-base64-conversion
+ * @type {{blobToBase64: blobToBase64, base64ToBlob: base64ToBlob}}
+ */
+var Base64 = {
+
+  blobToBase64: function (blob) {
+    var deferredResponse = jquery.Deferred()
+    var reader = new FileReader()
+    reader.onload = function () {
+      var dataUrl = reader.result
+      var base64 = dataUrl.split(',')[1]
+      deferredResponse.resolve(base64)
+    }
+    reader.readAsDataURL(blob)
+
+    return deferredResponse.promise()
+  },
+
+  base64ToBlob: function (base64, mimeType) {
+    var deferredResponse = jquery.Deferred()
+    var binary = atob(base64)
+    var len = binary.length
+    var buffer = new ArrayBuffer(len)
+    var view = new Uint8Array(buffer)
+    for (var i = 0; i < len; i++) {
+      view[i] = binary.charCodeAt(i)
+    }
+    var blob = new Blob([view], {type: mimeType})
+    deferredResponse.resolve(blob)
+
+    return deferredResponse.promise()
+  }
+}
+
+module.exports = Base64
+
+},{"jquery-deferred":29}],2:[function(require,module,exports){
+var jquery = require('jquery-deferred')
 /**
  * @author Martins Balodis
  *
@@ -9,7 +48,7 @@ var jqueryDeferred = require('jquery-deferred')
  * @returns jqueryDeferred().promise()
  */
 module.exports = function whenCallSequentially (functionCalls) {
-  var deferredResonse = jqueryDeferred()
+  var deferredResonse = jquery.Deferred()
   var resultData = []
 
 	// nothing to do
@@ -48,7 +87,7 @@ module.exports = function whenCallSequentially (functionCalls) {
   return deferredResonse.promise()
 }
 
-},{"jquery-deferred":28}],2:[function(require,module,exports){
+},{"jquery-deferred":29}],3:[function(require,module,exports){
 var Config = require('../scripts/Config')
 var Store = require('../scripts/Store')
 var Sitemap = require('../scripts/Sitemap')
@@ -165,22 +204,23 @@ chrome.runtime.onMessage.addListener(
 }
 )
 
-},{"../scripts/ChromePopupBrowser":4,"../scripts/Config":5,"../scripts/Queue":8,"../scripts/Scraper":9,"../scripts/Sitemap":24,"../scripts/Store":25,"../scripts/getBackgroundScript":27}],3:[function(require,module,exports){
+},{"../scripts/ChromePopupBrowser":5,"../scripts/Config":6,"../scripts/Queue":9,"../scripts/Scraper":10,"../scripts/Sitemap":25,"../scripts/Store":26,"../scripts/getBackgroundScript":28}],4:[function(require,module,exports){
+var jquery = require('jquery-deferred')
 /**
  * ContentScript that can be called from anywhere within the extension
  */
 var BackgroundScript = {
 
   dummy: function () {
-    return $.Deferred().resolve('dummy').promise()
+    return jquery.Deferred().resolve('dummy').promise()
   },
 
 	/**
 	 * Returns the id of the tab that is visible to user
-	 * @returns $.Deferred() integer
+	 * @returns jquery.Deferred() integer
 	 */
   getActiveTabId: function () {
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
 
     chrome.tabs.query({
       active: true,
@@ -208,7 +248,7 @@ var BackgroundScript = {
       fn: request.fn,
       request: request.request
     }
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var deferredActiveTabId = this.getActiveTabId()
     deferredActiveTabId.done(function (tabId) {
       chrome.tabs.sendMessage(tabId, reqToContentScript, function (response) {
@@ -222,7 +262,7 @@ var BackgroundScript = {
 
 module.exports = BackgroundScript
 
-},{}],4:[function(require,module,exports){
+},{"jquery-deferred":29}],5:[function(require,module,exports){
 var ChromePopupBrowser = function (options) {
   this.pageLoadDelay = options.pageLoadDelay
 
@@ -303,7 +343,7 @@ ChromePopupBrowser.prototype = {
 
 module.exports = ChromePopupBrowser
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var Config = function () {
 
 }
@@ -352,7 +392,7 @@ Config.prototype = {
 }
 
 module.exports = Config
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 /**
  * Element selector. Uses jQuery as base and adds some more features
  * @param parentElement
@@ -411,7 +451,7 @@ ElementQuery.getSelectorParts = function (CSSSelector) {
 
 module.exports = ElementQuery
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 
 var Job = function (url, parentSelector, scraper, parentJob, baseData) {
   if (parentJob !== undefined) {
@@ -489,7 +529,7 @@ Job.prototype = {
 
 module.exports = Job
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 
 var Queue = function () {
   this.jobs = []
@@ -548,10 +588,10 @@ Queue.prototype = {
 
 module.exports = Queue
 
-},{}],9:[function(require,module,exports){
-if (typeof require !== 'undefined') {
-  require('./../assets/jquery.whencallsequentially')
-}
+},{}],10:[function(require,module,exports){
+var jquery = require('jquery-deferred')
+var whenCallSequentially = require('../assets/jquery.whencallsequentially')
+var Base64 = require('../assets/base64')
 var Job = require('./Job')
 
 var Scraper = function (options) {
@@ -624,7 +664,7 @@ Scraper.prototype = {
 	 * @param record
 	 */
   saveImages: function (record) {
-    var deferredResponse = $.Deferred()
+    var deferredResponse = jquery.Deferred()
     var deferredImageStoreCalls = []
     var prefixLength = '_imageBase64-'.length
 
@@ -633,7 +673,7 @@ Scraper.prototype = {
         var selectorId = attr.substring(prefixLength, attr.length)
         deferredImageStoreCalls.push(function (selectorId) {
           var imageBase64 = record['_imageBase64-' + selectorId]
-          var deferredDownloadDone = $.Deferred()
+          var deferredDownloadDone = jquery.Deferred()
 
           var deferredBlob = Base64.base64ToBlob(imageBase64, record['_imageMimeType-' + selectorId])
 
@@ -673,7 +713,7 @@ Scraper.prototype = {
       }
     }
 
-    $.whenCallSequentially(deferredImageStoreCalls).done(function () {
+    whenCallSequentially(deferredImageStoreCalls).done(function () {
       deferredResponse.resolve()
     })
 
@@ -725,7 +765,7 @@ Scraper.prototype = {
         }
       }.bind(this))
 
-      $.whenCallSequentially(deferredDatamanipulations).done(function () {
+      whenCallSequentially(deferredDatamanipulations).done(function () {
         this.resultWriter.writeDocs(scrapedRecords, function () {
           var now = (new Date()).getTime()
 					// delay next job if needed
@@ -746,9 +786,10 @@ Scraper.prototype = {
 
 module.exports = Scraper
 
-},{"./../assets/jquery.whencallsequentially":1,"./Job":7}],10:[function(require,module,exports){
+},{"../assets/base64":1,"../assets/jquery.whencallsequentially":2,"./Job":8,"jquery-deferred":29}],11:[function(require,module,exports){
 var selectors = require('./Selectors')
 var ElementQuery = require('./ElementQuery')
+var jquery = require('jquery-deferred')
 
 var Selector = function (selector) {
   this.updateData(selector)
@@ -846,10 +887,10 @@ Selector.prototype = {
   },
 
   getData: function (parentElement) {
-    var d = $.Deferred()
+    var d = jquery.Deferred()
     var timeout = this.delay || 0
 
-		// this works much faster because $.whenCallSequentially isn't running next data extraction immediately
+		// this works much faster because whenCallSequentally isn't running next data extraction immediately
     if (timeout === 0) {
       var deferredData = this._getData(parentElement)
       deferredData.done(function (data) {
@@ -870,7 +911,9 @@ Selector.prototype = {
 
 module.exports = Selector
 
-},{"./ElementQuery":6,"./Selectors":23}],11:[function(require,module,exports){
+},{"./ElementQuery":7,"./Selectors":24,"jquery-deferred":29}],12:[function(require,module,exports){
+var jquery = require('jquery-deferred')
+
 var SelectorElement = {
 
   canReturnMultipleRecords: function () {
@@ -893,7 +936,7 @@ var SelectorElement = {
   },
 
   _getData: function (parentElement) {
-    var dfd = $.Deferred()
+    var dfd = jquery.Deferred()
 
     var elements = this.getDataElements(parentElement)
     dfd.resolve(jQuery.makeArray(elements))
@@ -912,7 +955,8 @@ var SelectorElement = {
 
 module.exports = SelectorElement
 
-},{}],12:[function(require,module,exports){
+},{"jquery-deferred":29}],13:[function(require,module,exports){
+var jquery = require('jquery-deferred')
 var SelectorElementAttribute = {
   canReturnMultipleRecords: function () {
     return true

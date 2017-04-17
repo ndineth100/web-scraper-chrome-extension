@@ -1,4 +1,4 @@
-var whenCallSequentially = require('../assets/jquery.whencallsequentially')
+var whenCallSequentially = require('../../assets/jquery.whencallsequentially')
 var jquery = require('jquery-deferred')
 
 var SelectorPopupLink = {

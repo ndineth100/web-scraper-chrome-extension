@@ -1,5 +1,5 @@
 var jquery = require('jquery-deferred')
-var whenCallSequentially = require('../assets/jquery.whencallsequentially')
+var whenCallSequentially = require('../../assets/jquery.whencallsequentially')
 var Base64 = require('../../assets/base64')
 var SelectorImage = {
   canReturnMultipleRecords: function () {

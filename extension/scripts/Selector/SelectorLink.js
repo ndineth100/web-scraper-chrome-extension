@@ -1,5 +1,5 @@
 var jquery = require('jquery-deferred')
-var whenCallSequentially = require('../assets/jquery.whencallsequentially')
+var whenCallSequentially = require('../../assets/jquery.whencallsequentially')
 
 var SelectorLink = {
   canReturnMultipleRecords: function () {
