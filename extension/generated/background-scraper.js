@@ -324,7 +324,7 @@ ChromePopupBrowser.prototype = {
 
     this._initPopupWindow(function () {
       var tab = browser.tab
-
+      console.log('Init browser app')
       browser.loadUrl(url, function () {
         var message = {
           extractData: true,
@@ -877,6 +877,7 @@ Selector.prototype = {
 
   getDataElements: function (parentElement) {
     var elements = ElementQuery(this.selector, parentElement)
+    console.log(elements)
     if (this.multiple) {
       return elements
     } else if (elements.length > 0) {

@@ -17,6 +17,4 @@ FakeStore.prototype = {
   }
 }
 
-if (typeof require !== 'undefined') {
-  global.FakeStore = FakeStore
-}
+module.exports = FakeStore

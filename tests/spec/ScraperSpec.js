@@ -1,14 +1,14 @@
-if (typeof require !== 'undefined') {
-  require('./../../extension/scripts/Queue')
-  require('./../../extension/scripts/Job')
-  require('./../../extension/scripts/ChromeHeadlessBrowser')
-  require('./../../extension/scripts/Sitemap')
-  require('./../FakeStore')
-  require('./../../extension/scripts/Scraper')
-  process.on('unhandledRejection', function (err) {
-  	console.error(err)
-  })
-}
+var Queue = require('./../../extension/scripts/Queue')
+var assert = require('chai').assert
+
+var ChromePopupBrowser = require('./../../extension/scripts/ChromePopupBrowser')
+var Sitemap = require('./../../extension/scripts/Sitemap')
+var FakeStore = require('./../FakeStore')
+var Scraper = require('./../../extension/scripts/Scraper')
+var utils = require('./../utils')
+process.on('unhandledRejection', function (err) {
+  console.error(err)
+})
 
 describe('Scraper', function () {
   var q, store, $el
@@ -16,9 +16,17 @@ describe('Scraper', function () {
   beforeEach(function () {
     q = new Queue()
     store = new FakeStore()
+    document.body.innerHTML = utils.getTestHTML()
+    window.chromeAPI.reset()
+  })
+  afterEach(function () {
+    //while (document.body.firsteChild) document.body.removeChild(document.body.firstChild)
   })
 
-  iit('should be able to scrape one page', function (done) {
+  it.only('should be able to scrape one page', function (done) {
+    var b = document.querySelector('#scraper-test-one-page a')
+    console.error(1)
+    console.log(b)
     var sitemap = new Sitemap({
       id: 'test',
       startUrl: 'http://test.lv/',
@@ -35,8 +43,9 @@ describe('Scraper', function () {
       ]
     })
 
-    var browser = new ChromeHeadlessBrowser({
-      pageLoadDelay: 500
+
+    var browser = new ChromePopupBrowser({
+      pageLoadDelay: 100
     })
 
     var s = new Scraper({
@@ -45,22 +54,9 @@ describe('Scraper', function () {
       browser: browser,
       store: store
     })
-
-    var executed = false
-    runs(function () {
-      s.run(function () {
-        executed = true
-      })
-    })
-
-    waitsFor(function () {
-      return executed
-    }, 10000)
-    runs(function () {
-      console.log('running')
-
-      expect(executed).toBe(true)
-      expect(JSON.stringify(store.data[0])).toBe(JSON.stringify({a: 'a'}))
+    console.log(6)
+    s.run(function () {
+      assert.deepEqual(store.data[0], {a: 'a'})
       done()
     })
   })

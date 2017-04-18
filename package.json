@@ -9,13 +9,15 @@
   },
   "watch": {
     "generate": {
-      "patterns": ["extension"],
+      "patterns": [
+        "extension"
+      ],
       "ignore": "extension/generated",
       "extensions": "js"
     }
   },
   "scripts": {
-    "test": "mocha tests/spec/ScraperSpec-mocha",
+    "test": "karma start",
     "test-jasmine": "jasmine-node tests/spec/ScraperSpec.js",
     "generate-scraper": "browserify extension/content_script/content_scraper.js --standalone contentScraper > extension/generated/content-scraper.js",
     "generate-background-script": "browserify extension/background_page/background_script.js --standalone backgroundScraper > extension/generated/background-scraper.js",
@@ -34,10 +36,18 @@
   },
   "homepage": "https://github.com/martinsbalodis/web-scraper-chrome-extension#readme",
   "devDependencies": {
+    "babel-plugin-meaningful-logs": "^1.0.2",
+    "babelify": "^7.3.0",
+    "chai": "^3.5.0",
     "jasmine-node": "^1.14.5",
+    "karma": "^1.6.0",
+    "karma-browserify": "^5.1.1",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-mocha": "^1.3.0",
     "mocha": "^3.2.0",
     "npm-watch": "^0.1.8",
-    "standard": "^9.0.2"
+    "standard": "^9.0.2",
+    "watchify": "^3.9.0"
   },
   "dependencies": {
     "browserify": "^14.1.0",

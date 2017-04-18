@@ -59,7 +59,7 @@ ChromePopupBrowser.prototype = {
 
     this._initPopupWindow(function () {
       var tab = browser.tab
-
+      console.log('Init browser app')
       browser.loadUrl(url, function () {
         var message = {
           extractData: true,

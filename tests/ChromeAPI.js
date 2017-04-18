@@ -3,6 +3,7 @@ var ChromeAPI = function () {
   this.contentScriptMessageHandler = null
   this.reset()
   this.defineAPI()
+  console.log('defining api')
 }
 
 ChromeAPI.prototype = {
@@ -151,3 +152,4 @@ ChromeAPI.prototype = {
     }
   }
 }
+if (!window.chromeAPI) window.chromeAPI = new ChromeAPI()
