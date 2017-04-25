@@ -1,11 +1,11 @@
-var Queue = require('./../../extension/scripts/Queue')
-var assert = require('chai').assert
+const Queue = require('./../../extension/scripts/Queue')
+const assert = require('chai').assert
 
-var ChromePopupBrowser = require('./../../extension/scripts/ChromePopupBrowser')
-var Sitemap = require('./../../extension/scripts/Sitemap')
-var FakeStore = require('./../FakeStore')
-var Scraper = require('./../../extension/scripts/Scraper')
-var utils = require('./../utils')
+const ChromePopupBrowser = require('./../../extension/scripts/ChromePopupBrowser')
+const Sitemap = require('./../../extension/scripts/Sitemap')
+const FakeStore = require('./../FakeStore')
+const Scraper = require('./../../extension/scripts/Scraper')
+const utils = require('./../utils')
 process.on('unhandledRejection', function (err) {
   console.error(err)
 })
