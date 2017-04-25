@@ -20,10 +20,10 @@ describe('Scraper', function () {
     window.chromeAPI.reset()
   })
   afterEach(function () {
-    //while (document.body.firsteChild) document.body.removeChild(document.body.firstChild)
+    while (document.body.firstChild) document.body.removeChild(document.body.firstChild)
   })
 
-  it.only('should be able to scrape one page', function (done) {
+  it('should be able to scrape one page', function (done) {
     var b = document.querySelector('#scraper-test-one-page a')
     console.error(1)
     console.log(b)
@@ -54,14 +54,13 @@ describe('Scraper', function () {
       browser: browser,
       store: store
     })
-    console.log(6)
     s.run(function () {
       assert.deepEqual(store.data[0], {a: 'a'})
       done()
     })
   })
 
-  it('should be able to scrape a child page', function () {
+  it('should be able to scrape a child page', function (done) {
     var sitemap = new Sitemap({
       id: 'test',
       startUrl: 'http://test.lv/',
@@ -83,7 +82,7 @@ describe('Scraper', function () {
       ]
     })
 
-    var browser = new ChromeHeadlessBrowser({
+    var browser = new ChromePopupBrowser({
       pageLoadDelay: 500
     })
 
@@ -95,22 +94,12 @@ describe('Scraper', function () {
       delay: 0
     })
 
-    var executed = false
-    runs(function () {
-      s.run(function () {
-        executed = true
-      })
-    })
 
-    waitsFor(function () {
-      return executed
-    }, 3000)
-
-    runs(function () {
-      expect(executed).toBe(true)
-      expect(store.data).toEqual([
+    s.run(function () {
+      assert.deepEqual(store.data, [
 				{'link': 'test', 'link-href': 'http://test.lv/1/', 'b': 'b'}
       ])
+      done()
     })
   })
 
@@ -153,13 +142,13 @@ describe('Scraper', function () {
       _follow: 'http://example.com/',
       _followSelectorId: 'link-w-children'
     })
-    expect(follow).toBe(true)
+    assert.equal(follow, true)
 
     follow = s.recordCanHaveChildJobs({
       _follow: 'http://example.com/',
       _followSelectorId: 'link-wo-children'
     })
-    expect(follow).toBe(false)
+    assert.equal(follow, false)
   })
 
   it('should be able to create multiple start jobs', function () {
@@ -174,7 +163,7 @@ describe('Scraper', function () {
     })
 
     s.initFirstJobs()
-    expect(q.jobs.length).toBe(100)
+    assert.equal(q.jobs.length, 100)
   })
 
   it('should create multiple start jobs if multiple urls provided', function () {
@@ -189,17 +178,17 @@ describe('Scraper', function () {
     })
 
     s.initFirstJobs()
-    expect(q.jobs.length).toBe(3)
+    assert.equal(q.jobs.length, 3)
   })
 
   it('should extract filename from image url', function () {
     var image = Scraper.prototype.getFileFilename('http://example.com/image.jpg')
-    expect(image).toEqual('image.jpg')
+    assert.equal(image, 'image.jpg')
   })
 
   it('should extract filename from image url with query string', function () {
     var image = Scraper.prototype.getFileFilename('http://example.com/image.jpg?a=1&b=2')
-    expect(image).toEqual('image.jpga=1&b=2')
+    assert.equal(image, 'image.jpga=1&b=2')
   })
 
   it('should shorten image file name to 143 symbols', function () {
@@ -209,15 +198,15 @@ describe('Scraper', function () {
 		// web scraper allows only 130
 
     var image = Scraper.prototype.getFileFilename('http://example.com/012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789')
-    expect(image).toEqual('0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789')
+    assert.equal(image, '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789')
   })
 
   it('should extract filename from image url without http://', function () {
     var image = Scraper.prototype.getFileFilename('image.jpg')
-    expect(image).toEqual('image.jpg')
+    assert.equal(image, 'image.jpg')
   })
 
-  it('should store images', function () {
+  it('should store images', function (done) {
     var record = {
       '_imageBase64-test': 'test',
       '_imageMimeType-test': 'test',
@@ -237,20 +226,20 @@ describe('Scraper', function () {
     chrome.downloads.onChanged.addListener(function () {
       downloadAPICalled = true
     })
-    expect(downloadAPICalled).toEqual(false)
+    assert.equal(downloadAPICalled, false)
 
-    waitsFor(function () {
-      return deferredSave.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      expect(record['_imageBase64-test']).toEqual(undefined)
-      expect(record['_imageMimeType-test']).toEqual(undefined)
-      expect(downloadAPICalled).toEqual(true)
+    deferredSave.then(function () {
+      assert.equal(record['_imageBase64-test'], undefined)
+      assert.equal(record['_imageMimeType-test'], undefined)
+      assert.equal(downloadAPICalled, true)
+      done()
     })
+      .then(null, function (e) {
+        done(e)
+      })
   })
 
-  xit('should store images while scraping', function () {
+  it.skip('should store images while scraping', function (done) {
     $el.append('<div id="scraper-test-img"><img src="../docs/images/chrome-store-logo.png"></div>')
 
     var sitemap = new Sitemap({
@@ -270,7 +259,7 @@ describe('Scraper', function () {
       ]
     })
 
-    var browser = new ChromeHeadlessBrowser({
+    var browser = new ChromePopupBrowser({
       pageLoadDelay: 500
     })
 
@@ -286,20 +275,10 @@ describe('Scraper', function () {
       downloadAPICalled = true
     })
 
-    var executed = false
-    runs(function () {
-      s.run(function () {
-        executed = true
-      })
-    })
-
-    waitsFor(function () {
-      return executed
-    }, 5000)
-    runs(function () {
-      expect(executed).toBe(true)
-      expect(store.data[0]['test-src']).toMatch(/chrome-store-logo.png/)
-      expect(downloadAPICalled).toEqual(true)
+    s.run(function () {
+      assert.ok(store.data[0]['test-src'].match(/chrome-store-logo.png/))
+      assert.equal(downloadAPICalled, true)
+      done()
     })
   })
 })
