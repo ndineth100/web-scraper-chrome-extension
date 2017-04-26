@@ -1,3 +1,4 @@
+const assert = require('chai').assert
 var getSelectorIds = function (selectors) {
   var ids = []
   selectors.forEach(function (selector) {
@@ -17,31 +18,25 @@ var selectorListSorter = function (a, b) {
 }
 
 var selectorMatchers = {
-  matchSelectors: function (expectedIds) {
+  matchSelectors: async function (actual, expectedIds) {
     expectedIds = expectedIds.sort()
-    var actualIds = getSelectorIds(this.actual).sort()
+    var actualIds = getSelectorIds(actual).sort()
 
-    expect(actualIds).toEqual(expectedIds)
-    return true
+    assert.deepEqual(actualIds, expectedIds)
   },
-  matchSelectorList: function (expectedSelectors) {
-    var actualSelectors = this.actual
-    if (expectedSelectors.length !== actualSelectors.length) {
-      return false
-    }
+  matchSelectorList: async function (actual, expectedSelectors) {
+    var actualSelectors = actual
+    assert.equal(expectedSelectors.length, actualSelectors.length)
     expectedSelectors.sort(selectorListSorter)
     actualSelectors.sort(selectorListSorter)
 
-    for (var i in expectedSelectors) {
-      if (expectedSelectors[i].id !== actualSelectors[i].id) {
-        return false
-      }
+    for (const i in expectedSelectors) {
+      assert.equal(expectedSelectors[i].id, actualSelectors[i].id)
     }
-    return true
   },
 	// @REFACTOR use match selector list
-  matchSelectorTrees: function (expectedSelectorTrees) {
-    var actualSelectorTrees = this.actual
+  matchSelectorTrees: function (actual, expectedSelectorTrees) {
+    var actualSelectorTrees = actual
 
     if (actualSelectorTrees.length !== expectedSelectorTrees.length) {
       return false
@@ -52,43 +47,23 @@ var selectorMatchers = {
     }
     return true
   },
-  deferredToEqual: function (expectedData) {
-    var deferredData = this.actual
-    var data
-
-    waitsFor(function () {
-      var state = deferredData.state()
-      if (state === 'resolved') return true
-      if (state === 'rejected') {
-        expect(state).toEqual('resolved')
-        return true
-      }
-
-      return false
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      deferredData.done(function (d) {
-        data = d
+  deferredToEqual: function (actual, expectedData) {
+    var deferredData = actual
+    return deferredData
+      .then(function (d) {
+        assert.deepEqual(d, expectedData)
       })
-      expect(data).toEqual(expectedData)
-    })
-    return true
   },
-  deferredToFail: function () {
-    var deferredData = this.actual
+  deferredToFail: async function (actual) {
+    var deferredData = actual
 
-    waitsFor(function () {
-      var state = deferredData.state()
-      if (state === 'rejected') return true
-      if (state === 'resolved') {
-        expect(state).toEqual('rejected')
-        return true
-      }
-
-      return false
-    }, 'wait for data extraction', 5000)
-
-    return true
+    try {
+      await deferredData
+      return Promise.reject(new Error('Promise not rejected'))
+    } catch (e) {
+      return
+    }
   }
 }
+
+module.exports = selectorMatchers

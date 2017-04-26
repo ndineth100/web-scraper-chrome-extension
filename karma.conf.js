@@ -1,4 +1,4 @@
-var files = 'tests/spec/ScraperSpec.js'
+var files = 'tests/spec/SelectorListSpec.js'
 module.exports = function (config) {
   config.set({
 

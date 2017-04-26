@@ -1,8 +1,8 @@
-describe('SelectorList', function () {
-  beforeEach(function () {
-    this.addMatchers(selectorMatchers)
-  })
-
+const SelectorList = require('./../../extension/scripts/SelectorList')
+const Selector = require('./../../extension/scripts/Selector')
+const selectorMatchers = require('../Matchers')
+const assert = require('chai').assert
+describe.only('SelectorList', function () {
   it('should init selectors', function () {
     var selectors = [
       {
@@ -15,7 +15,7 @@ describe('SelectorList', function () {
 
     var selectorList = new SelectorList(selectors)
 
-    expect(selectorList[0] instanceof Selector).toBe(true)
+    assert.isTrue(selectorList[0] instanceof Selector)
   })
 
   it('should be able to create a selector list', function () {
@@ -30,7 +30,7 @@ describe('SelectorList', function () {
 
     var selectorList = new SelectorList(selectors)
 
-    expect(selectorList[0]).toEqual(new Selector(selectors[0]))
+    assert.deepEqual(selectorList[0], new Selector(selectors[0]))
   })
 
   it('should ignore repeating selectors', function () {
@@ -47,12 +47,12 @@ describe('SelectorList', function () {
 
     var selectorList = new SelectorList(selectors)
 
-    expect(selectorList.length).toBe(1)
-    expect(selectorList[0]).toEqual(new Selector(selectors[0]))
-    expect(selectorList[0]).toEqual(new Selector(selectors[1]))
+    assert.equal(selectorList.length, 1)
+    assert.deepEqual(selectorList[0], new Selector(selectors[0]))
+    assert.deepEqual(selectorList[0], new Selector(selectors[1]))
   })
 
-  it('should be able to return all of its selectors', function () {
+  it('should be able to return all of its selectors', async function () {
     var selectors = [
       {
         id: 'a',
@@ -67,10 +67,10 @@ describe('SelectorList', function () {
     var selectorList = new SelectorList(selectors)
 
     var foundSelectors = selectorList.getAllSelectors()
-    expect(foundSelectors).matchSelectorList(selectors)
+    await selectorMatchers.matchSelectorList(foundSelectors, selectors)
   })
 
-  it('should be able to return all child selectors of a parent selector', function () {
+  it('should be able to return all child selectors of a parent selector', async function () {
     var expectedSelectors = [
       {
         id: 'a',
@@ -99,10 +99,10 @@ describe('SelectorList', function () {
     var selectorList = new SelectorList(selectors)
 
     var foundSelectors = selectorList.getAllSelectors('a')
-    expect(foundSelectors).matchSelectorList(expectedSelectors)
+    await selectorMatchers.matchSelectorList(foundSelectors, expectedSelectors)
   })
 
-  it('should be able to return direct child selectors of a parent selector', function () {
+  it('should be able to return direct child selectors of a parent selector', async function () {
     var expectedSelectors = [
       {
         id: 'b',
@@ -131,7 +131,7 @@ describe('SelectorList', function () {
     var selectorList = new SelectorList(selectors)
 
     var foundSelectors = selectorList.getDirectChildSelectors('a')
-    expect(foundSelectors).matchSelectorList(expectedSelectors)
+    await selectorMatchers.matchSelectorList(foundSelectors, expectedSelectors)
   })
 
   it('should be able to clone itself', function () {
@@ -143,8 +143,8 @@ describe('SelectorList', function () {
     ])
     var resultList = selectorList.clone()
     selectorList.pop()
-    expect(selectorList.length).toBe(0)
-    expect(resultList.length).toBe(1)
+    assert.equal(selectorList.length, 0)
+    assert.equal(resultList.length, 1)
   })
 
   it('should be able to execute concat', function () {
@@ -162,7 +162,7 @@ describe('SelectorList', function () {
       }
     ])
 
-    expect(newList.length).toBe(2)
+    assert.equal(newList.length, 2)
   })
 
   it('should be able to tell whether selector or its child selectors will return multiple items', function () {
@@ -187,7 +187,7 @@ describe('SelectorList', function () {
       }
     ])
 
-    expect(selectorList.willReturnMultipleRecords('a')).toBe(true)
+    assert.isTrue(selectorList.willReturnMultipleRecords('a'))
   })
 
   it('should be able to tell whether selector or its child selectors will NOT return multiple items', function () {
@@ -212,7 +212,7 @@ describe('SelectorList', function () {
       }
     ])
 
-    expect(selectorList.willReturnMultipleRecords('a')).toBe(false)
+    assert.isFalse(selectorList.willReturnMultipleRecords('a'))
   })
 
   it('should serialize as JSON array', function () {
@@ -226,7 +226,7 @@ describe('SelectorList', function () {
     ])
     var selectorListJSON = JSON.stringify(selectorList)
 
-    expect(selectorListJSON).toEqual('[{"id":"a","type":"SelectorElement","multiple":false,"parentSelectors":["_root"]}]')
+    assert.equal(selectorListJSON, '[{"id":"a","type":"SelectorElement","multiple":false,"parentSelectors":["_root"]}]')
   })
 
   it('should allow to create list from JSON unserialized selectorList', function () {
@@ -240,10 +240,10 @@ describe('SelectorList', function () {
     ])
     var selectorListNew = new SelectorList(JSON.parse(JSON.stringify(selectorList)))
 
-    expect(selectorListNew).toEqual(selectorList)
+    assert.deepEqual(selectorListNew, selectorList)
   })
 
-  it('should select child selectors within one page', function () {
+  it('should select child selectors within one page', async function () {
     var expectedSelectorList = new SelectorList([
       {
         id: 'child1',
@@ -317,10 +317,10 @@ describe('SelectorList', function () {
     ])
 
     var pageChildSelectors = selectorList.getSinglePageAllChildSelectors('parent2')
-    expect(pageChildSelectors).matchSelectorList(expectedSelectorList)
+    await selectorMatchers.matchSelectorList(pageChildSelectors, expectedSelectorList)
   })
 
-  it('should extract all child selectors and parent within one page', function () {
+  it('should extract all child selectors and parent within one page', async function () {
     var expectedSelectorList = new SelectorList([
       {
         id: 'parent1',
@@ -400,7 +400,7 @@ describe('SelectorList', function () {
     ])
 
     var pageSelectors = selectorList.getOnePageSelectors('parent2')
-    expect(pageSelectors).matchSelectorList(expectedSelectorList)
+    await selectorMatchers.matchSelectorList(pageSelectors, expectedSelectorList)
   })
 
   it('should extract css selector within one page for a selector with no parent selectors', function () {
@@ -413,7 +413,7 @@ describe('SelectorList', function () {
     ])
 
     var CSSSelector = selectorList.getCSSSelectorWithinOnePage('div', ['_root'])
-    expect(CSSSelector).toEqual('div')
+    assert.equal(CSSSelector, 'div')
   })
 
   it('should extract css selector within one page for a selector with parent element selector', function () {
@@ -431,7 +431,7 @@ describe('SelectorList', function () {
     ])
 
     var CSSSelector = selectorList.getCSSSelectorWithinOnePage('div', ['_root', 'parent1'])
-    expect(CSSSelector).toEqual('div.parent div')
+    assert.equal(CSSSelector, 'div.parent div')
   })
 
   it('should extract css selector within one page from a list of parent selectors', function () {
@@ -454,7 +454,7 @@ describe('SelectorList', function () {
     ])
 
     var CSSSelector = selectorList.getParentCSSSelectorWithinOnePage(['_root', 'parent2', 'parent1'])
-    expect(CSSSelector).toEqual('div.parent2 div.parent ')
+    assert.equal(CSSSelector, 'div.parent2 div.parent ')
   })
 
   it('should extract css selector within one page for a selector with parent element selectors', function () {
@@ -477,7 +477,7 @@ describe('SelectorList', function () {
     ])
 
     var CSSSelector = selectorList.getCSSSelectorWithinOnePage('div', ['_root', 'parent2', 'parent1'])
-    expect(CSSSelector).toEqual('div.parent2 div.parent div')
+    assert.equal(CSSSelector, 'div.parent2 div.parent div')
   })
 
   it('should extract css selector within one page for a selector with parent non element selectors', function () {
@@ -500,7 +500,7 @@ describe('SelectorList', function () {
     ])
 
     var CSSSelector = selectorList.getCSSSelectorWithinOnePage('div', ['_root', 'parent2', 'parent1'])
-    expect(CSSSelector).toEqual('div.parent div')
+    assert.equal(CSSSelector, 'div.parent div')
   })
 
   it('should return false when no recursion found', function () {
@@ -526,7 +526,7 @@ describe('SelectorList', function () {
     ])
 
     var recursionFound = selectorList.hasRecursiveElementSelectors()
-    expect(recursionFound).toEqual(false)
+    assert.isFalse(recursionFound)
   })
 
   it('should return true when recursion found', function () {
@@ -552,7 +552,7 @@ describe('SelectorList', function () {
     ])
 
     var recursionFound = selectorList.hasRecursiveElementSelectors()
-    expect(recursionFound).toEqual(true)
+    assert.isTrue(recursionFound)
   })
 
   it('should return false when recursion only made of link selectors', function () {
@@ -572,12 +572,13 @@ describe('SelectorList', function () {
       {
         id: 'div',
         type: 'SelectorElement',
+        type: 'SelectorElement',
         selector: 'div',
         parentSelectors: ['parent', 'link']
       }
     ])
 
     var recursionFound = selectorList.hasRecursiveElementSelectors()
-    expect(recursionFound).toEqual(false)
+    assert.isFalse(recursionFound)
   })
 })
