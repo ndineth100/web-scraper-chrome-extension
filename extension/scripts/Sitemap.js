@@ -7,9 +7,12 @@ var Sitemap = function (sitemapObj) {
 Sitemap.prototype = {
 
   initData: function (sitemapObj) {
+    console.log(this)
     for (var key in sitemapObj) {
+      console.log(key)
       this[key] = sitemapObj[key]
     }
+    console.log(this)
 
     var selectors = this.selectors
     this.selectors = new SelectorList(this.selectors)

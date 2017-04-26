@@ -1,8 +1,9 @@
+const selectorMatchers = require('./../Matchers')
+const assert = require('chai').assert
+const Sitemap = require('../../extension/scripts/Sitemap')
+const Selector = require('../../extension/scripts/Selector')
+const SelectorList = require('../../extension/scripts/SelectorList')
 describe('Sitemap', function () {
-  beforeEach(function () {
-    this.addMatchers(selectorMatchers)
-  })
-
   it('should be able to rename selector with a parent', function () {
     var selectors = [
       {
@@ -35,7 +36,7 @@ describe('Sitemap', function () {
 
 		// no hard decidions here
     sitemap.updateSelector(sitemap.selectors[1], expected)
-    expect(sitemap.selectors[1]).toEqual(expected)
+    assert.deepEqual(sitemap.selectors[1], expected)
   })
 
   it('should be able to rename selector with child selectors', function () {
@@ -78,8 +79,8 @@ describe('Sitemap', function () {
 
 		// no hard decidions here
     sitemap.updateSelector(sitemap.selectors[1], expected)
-    expect(sitemap.selectors[1]).toEqual(expected)
-    expect(sitemap.selectors[0]).toEqual(expectedChild)
+    assert.deepEqual(sitemap.selectors[1], expected)
+    assert.deepEqual(sitemap.selectors[0], expectedChild)
   })
 
   it('should be able to rename selector who is his own parent', function () {
@@ -115,7 +116,7 @@ describe('Sitemap', function () {
 
 		// no hard decidions here
     sitemap.updateSelector(sitemap.selectors[0], update)
-    expect(sitemap.selectors[0]).toEqual(expected)
+    assert.deepEqual(sitemap.selectors[0], expected)
   })
 
   it('should be able to change selector type', function () {
@@ -139,9 +140,9 @@ describe('Sitemap', function () {
       ]
     })
 
-    expect(sitemap.selectors[0].canCreateNewJobs()).toEqual(false)
+    assert.isFalse(sitemap.selectors[0].canCreateNewJobs())
     sitemap.updateSelector(sitemap.selectors[0], update)
-    expect(sitemap.selectors[0].canCreateNewJobs()).toEqual(true)
+    assert.isTrue(sitemap.selectors[0].canCreateNewJobs())
   })
 
   it('should be able to export as JSON', function () {
@@ -161,7 +162,7 @@ describe('Sitemap', function () {
 
     var sitemapJSON = sitemap.exportSitemap()
     var expectedJSON = '{"_id":"id","selectors":[{"id":"a","type":"SelectorElement","parentSelectors":["a"]}]}'
-    expect(sitemapJSON).toEqual(expectedJSON)
+    assert.equal(sitemapJSON, expectedJSON)
   })
 
   it('should be able to import from JSON', function () {
@@ -181,7 +182,7 @@ describe('Sitemap', function () {
     var sitemapJSON = '{"_id":"id","selectors":[{"id":"a","type":"SelectorElement","parentSelectors":["a"]}]}'
     var sitemap = new Sitemap()
     sitemap.importSitemap(sitemapJSON)
-    expect(sitemap).toEqual(expectedSitemap)
+    assert.deepEqual(sitemap, expectedSitemap)
   })
 
   it('should be able to export data as CSV', function () {
@@ -205,7 +206,7 @@ describe('Sitemap', function () {
     ]
     var blob = sitemap.getDataExportCsvBlob(data)
 		// can't access the data so I'm just checking whether this runs
-    expect(blob.toString()).toEqual('[object Blob]')
+    assert.equal(blob.toString(), '[object Blob]')
   })
 
   it('should know what data columns is it going to return', function () {
@@ -225,7 +226,7 @@ describe('Sitemap', function () {
     })
 
     var columns = sitemap.getDataColumns()
-    expect(columns).toEqual(['a', 'b', 'b-href'])
+    assert.deepEqual(columns, ['a', 'b', 'b-href'])
   })
 
   it('should be able to delete a selector', function () {
@@ -248,7 +249,7 @@ describe('Sitemap', function () {
 
     sitemap.deleteSelector(sitemap.selectors[0])
 
-    expect(sitemap.selectors.length).toEqual(1)
+    assert.equal(sitemap.selectors.length, 1)
   })
 
   it('should be able to delete a selector with child selectors', function () {
@@ -270,7 +271,7 @@ describe('Sitemap', function () {
     })
 
     sitemap.deleteSelector(sitemap.selectors[0])
-    expect(sitemap.selectors.length).toEqual(0)
+    assert.equal(sitemap.selectors.length, 0)
   })
 
   it('should not delete selectors if they have multiple parent selectors when deleting one of their parent', function () {
@@ -304,7 +305,7 @@ describe('Sitemap', function () {
     })
 
     sitemap.deleteSelector(sitemap.selectors[0])
-    expect(sitemap.selectors).toEqual(new SelectorList([expectedSelector]))
+    assert.deepEqual(sitemap.selectors, new SelectorList([expectedSelector]))
   })
 
   it('Should return one start url', function () {
@@ -312,7 +313,7 @@ describe('Sitemap', function () {
       startUrl: 'http://example.com/'
     })
     var expectedURLS = ['http://example.com/']
-    expect(sitemap.getStartUrls()).toEqual(expectedURLS)
+    assert.deepEqual(sitemap.getStartUrls(), expectedURLS)
   })
 
   it('Should return multiple start urls', function () {
@@ -324,7 +325,7 @@ describe('Sitemap', function () {
       'http://example.com/2.html',
       'http://example.com/3.html'
     ]
-    expect(sitemap.getStartUrls()).toEqual(expectedURLS)
+    assert.deepEqual(sitemap.getStartUrls(), expectedURLS)
   })
 
   it('Should return multiple start urls with id at the end', function () {
@@ -336,7 +337,7 @@ describe('Sitemap', function () {
       'http://example.com/?id=2',
       'http://example.com/?id=3'
     ]
-    expect(sitemap.getStartUrls()).toEqual(expectedURLS)
+    assert.deepEqual(sitemap.getStartUrls(), expectedURLS)
   })
 
   it('should return multiple start urls with specified incremental', function () {
@@ -348,7 +349,7 @@ describe('Sitemap', function () {
       'http://example.com/?id=10',
       'http://example.com/?id=20'
     ]
-    expect(sitemap.getStartUrls()).toEqual(expectedURLS)
+    assert.deepEqual(sitemap.getStartUrls(), expectedURLS)
   })
 
   it('Should return multiple start urls with padding', function () {
@@ -360,7 +361,7 @@ describe('Sitemap', function () {
       'http://example.com/002.html',
       'http://example.com/003.html'
     ]
-    expect(sitemap.getStartUrls()).toEqual(expectedURLS)
+    assert.deepEqual(sitemap.getStartUrls(), expectedURLS)
   })
 
   it('Should return multiple start urls when startUrl is an array', function () {
@@ -372,7 +373,7 @@ describe('Sitemap', function () {
       'http://example.com/2.html',
       'http://example.com/3.html'
     ]
-    expect(sitemap.getStartUrls()).toEqual(expectedURLS)
+    assert.deepEqual(sitemap.getStartUrls(), expectedURLS)
   })
 
   it('Should return only selectors which can have child selectors', function () {
@@ -406,6 +407,6 @@ describe('Sitemap', function () {
     })
 
     var expectedIds = ['_root', 'a', 'e']
-    expect(sitemap.getPossibleParentSelectorIds()).toEqual(expectedIds)
+    assert.deepEqual(sitemap.getPossibleParentSelectorIds(), expectedIds)
   })
 })
