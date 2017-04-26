@@ -1,35 +1,37 @@
+const Selector = require('./../../extension/scripts/Selector')
+const utils = require('./../utils')
+const assert = require('chai').assert
+
 describe('Selector', function () {
   var $el
 
   beforeEach(function () {
-    $el = jQuery('#tests').html('')
-    if ($el.length === 0) {
-      $el = $("<div id='tests' style='display:none'>aaaaaaaaaaaa</div>").appendTo('body')
-    }
+    console.log(utils)
+    document.body.innerHTML = utils.getTestHTML()
+    $el = utils.createElementFromHTML("<div id='tests' style='display:none'>aaaaaaaaaaaa</div>")
+    document.body.appendChild($el)
   })
 
   it('should be able to select elements', function () {
-    $el.html('<a></a>')
-
+    $el.innerHTML = '<a></a>'
     var selector = new Selector({
       selector: 'a',
       type: 'SelectorLink'
     })
     var elements = selector.getDataElements($el)
 
-    expect(elements).toEqual($el.find('a').get())
+    assert.deepEqual(elements, Object.values($el.querySelectorAll('a')))
   })
 
   it('should be able to select parent', function () {
-    $el.html('<a></a>')
-
+    $el.innerHTML = '<a></a>'
     var selector = new Selector({
       selector: '_parent_',
       type: 'SelectorLink'
     })
     var elements = selector.getDataElements($el)
 
-    expect(elements).toEqual($el.get())
+    assert.deepEqual(elements, [$el])
   })
 
   it('should be able to select elements with delay', function () {
@@ -42,20 +44,14 @@ describe('Selector', function () {
     var dataDeferred = selector.getData($el)
 
 		// add data after data extraction called
-    $el.html('<a>a</a>')
+    $el.innerHTML = '<a>a</a>'
 
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            'a': 'a'
-          }
-        ])
-      })
+    return dataDeferred.then(function (data) {
+      assert.deepEqual(data, [
+        {
+          'a': 'a'
+        }
+      ])
     })
   })
 })
