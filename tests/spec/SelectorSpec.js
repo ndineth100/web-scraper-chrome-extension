@@ -6,7 +6,6 @@ describe('Selector', function () {
   var $el
 
   beforeEach(function () {
-    console.log(utils)
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'>aaaaaaaaaaaa</div>")
     document.body.appendChild($el)

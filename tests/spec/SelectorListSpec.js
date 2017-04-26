@@ -2,7 +2,7 @@ const SelectorList = require('./../../extension/scripts/SelectorList')
 const Selector = require('./../../extension/scripts/Selector')
 const selectorMatchers = require('../Matchers')
 const assert = require('chai').assert
-describe.only('SelectorList', function () {
+describe('SelectorList', function () {
   it('should init selectors', function () {
     var selectors = [
       {

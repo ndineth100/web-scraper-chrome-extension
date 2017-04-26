@@ -1,3 +1,5 @@
+// TODO get rid of jquery
+
 /**
  * Only Elements unique will be added to this array
  * @constructor
@@ -7,7 +9,7 @@ function UniqueElementList (clickElementUniquenessType) {
   this.addedElements = {}
 }
 
-UniqueElementList.prototype = new Array()
+UniqueElementList.prototype = []
 
 UniqueElementList.prototype.push = function (element) {
   if (this.isAdded(element)) {
