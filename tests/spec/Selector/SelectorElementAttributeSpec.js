@@ -1,16 +1,16 @@
+const Selector = require('../../../extension/scripts/Selector')
+const utils = require('./../../utils')
+const assert = require('chai').assert
 describe('Element Attribute Selector', function () {
   var $el
 
   beforeEach(function () {
-    this.addMatchers(selectorMatchers)
-
-    $el = jQuery('#tests').html('')
-    if ($el.length === 0) {
-      $el = $("<div id='tests' style='display:none'></div>").appendTo('body')
-    }
+    document.body.innerHTML = utils.getTestHTML()
+    $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
+    document.body.appendChild($el)
   })
 
-  it('should extract image src tag', function () {
+  it('should extract image src tag', function (done) {
     var selector = new Selector({
       id: 'img',
       type: 'SelectorElementAttribute',
@@ -19,24 +19,18 @@ describe('Element Attribute Selector', function () {
       selector: 'img'
     })
 
-    var dataDeferred = selector.getData($('#selector-image-one-image'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            'img': 'http://aa/'
-          }
-        ])
-      })
+    var dataDeferred = selector.getData(document.querySelector('#selector-image-one-image'))
+    dataDeferred.then(function (data) {
+      assert.deepEqual(data, [
+        {
+          'img': 'http://aa/'
+        }
+      ])
+      done()
     })
   })
 
-  it('should extract multiple src tags', function () {
+  it('should extract multiple src tags', function (done) {
     var selector = new Selector({
       id: 'img',
       type: 'SelectorElementAttribute',
@@ -45,23 +39,18 @@ describe('Element Attribute Selector', function () {
       selector: 'img'
     })
 
-    var dataDeferred = selector.getData($('#selector-image-multiple-images'))
+    var dataDeferred = selector.getData(document.querySelector('#selector-image-multiple-images'))
 
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            'img': 'http://aa/'
-          },
-          {
-            'img': 'http://bb/'
-          }
-        ])
-      })
+    dataDeferred.then(function (data) {
+      assert.deepEqual(data, [
+        {
+          'img': 'http://aa/'
+        },
+        {
+          'img': 'http://bb/'
+        }
+      ])
+      done()
     })
   })
 
@@ -74,10 +63,10 @@ describe('Element Attribute Selector', function () {
     })
 
     var columns = selector.getDataColumns()
-    expect(columns).toEqual(['id'])
+    assert.deepEqual(columns, ['id'])
   })
 
-  it('should return empty array when no images are found', function () {
+  it('should return empty array when no images are found', function (done) {
     var selector = new Selector({
       id: 'img',
       type: 'SelectorElementAttribute',
@@ -86,22 +75,17 @@ describe('Element Attribute Selector', function () {
       extractAttribute: 'src'
     })
 
-    var dataDeferred = selector.getData($('#not-exist'))
+    var dataDeferred = selector.getData(document.querySelector('#not-exist'))
 
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([])
-      })
+    dataDeferred.then(function (data) {
+      assert.deepEqual(data, [])
+      done()
     })
   })
 
-  it('should be able to select data- attributes', function () {
+  it('should be able to select data- attributes', function (done) {
     var html = '<ul><li data-type="dog"></li></ul>'
-    $el.append(html)
+    utils.appendHTML($el, html)
 
     var selector = new Selector({
       id: 'type',
@@ -113,8 +97,11 @@ describe('Element Attribute Selector', function () {
 
     var dataDeferred = selector.getData($el)
 
-    expect(dataDeferred).deferredToEqual([{
-      'type': 'dog'
-    }])
+    dataDeferred.then(function (data) {
+      assert.deepEqual(data, [{
+        'type': 'dog'
+      }])
+      done()
+    })
   })
 })
