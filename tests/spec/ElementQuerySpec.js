@@ -1,64 +1,64 @@
 const ElementQuery = require('../../extension/scripts/ElementQuery')
 const assert = require('chai').assert
+const utils = require('./../utils')
 
 describe('ElementQuery', function () {
   var $el
 
   beforeEach(function () {
-    $el = jQuery('#tests').html('')
-    if ($el.length === 0) {
-      $el = $("<div id='tests' style='display:none'></div>").appendTo('body')
-    }
+    document.body.innerHTML = utils.getTestHTML()
+    $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
+    document.body.appendChild($el)
   })
 
   it('should be able to select elements', function () {
-    $el.append('<a></a><span></span>')
+    $el.innerHTML = '<a></a><span></span>'
 
     var selectedElements = ElementQuery('a, span', $el)
-    var expectedElements = $('a, span', $el)
+    var expectedElements = Array.from($el.querySelectorAll('a, span'))
 
-    assert.deepEqual(selectedElements.sort(), expectedElements.get().sort())
+    assert.deepEqual(selectedElements.sort(), expectedElements)
   })
 
   it('should be able to select parent', function () {
-    $el.append('<a></a><span></span>')
+    $el.innerHTML = '<a></a><span></span>'
 
     var selectedElements = ElementQuery('a, span, _parent_', $el)
-    var expectedElements = $('a, span', $el)
-    expectedElements = expectedElements.add($el)
+    var expectedElements = Array.from($el.querySelectorAll('a, span'))
+    expectedElements.push($el)
 
-    assert.deepEqual(selectedElements.sort(), expectedElements.get().sort())
+    assert.deepEqual(selectedElements.sort(), expectedElements.sort())
   })
 
   it('should should not return duplicates', function () {
-    $el.append('<a></a><span></span>')
+    $el.innerHTML = '<a></a><span></span>'
 
     var selectedElements = ElementQuery('*, a, span, _parent_', $el)
-    var expectedElements = $('a, span', $el)
-    expectedElements = expectedElements.add($el)
+    var expectedElements = Array.from($el.querySelectorAll('a, span'))
+    expectedElements.push($el)
 
     assert.deepEqual(selectedElements.length, 3)
-    assert.deepEqual(selectedElements.sort(), expectedElements.get().sort())
+    assert.deepEqual(selectedElements.sort(), expectedElements.sort())
   })
 
   it('should be able to select parent when parent there are multiple parents', function () {
-    $el.append('<span></span><span></span>')
+    $el.innerHTML = '<span></span><span></span>'
 
-    var selectedElements = ElementQuery('_parent_', $('span', $el))
-    var expectedElements = $('span', $el)
+    var selectedElements = ElementQuery('_parent_', $el.querySelectorAll('span'))
+    var expectedElements = Array.from($el.querySelectorAll('span'))
 
     assert.deepEqual(selectedElements.length, 2)
-    assert.deepEqual(selectedElements.sort(), expectedElements.get().sort())
+    assert.deepEqual(selectedElements.sort(), expectedElements)
   })
 
   it('should be able to select element with a comma ,', function () {
-    $el.append('<span>,</span>')
+    $el.innerHTML = '<span>,</span>'
 
     var selectedElements = ElementQuery(":contains(',')", $el)
-    var expectedElements = $('span', $el)
+    var expectedElements = Array.from($el.querySelectorAll('span'))
 
     assert.deepEqual(selectedElements.length, 1)
-    assert.deepEqual(selectedElements.sort(), expectedElements.get().sort())
+    assert.deepEqual(selectedElements.sort(), expectedElements.sort())
   })
 
   it('should preserve spaces', function () {

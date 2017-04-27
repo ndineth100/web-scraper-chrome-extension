@@ -1,4 +1,4 @@
-module.exports = {getTestHTML, createElementFromHTML}
+module.exports = {getTestHTML, createElementFromHTML, appendHTML}
 function getTestHTML () {
   return `<div style="display:none" id="webpage">
 	<!-- content script data extraction tests -->
@@ -223,4 +223,8 @@ function createElementFromHTML (html) {
   var template = document.createElement('template')
   template.innerHTML = html
   return template.content.firstChild
+}
+
+function appendHTML (element, html) {
+  return element.appendChild(createElementFromHTML(html))
 }
