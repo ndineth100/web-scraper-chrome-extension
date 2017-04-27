@@ -31,21 +31,19 @@ var selectorMatchers = {
     actualSelectors.sort(selectorListSorter)
 
     for (const i in expectedSelectors) {
+      console.log(expectedSelectors[i], actualSelectors[i].id)
       assert.equal(expectedSelectors[i].id, actualSelectors[i].id)
     }
   },
 	// @REFACTOR use match selector list
-  matchSelectorTrees: function (actual, expectedSelectorTrees) {
+  matchSelectorTrees: async function (actual, expectedSelectorTrees) {
     var actualSelectorTrees = actual
 
-    if (actualSelectorTrees.length !== expectedSelectorTrees.length) {
-      return false
-    }
+    assert.equal(actualSelectorTrees.length, expectedSelectorTrees.length)
 
     for (var i in expectedSelectorTrees) {
-      expect(actualSelectorTrees[i]).matchSelectors(expectedSelectorTrees[i])
+      await selectorMatchers.matchSelectors(actualSelectorTrees[i], expectedSelectorTrees[i])
     }
-    return true
   },
   deferredToEqual: function (actual, expectedData) {
     var deferredData = actual

@@ -1,3 +1,6 @@
+const ElementQuery = require('../../extension/scripts/ElementQuery')
+const assert = require('chai').assert
+
 describe('ElementQuery', function () {
   var $el
 
@@ -14,7 +17,7 @@ describe('ElementQuery', function () {
     var selectedElements = ElementQuery('a, span', $el)
     var expectedElements = $('a, span', $el)
 
-    expect(selectedElements.sort()).toEqual(expectedElements.get().sort())
+    assert.deepEqual(selectedElements.sort(), expectedElements.get().sort())
   })
 
   it('should be able to select parent', function () {
@@ -24,7 +27,7 @@ describe('ElementQuery', function () {
     var expectedElements = $('a, span', $el)
     expectedElements = expectedElements.add($el)
 
-    expect(selectedElements.sort()).toEqual(expectedElements.get().sort())
+    assert.deepEqual(selectedElements.sort(), expectedElements.get().sort())
   })
 
   it('should should not return duplicates', function () {
@@ -34,8 +37,8 @@ describe('ElementQuery', function () {
     var expectedElements = $('a, span', $el)
     expectedElements = expectedElements.add($el)
 
-    expect(selectedElements.length).toEqual(3)
-    expect(selectedElements.sort()).toEqual(expectedElements.get().sort())
+    assert.deepEqual(selectedElements.length, 3)
+    assert.deepEqual(selectedElements.sort(), expectedElements.get().sort())
   })
 
   it('should be able to select parent when parent there are multiple parents', function () {
@@ -44,8 +47,8 @@ describe('ElementQuery', function () {
     var selectedElements = ElementQuery('_parent_', $('span', $el))
     var expectedElements = $('span', $el)
 
-    expect(selectedElements.length).toEqual(2)
-    expect(selectedElements.sort()).toEqual(expectedElements.get().sort())
+    assert.deepEqual(selectedElements.length, 2)
+    assert.deepEqual(selectedElements.sort(), expectedElements.get().sort())
   })
 
   it('should be able to select element with a comma ,', function () {
@@ -54,12 +57,12 @@ describe('ElementQuery', function () {
     var selectedElements = ElementQuery(":contains(',')", $el)
     var expectedElements = $('span', $el)
 
-    expect(selectedElements.length).toEqual(1)
-    expect(selectedElements.sort()).toEqual(expectedElements.get().sort())
+    assert.deepEqual(selectedElements.length, 1)
+    assert.deepEqual(selectedElements.sort(), expectedElements.get().sort())
   })
 
   it('should preserve spaces', function () {
     var parts = ElementQuery.getSelectorParts('div.well li:nth-of-type(2) a')
-    expect(parts).toEqual(['div.well li:nth-of-type(2) a'])
+    assert.deepEqual(parts, ['div.well li:nth-of-type(2) a'])
   })
 })
