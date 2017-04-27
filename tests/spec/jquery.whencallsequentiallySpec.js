@@ -1,10 +1,14 @@
+var whenCallSequentially = require('../../extension/assets/jquery.whencallsequentially')
+var jquery = require('jquery-deferred')
+const assert = require('chai').assert
+
 describe('jQuery When call sequentially', function () {
   var syncCall = function () {
-    return $.Deferred().resolve('sync').promise()
+    return jquery.Deferred().resolve('sync').promise()
   }
 
   var asyncCall = function () {
-    var d = $.Deferred()
+    var d = jquery.Deferred()
     setTimeout(function () {
       d.resolve('async')
     }, 0)
@@ -15,90 +19,68 @@ describe('jQuery When call sequentially', function () {
   })
 
   it('should return immediately empty array when no calls passed', function () {
-    var deferred = $.whenCallSequentially([])
-    expect(deferred.state()).toBe('resolved')
+    var deferred = whenCallSequentially([])
+    assert.equal(deferred.state(), 'resolved')
     var data
     deferred.done(function (res) {
       data = res
     })
-    expect(data).toEqual([])
+    assert.deepEqual(data, [])
   })
 
   it('should return immediately with data when synchronous call passed', function () {
-    var deferred = $.whenCallSequentially([syncCall])
-    expect(deferred.state()).toBe('resolved')
+    var deferred = whenCallSequentially([syncCall])
+    assert.deepEqual(deferred.state(), 'resolved')
     var data
     deferred.done(function (res) {
       data = res
     })
-    expect(data).toEqual(['sync'])
+    assert.deepEqual(data, ['sync'])
   })
 
   it('should return immediately with data when multiple synchronous call passed', function () {
-    var deferred = $.whenCallSequentially([syncCall, syncCall, syncCall])
-    expect(deferred.state()).toBe('resolved')
+    var deferred = whenCallSequentially([syncCall, syncCall, syncCall])
+    assert.deepEqual(deferred.state(), 'resolved')
     var data
     deferred.done(function (res) {
       data = res
     })
-    expect(data).toEqual(['sync', 'sync', 'sync'])
+    assert.deepEqual(data, ['sync', 'sync', 'sync'])
   })
 
-  it('should execute one async job', function () {
-    var deferred = $.whenCallSequentially([asyncCall])
-    expect(deferred.state()).toEqual('pending')
+  it('should execute one async job', function (done) {
+    var deferred = whenCallSequentially([asyncCall])
+    assert.deepEqual(deferred.state(), 'pending')
 
-    waitsFor(function () {
-      return deferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      var data
-      deferred.done(function (res) {
-        data = res
-      })
-      expect(data).toEqual(['async'])
+    deferred.then(function (data) {
+      assert.deepEqual(data, ['async'])
+      done()
     })
   })
 
-  it('should execute multiple async jobs', function () {
-    var deferred = $.whenCallSequentially([asyncCall, asyncCall, asyncCall])
-    expect(deferred.state()).toEqual('pending')
+  it('should execute multiple async jobs', function (done) {
+    var deferred = whenCallSequentially([asyncCall, asyncCall, asyncCall])
+    assert.deepEqual(deferred.state(), 'pending')
 
-    waitsFor(function () {
-      return deferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      var data
-      deferred.done(function (res) {
-        data = res
-      })
-      expect(data).toEqual(['async', 'async', 'async'])
+    deferred.then(function (res) {
+      assert.deepEqual(res, ['async', 'async', 'async'])
+      done()
     })
   })
 
   it('should execute multiple sync and async jobs', function () {
-    var deferred = $.whenCallSequentially([syncCall, syncCall, asyncCall, asyncCall, syncCall, asyncCall])
-    expect(deferred.state()).toEqual('pending')
+    var deferred = whenCallSequentially([syncCall, syncCall, asyncCall, asyncCall, syncCall, asyncCall])
+    assert.deepEqual(deferred.state(), 'pending')
 
-    waitsFor(function () {
-      return deferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      var data
-      deferred.done(function (res) {
-        data = res
-      })
-      expect(data).toEqual(['sync', 'sync', 'async', 'async', 'sync', 'async'])
+    deferred.done(function (data) {
+      assert.deepEqual(data, ['sync', 'sync', 'async', 'async', 'sync', 'async'])
     })
   })
 
   it('should allow adding jobs to job array from an async job', function () {
     var jobs = []
     var asyncMoreCall = function () {
-      var d = $.Deferred()
+      var d = jquery.Deferred()
       setTimeout(function () {
         d.resolve('asyncmore')
         jobs.push(asyncCall)
@@ -107,37 +89,27 @@ describe('jQuery When call sequentially', function () {
     }
     jobs.push(asyncMoreCall)
 
-    var deferred = $.whenCallSequentially(jobs)
-    expect(deferred.state()).toEqual('pending')
+    var deferred = whenCallSequentially(jobs)
+    assert.deepEqual(deferred.state(), 'pending')
 
-    waitsFor(function () {
-      return deferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      var data
-      deferred.done(function (res) {
-        data = res
-      })
-      expect(data).toEqual(['asyncmore', 'async'])
+    deferred.then(function (data) {
+      assert.deepEqual(data, ['asyncmore', 'async'])
     })
   })
 
   it('should allow adding jobs to job array from a sync job', function () {
     var jobs = []
     var syncMoreCall = function () {
-      var d = $.Deferred()
+      var d = jquery.Deferred()
       jobs.push(syncCall)
       d.resolve('syncmore')
       return d.promise()
     }
     jobs.push(syncMoreCall)
 
-    var deferred = $.whenCallSequentially(jobs)
-    expect(deferred.state()).toEqual('resolved')
-
-    deferred.done(function (res) {
-      expect(res).toEqual(['syncmore', 'sync'])
+    var deferred = whenCallSequentially(jobs)
+    deferred.then(function (res) {
+      assert.deepEqual(res, ['syncmore', 'sync'])
     })
   })
 })

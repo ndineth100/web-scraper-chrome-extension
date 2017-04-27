@@ -219,6 +219,7 @@ function getTestHTML () {
   `
 }
 
+// Take care, this only generates a node, not several nodes like <a></a><span></span>
 function createElementFromHTML (html) {
   var template = document.createElement('template')
   template.innerHTML = html

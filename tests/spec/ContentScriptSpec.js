@@ -1,53 +1,53 @@
+const getContentScript = require('../../extension/scripts/getContentScript')
+const selectorMatchers = require('../Matchers')
+const utils = require('./../utils')
+const assert = require('chai').assert
+
 describe('ContentScript', function () {
   var contentScript = getContentScript('ContentScript')
   var $el
 
   beforeEach(function () {
-    this.addMatchers(selectorMatchers)
-
-    $el = jQuery('#tests').html('')
-    if ($el.length === 0) {
-      $el = $("<div id='tests' style='display:none'></div>").appendTo('body')
-    }
+    document.body.innerHTML = utils.getTestHTML()
+    $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
+    document.body.appendChild($el)
   })
 
-  it('should be able to extract html', function () {
-    $el.append('<div id="content-script-html-selector-test"></div>')
+  it('should be able to extract html', async function () {
+    $el.innerHTML = '<div id="content-script-html-selector-test"></div>'
 
     var deferredHMTL = contentScript.getHTML({
       CSSSelector: 'div#content-script-html-selector-test'
     })
-
-    expect(deferredHMTL).deferredToEqual('<div id="content-script-html-selector-test"></div>')
+    await selectorMatchers.deferredToEqual(deferredHMTL, '<div id="content-script-html-selector-test"></div>')
   })
 
-  it('should be able to call ContentScript from background script', function () {
+  it('should be able to call ContentScript from background script', async function () {
     contentScript = getContentScript('BackgroundScript')
 
-    $el.append('<div id="content-script-html-selector-test"></div>')
+    $el.innerHTML = '<div id="content-script-html-selector-test"></div>'
+
+    var deferredHMTL = contentScript.getHTML({
+      CSSSelector: 'div#content-script-html-selector-test'
+    })
+    await selectorMatchers.deferredToEqual(deferredHMTL, '<div id="content-script-html-selector-test"></div>')
+  })
+
+  it('should be able to call ContentScript from devtools', async function () {
+    contentScript = getContentScript('DevTools')
+
+    $el.innerHTML = '<div id="content-script-html-selector-test"></div>'
 
     var deferredHMTL = contentScript.getHTML({
       CSSSelector: 'div#content-script-html-selector-test'
     })
 
-    expect(deferredHMTL).deferredToEqual('<div id="content-script-html-selector-test"></div>')
+    await selectorMatchers.deferredToEqual(deferredHMTL, '<div id="content-script-html-selector-test"></div>')
   })
 
-  it('should be able to call ContentScript from devtools', function () {
+  it('should be able to get css selector from user', async function () {
     contentScript = getContentScript('DevTools')
-
-    $el.append('<div id="content-script-html-selector-test"></div>')
-
-    var deferredHMTL = contentScript.getHTML({
-      CSSSelector: 'div#content-script-html-selector-test'
-    })
-
-    expect(deferredHMTL).deferredToEqual('<div id="content-script-html-selector-test"></div>')
-  })
-
-  it('should be able to get css selector from user', function () {
-    contentScript = getContentScript('DevTools')
-    $el.append('<div id="content-script-css-selector-test"><a class="needed"></a><a></a></div>')
+    $el.innerHTML = '<div id="content-script-css-selector-test"><a class="needed"></a><a></a></div>'
 
     var deferredCSSSelector = contentScript.selectSelector({
       parentCSSSelector: 'div#content-script-css-selector-test',
@@ -55,19 +55,19 @@ describe('ContentScript', function () {
     })
 
 		// click on the element that will be selected
-    $el.find('a.needed').click()
+    $el.querySelector('a.needed').click()
 
 		// finish selection
-    $('#-selector-toolbar .done-selecting-button').click()
+    document.body.querySelector('#-selector-toolbar .done-selecting-button').click()
 
-    expect(deferredCSSSelector).deferredToEqual({CSSSelector: 'a.needed'})
+    await selectorMatchers.deferredToEqual(deferredCSSSelector, {CSSSelector: 'a.needed'})
 
-    expect(window.cs).toEqual(undefined)
+    assert.equal(window.cs, undefined)
   })
 
-  it('should be return empty css selector when no element selected', function () {
+  it('should be return empty css selector when no element selected', async function () {
     contentScript = getContentScript('DevTools')
-    $el.append('<div id="content-script-css-selector-test"></div>')
+    $el.innerHTML = '<div id="content-script-css-selector-test"></div>'
 
     var deferredCSSSelector = contentScript.selectSelector({
       parentCSSSelector: 'div#content-script-css-selector-test',
@@ -75,33 +75,33 @@ describe('ContentScript', function () {
     })
 
 		// finish selection
-    $('#-selector-toolbar .done-selecting-button').click()
+    document.body.querySelector('#-selector-toolbar .done-selecting-button').click()
 
-    expect(deferredCSSSelector).deferredToEqual({CSSSelector: ''})
+    await selectorMatchers.deferredToEqual(deferredCSSSelector, {CSSSelector: ''})
 
-    expect(window.cs).toEqual(undefined)
+    assert.equal(window.cs, undefined)
   })
 
-  it('should be able to preview elements', function () {
+  it('should be able to preview elements', async function () {
     contentScript = getContentScript('DevTools')
-    $el.append('<div id="content-script-css-selector-test"><a></a></div>')
+    $el.innerHTML = '<div id="content-script-css-selector-test"><a></a></div>'
 
     var deferredSelectorPreview = contentScript.previewSelector({
       parentCSSSelector: 'div#content-script-css-selector-test',
       elementCSSSelector: 'a'
     })
 
-    expect($('.-sitemap-select-item-selected').length).toEqual(1)
-    expect($el.find('#content-script-css-selector-test').hasClass('-sitemap-parent')).toEqual(true)
-    expect($el.find('a').hasClass('-sitemap-select-item-selected')).toEqual(true)
+    assert.equal($('.-sitemap-select-item-selected').length, 1)
+    assert.isTrue(document.querySelector('#content-script-css-selector-test').classList.contains('-sitemap-parent'))
+    assert.isTrue($el.querySelector('a').classList.contains('-sitemap-select-item-selected'))
 
     var deferredSelectorPreviewCancel = contentScript.removeCurrentContentSelector()
-    expect(deferredSelectorPreviewCancel).deferredToEqual(undefined)
+    await selectorMatchers.deferredToEqual(deferredSelectorPreviewCancel, undefined)
 
-    expect($('.-sitemap-select-item-selected').length).toEqual(0)
-    expect($el.find('#content-script-css-selector-test').hasClass('-sitemap-parent')).toEqual(false)
-    expect($el.find('a').hasClass('-sitemap-select-item-selected')).toEqual(false)
+    assert.equal(document.querySelectorAll('.-sitemap-select-item-selected').length, 0)
+    assert.isFalse(document.querySelector('#content-script-css-selector-test').classList.contains('-sitemap-parent'))
+    assert.equal($el.querySelector('a').classList.contains('-sitemap-select-item-selected'), false)
 
-    expect(window.cs).toEqual(undefined)
+    assert.equal(window.cs, undefined)
   })
 })

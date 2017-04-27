@@ -1,4 +1,3 @@
-const selectorMatchers = require('./../Matchers')
 const assert = require('chai').assert
 const Sitemap = require('../../extension/scripts/Sitemap')
 const Selector = require('../../extension/scripts/Selector')
