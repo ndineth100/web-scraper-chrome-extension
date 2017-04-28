@@ -1,4 +1,4 @@
-var files = 'tests/spec/SelectorListSpec.js'
+const files = ['tests/spec/*.js', 'tests/spec/*/*.js']
 module.exports = function (config) {
   config.set({
 
@@ -10,7 +10,8 @@ module.exports = function (config) {
     frameworks: ['browserify', 'mocha'],
 
     preprocessors: {
-      [files]: ['browserify']
+      [files[0]]: ['browserify'],
+      [files[1]]: ['browserify']
     },
     // list of files / patterns to load in the browser
     files: [
@@ -22,7 +23,11 @@ module.exports = function (config) {
       'extension/generated/background-scraper.js', // not very nice, we need to load the background script to listen to the messages
       'extension/generated/content-scraper.js',
       'extension/content_script/content_script.js',
-      files
+      'docs/images/chrome-store-logo.png',
+      '/docs/images/chrome-store-logo.png',
+      'tests/spec/*.js',
+      'tests/spec/*/*.js',
+      ...files
     ],
     customLaunchers: {
       ChromeOutOfFocus: {
@@ -61,7 +66,11 @@ module.exports = function (config) {
     },
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: true,
-
+    watchify: {
+      poll: true
+    },
+    // https://stackoverflow.com/questions/23361550/karma-not-picking-the-changes-have-to-run-tests-twice/26407061
+    usePolling: true,
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     browsers: ['ChromeOutOfFocus'],

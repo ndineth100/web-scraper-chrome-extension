@@ -1,13 +1,14 @@
+const Selector = require('../../../extension/scripts/Selector')
+const SelectorTable = require('../../../extension/scripts/Selector/SelectorTable')
+const utils = require('./../../utils')
+const assert = require('chai').assert
+
 describe('Table Selector', function () {
   var $el
-
   beforeEach(function () {
-    this.addMatchers(selectorMatchers)
-
-    $el = jQuery('#tests').html('')
-    if ($el.length === 0) {
-      $el = $("<div id='tests' style='display:none'></div>").appendTo('body')
-    }
+    document.body.innerHTML = utils.getTestHTML()
+    $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
+    document.body.appendChild($el)
   })
 
   it('should extract table header columns', function () {
@@ -25,16 +26,16 @@ describe('Table Selector', function () {
       ]
     })
 
-    var $table = $('#selector-table-single-table-single-row table')
-    var columns = selector.getTableHeaderColumns($table)
-    expect(columns).toEqual({
+    const columns = selector.getTableHeaderColumns(document.querySelectorAll('#selector-table-single-table-single-row table')[0])
+    const expected = {
       a: {
         index: 1
       }
-    })
+    }
+    assert.deepEqual(columns, expected)
   })
 
-  it('should extract single text record from one table', function () {
+  it('should extract single text record from one table', function (done) {
     var selector = new Selector({
       id: 'a',
       type: 'SelectorTable',
@@ -49,24 +50,19 @@ describe('Table Selector', function () {
       ]
     })
 
-    var dataDeferred = selector.getData($('#selector-table-single-table-single-row'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            a_renamed: 'abc'
-          }
-        ])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#selector-table-single-table-single-row')[0])
+    dataDeferred.then(function (data) {
+      var expected = [
+        {
+          a_renamed: 'abc'
+        }
+      ]
+      assert.deepEqual(data, expected)
+      done()
     })
   })
 
-  it('should extract multiple text records from one table', function () {
+  it('should extract multiple text records from one table', function (done) {
     var selector = new Selector({
       id: 'a',
       type: 'SelectorTable',
@@ -85,30 +81,24 @@ describe('Table Selector', function () {
         }
       ]
     })
-
-    var dataDeferred = selector.getData($('#selector-table-single-table-multiple-rows'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            a_renamed: 'aaa',
-            b_renamed: 'bbb'
-          },
-          {
-            a_renamed: 'ccc',
-            b_renamed: 'ddd'
-          }
-        ])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#selector-table-single-table-multiple-rows')[0])
+    dataDeferred.then(function (data) {
+      var expected = [
+        {
+          a_renamed: 'aaa',
+          b_renamed: 'bbb'
+        },
+        {
+          a_renamed: 'ccc',
+          b_renamed: 'ddd'
+        }
+      ]
+      assert.deepEqual(data, expected)
+      done()
     })
   })
 
-  it('should only extract records from columns which are marked as extract', function () {
+  it('should only extract records from columns which are marked as extract', function (done) {
     var selector = new Selector({
       id: 'a',
       type: 'SelectorTable',
@@ -127,24 +117,18 @@ describe('Table Selector', function () {
         }
       ]
     })
-
-    var dataDeferred = selector.getData($('#selector-table-single-table-multiple-rows'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            a_renamed: 'aaa'
-          },
-          {
-            a_renamed: 'ccc'
-          }
-        ])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#selector-table-single-table-multiple-rows')[0])
+    dataDeferred.then(function (data) {
+      var expected = [
+        {
+          a_renamed: 'aaa'
+        },
+        {
+          a_renamed: 'ccc'
+        }
+      ]
+      assert.deepEqual(data, expected)
+      done()
     })
   })
 
@@ -174,7 +158,7 @@ describe('Table Selector', function () {
     })
 
     var columns = selector.getDataColumns()
-    expect(columns).toEqual(['a_renamed', 'b_renamed'])
+    assert.deepEqual(columns, ['a_renamed', 'b_renamed'])
   })
 
   it('should return thead tr as table header selector for legacy table selectors', function () {
@@ -184,7 +168,7 @@ describe('Table Selector', function () {
 
     var headerSelector = selector.getTableHeaderRowSelector()
 
-    expect(headerSelector).toEqual('thead tr')
+    assert.equal(headerSelector, 'thead tr')
   })
 
   it('should return tbody tr as table row selector for legacy table selectors', function () {
@@ -194,13 +178,13 @@ describe('Table Selector', function () {
 
     var headerSelector = selector.getTableDataRowSelector()
 
-    expect(headerSelector).toEqual('tbody tr')
+    assert.equal(headerSelector, 'tbody tr')
   })
 
   it('should return thead tr while selecting tableHeaderRow when single row available within thead', function () {
     var html = '<table><thead><tr><td>asd</td></tr></thead></table>'
     var tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html)
-    expect(tableHeaderRowSelector).toEqual('thead tr')
+    assert.equal(tableHeaderRowSelector, 'thead tr')
   })
 
   it('should return thead tr:nth-of-type while selecting tableHeaderRow when multiple rows available within thead', function () {
@@ -208,31 +192,31 @@ describe('Table Selector', function () {
 
     html = '<table><thead><tr><td>asd</td></tr><tr><td>asd</td></tr></thead></table>'
     var tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html)
-    expect(tableHeaderRowSelector).toEqual('thead tr:nth-of-type(1)')
+    assert.equal(tableHeaderRowSelector, 'thead tr:nth-of-type(1)')
 
     html = '<table><thead><tr><td></td></tr><tr><td>asd</td></tr></thead></table>'
-    var tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html)
-    expect(tableHeaderRowSelector).toEqual('thead tr:nth-of-type(2)')
+    tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html)
+    assert.equal(tableHeaderRowSelector, 'thead tr:nth-of-type(2)')
 
     html = '<table><thead><tr><td>asd</td></tr><tr><th>asd</th></tr></thead></table>'
-    var tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html)
-    expect(tableHeaderRowSelector).toEqual('thead tr:nth-of-type(1)')
+    tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html)
+    assert.equal(tableHeaderRowSelector, 'thead tr:nth-of-type(1)')
 
     html = '<table><thead><tr><td></td></tr><tr><th>asd</th></tr></thead></table>'
-    var tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html)
-    expect(tableHeaderRowSelector).toEqual('thead tr:nth-of-type(2)')
+    tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html)
+    assert.equal(tableHeaderRowSelector, 'thead tr:nth-of-type(2)')
   })
 
   it('should return empty string while selecting tableHeaderRow when no rows with data available', function () {
     var html = '<table><thead><tr><td></td></tr></thead><tr><td></td></tr></table>'
     var tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html)
-    expect(tableHeaderRowSelector).toEqual('')
+    assert.equal(tableHeaderRowSelector, '')
   })
 
   it('should return tbody tr while selecting tableDataRow when thead is available', function () {
     var html = '<table><thead><tr><td>asd</td></tr></thead></table>'
     var tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html)
-    expect(tableDataRowSelector).toEqual('tbody tr')
+    assert.equal(tableDataRowSelector, 'tbody tr')
   })
 
   it('should return tr:nth-of-type while selecting tableDataRow when thead is not available', function () {
@@ -240,25 +224,25 @@ describe('Table Selector', function () {
 
     html = '<table><tr><td>asd</td></tr><tr><td>asd</td></tr></table>'
     var tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html)
-    expect(tableDataRowSelector).toEqual('tr:nth-of-type(n+2)')
+    assert.equal(tableDataRowSelector, 'tr:nth-of-type(n+2)')
 
     html = '<table><tr><td></td></tr><tr><td>asd</td></tr><</table>'
-    var tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html)
-    expect(tableDataRowSelector).toEqual('tr:nth-of-type(n+3)')
+    tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html)
+    assert.equal(tableDataRowSelector, 'tr:nth-of-type(n+3)')
 
     html = '<table><tr><td>asd</td></tr><tr><th>asd</th></tr></table>'
-    var tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html)
-    expect(tableDataRowSelector).toEqual('tr:nth-of-type(n+2)')
+    tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html)
+    assert.equal(tableDataRowSelector, 'tr:nth-of-type(n+2)')
 
     html = '<table><tr><td></td></tr><tr><th>asd</th></tr></table>'
-    var tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html)
-    expect(tableDataRowSelector).toEqual('tr:nth-of-type(n+3)')
+    tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html)
+    assert.equal(tableDataRowSelector, 'tr:nth-of-type(n+3)')
   })
 
   it('should return empty string when selecting tableDataRow with no data rows', function () {
     var html = '<table><thead><tr><td></td></tr></thead><tr><td></td></tr></table>'
     var tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html)
-    expect(tableDataRowSelector).toEqual('')
+    assert.equal(tableDataRowSelector, '')
   })
 
   it('should get heder columns from html', function () {
@@ -266,7 +250,7 @@ describe('Table Selector', function () {
     var tableHeaderSelector = 'thead tr'
     var headerColumns = SelectorTable.getTableHeaderColumnsFromHTML(tableHeaderSelector, html)
 
-    expect(headerColumns).toEqual([{ header: 'a', name: 'a', extract: true }, { header: 'b', name: 'b', extract: true }])
+    assert.deepEqual(headerColumns, [{ header: 'a', name: 'a', extract: true }, { header: 'b', name: 'b', extract: true }])
   })
 
   it('should ignore empty columns when getting table header columns', function () {
@@ -274,10 +258,10 @@ describe('Table Selector', function () {
     var tableHeaderSelector = 'thead tr'
     var headerColumns = SelectorTable.getTableHeaderColumnsFromHTML(tableHeaderSelector, html)
 
-    expect(headerColumns).toEqual([{ header: 'a', name: 'a', extract: true }])
+    assert.deepEqual(headerColumns, [{ header: 'a', name: 'a', extract: true }])
   })
 
-  it('should extract data using specified header row', function () {
+  it('should extract data using specified header row', function (done) {
     var html = '<table>' +
 			'<thead>' +
 				'<tr><td>a</td><td>b</td></tr>' +
@@ -288,7 +272,7 @@ describe('Table Selector', function () {
 			'</tbody>' +
 			'</table>'
 
-    $el.append(html)
+    $el.innerHTML = html
 
     var selector = new Selector({
 
@@ -313,11 +297,14 @@ describe('Table Selector', function () {
     })
 
     var dataDeferred = selector.getData($el)
-
-    expect(dataDeferred).deferredToEqual([{c: 'e', d: 'f'}])
+    dataDeferred.then(function (data) {
+      var expected = [{c: 'e', d: 'f'}]
+      assert.deepEqual(data, expected)
+      done()
+    })
   })
 
-  it('should extract data from specified data rows', function () {
+  it('should extract data from specified data rows', function (done) {
     var html = '<table>' +
 			'<thead>' +
 			'<tr><td>a</td><td>b</td></tr>' +
@@ -329,7 +316,7 @@ describe('Table Selector', function () {
 			'</tbody>' +
 			'</table>'
 
-    $el.append(html)
+    $el.innerHTML = html
 
     var selector = new Selector({
 
@@ -352,13 +339,15 @@ describe('Table Selector', function () {
         }
       ]
     })
-
     var dataDeferred = selector.getData($el)
-
-    expect(dataDeferred).deferredToEqual([{c: 'g', d: 'h'}])
+    dataDeferred.then(function (data) {
+      var expected = [{c: 'g', d: 'h'}]
+      assert.deepEqual(data, expected)
+      done()
+    })
   })
 
-  it('should extract data from th data rows', function () {
+  it('should extract data from th data rows', function (done) {
     var html = '<table>' +
 			'<thead>' +
 			'<tr><td>a</td><td>b</td></tr>' +
@@ -370,7 +359,7 @@ describe('Table Selector', function () {
 			'</tbody>' +
 			'</table>'
 
-    $el.append(html)
+    $el.innerHTML = html
 
     var selector = new Selector({
 
@@ -393,13 +382,15 @@ describe('Table Selector', function () {
         }
       ]
     })
-
     var dataDeferred = selector.getData($el)
-
-    expect(dataDeferred).deferredToEqual([{c: 'g', d: 'h'}])
+    dataDeferred.then(function (data) {
+      var expected = [{c: 'g', d: 'h'}]
+      assert.deepEqual(data, expected)
+      done()
+    })
   })
 
-  it('should extract data only from td,th elements', function () {
+  it('should extract data only from td,th elements', function (done) {
     var html = '<table>' +
 			'<thead>' +
 			'<tr><td>a</td><td>b</td></tr>' +
@@ -409,7 +400,7 @@ describe('Table Selector', function () {
 			'</tbody>' +
 			'</table>'
 
-    $el.append(html)
+    $el.innerHTML = html
 
     var selector = new Selector({
 
@@ -434,7 +425,10 @@ describe('Table Selector', function () {
     })
 
     var dataDeferred = selector.getData($el)
-
-    expect(dataDeferred).deferredToEqual([{a: 'e', b: 'f'}])
+    dataDeferred.then(function (data) {
+      var expected = [{a: 'e', b: 'f'}]
+      assert.deepEqual(data, expected)
+      done()
+    })
   })
 })

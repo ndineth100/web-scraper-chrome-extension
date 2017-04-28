@@ -1,34 +1,32 @@
+var Selector = require('../../../extension/scripts/Selector')
+const utils = require('./../../utils')
+const assert = require('chai').assert
+
 describe('Text Selector', function () {
   beforeEach(function () {
-
+    document.body.innerHTML = utils.getTestHTML()
   })
 
-  it('should extract single text record', function () {
+  it('should extract single text record', function (done) {
     var selector = new Selector({
       id: 'a',
       type: 'SelectorText',
       multiple: false,
       selector: 'div'
     })
-
-    var dataDeferred = selector.getData($('#selector-text-single-text'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            a: 'a'
-          }
-        ])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-single-text')[0])
+    dataDeferred.then(function (data) {
+      var expected = [
+        {
+          a: 'a'
+        }
+      ]
+      assert.deepEqual(data, expected)
+      done()
     })
   })
 
-  it('should extract multiple text records', function () {
+  it('should extract multiple text records', function (done) {
     var selector = new Selector({
       id: 'a',
       type: 'SelectorText',
@@ -36,52 +34,41 @@ describe('Text Selector', function () {
       selector: 'div'
     })
 
-    var dataDeferred = selector.getData($('#selector-text-multiple-text'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            a: 'a'
-          },
-          {
-            a: 'b'
-          }
-        ])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-multiple-text')[0])
+    dataDeferred.then(function (data) {
+      var expected = [
+        {
+          a: 'a'
+        },
+        {
+          a: 'b'
+        }
+      ]
+      assert.deepEqual(data, expected)
+      done()
     })
   })
 
-  it('should extract null when there are no elements', function () {
+  it('should extract null when there are no elements', function (done) {
     var selector = new Selector({
       id: 'a',
       type: 'SelectorText',
       multiple: false,
       selector: 'div'
     })
-
-    var dataDeferred = selector.getData($('#selector-text-single-not-exist'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            a: null
-          }
-        ])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-single-not-exist')[0])
+    dataDeferred.then(function (data) {
+      var expected = [
+        {
+          a: null
+        }
+      ]
+      assert.deepEqual(data, expected)
+      done()
     })
   })
 
-  it('should extract null when there is no regex match', function () {
+  it('should extract null when there is no regex match', function (done) {
     var selector = new Selector({
       id: 'a',
       type: 'SelectorText',
@@ -89,25 +76,19 @@ describe('Text Selector', function () {
       selector: 'div',
       regex: 'wontmatch'
     })
-
-    var dataDeferred = selector.getData($('#selector-text-single-regex'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            a: null
-          }
-        ])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-single-regex')[0])
+    dataDeferred.then(function (data) {
+      var expected = [
+        {
+          a: null
+        }
+      ]
+      assert.deepEqual(data, expected)
+      done()
     })
   })
 
-  it('should extract text using regex', function () {
+  it('should extract text using regex', function (done) {
     var selector = new Selector({
       id: 'a',
       type: 'SelectorText',
@@ -115,21 +96,15 @@ describe('Text Selector', function () {
       selector: 'div',
       regex: '\\d+'
     })
-
-    var dataDeferred = selector.getData($('#selector-text-single-regex'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            a: '11113123'
-          }
-        ])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-single-regex')[0])
+    dataDeferred.then(function (data) {
+      var expected = [
+        {
+          a: '11113123'
+        }
+      ]
+      assert.deepEqual(data, expected)
+      done()
     })
   })
 
@@ -142,56 +117,44 @@ describe('Text Selector', function () {
     })
 
     var columns = selector.getDataColumns()
-    expect(columns).toEqual(['id'])
+    assert.deepEqual(columns, ['id'])
   })
 
-  it('should ignore script tag content', function () {
+  it('should ignore script tag content', function (done) {
     var selector = new Selector({
       id: 'a',
       type: 'SelectorText',
       multiple: false,
       selector: 'div'
     })
-
-    var dataDeferred = selector.getData($('#selector-text-ignore-script'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            a: 'aaa'
-          }
-        ])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-ignore-script')[0])
+    dataDeferred.then(function (data) {
+      var expected = [
+        {
+          a: 'aaa'
+        }
+      ]
+      assert.deepEqual(data, expected)
+      done()
     })
   })
 
-  it('should replace br tags with newlines', function () {
+  it('should replace br tags with newlines', function (done) {
     var selector = new Selector({
       id: 'p',
       type: 'SelectorText',
       multiple: false,
       selector: 'p'
     })
-
-    var dataDeferred = selector.getData($('#selector-text-newlines'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            p: 'aaa\naaa\naaa\naaa\naaa'
-          }
-        ])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-newlines')[0])
+    dataDeferred.then(function (data) {
+      var expected = [
+        {
+          p: 'aaa\naaa\naaa\naaa\naaa'
+        }
+      ]
+      assert.deepEqual(data, expected)
+      done()
     })
   })
 
