@@ -1,9 +1,13 @@
+var Selector = require('../../../extension/scripts/Selector')
+const utils = require('./../../utils')
+const assert = require('chai').assert
+
 describe('Element Selector', function () {
   beforeEach(function () {
-
+    document.body.innerHTML = utils.getTestHTML()
   })
 
-  it('should return one element', function () {
+  it('should return one element', function (done) {
     var selector = new Selector({
       id: 'a',
       type: 'SelectorElement',
@@ -11,37 +15,26 @@ describe('Element Selector', function () {
       selector: 'div'
     })
 
-    var dataDeferred = selector.getData($('#selector-element-nodata'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([$('#selector-element-nodata div')[0]])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#selector-element-nodata')[0])
+    dataDeferred.then(function (data) {
+      assert.equal(data.length, 1)
+      assert.equal(data[0], document.querySelectorAll('#selector-element-nodata div')[0])
+      done()
     })
   })
 
-  it('should return multiple elements', function () {
+  it('should return multiple elements', function (done) {
     var selector = new Selector({
       id: 'a',
       type: 'SelectorElement',
       multiple: true,
       selector: 'div'
     })
-
-    var dataDeferred = selector.getData($('#selector-element-nodata'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([$('#selector-element-nodata div')[0], $('#selector-element-nodata div')[1]])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#selector-element-nodata')[0])
+    dataDeferred.then(function (data) {
+      assert.equal(data.length, 2)
+      assert.deepEqual(data, Array.from(document.querySelectorAll('#selector-element-nodata div')))
+      done()
     })
   })
 
@@ -54,6 +47,6 @@ describe('Element Selector', function () {
     })
 
     var columns = selector.getDataColumns()
-    expect(columns).toEqual([])
+    assert.deepEqual(columns, [])
   })
 })

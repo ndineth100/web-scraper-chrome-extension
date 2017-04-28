@@ -75,26 +75,29 @@ var SelectorPopupLink = {
 		// we need to know how to find this element from page scope.
     var cs = new CssSelector({
       enableSmartTableSelector: false,
-      parent: $('body')[0],
+      parent: document.body,
       enableResultStripping: false
     })
     var cssSelector = cs.getCssSelector([element])
-
+    console.log(cssSelector)
+    console.log(document.body.querySelectorAll(cssSelector))
 		// this function will catch window.open call and place the requested url as the elements data attribute
     var script = document.createElement('script')
     script.type = 'text/javascript'
-    script.text = '' +
-			'(function(){ ' +
-			'var open = window.open; ' +
-			"var el = document.querySelectorAll('" + cssSelector + "')[0]; " +
-			'var openNew = function() { ' +
-			'var url = arguments[0]; ' +
-			'el.dataset.webScraperExtractUrl = url; ' +
-			'window.open = open; ' +
-			'};' +
-			'window.open = openNew; ' +
-			'el.click(); ' +
-			'})();'
+  console.log(cssSelector)
+    console.log(document.querySelectorAll(cssSelector))
+    script.text = `
+			(function(){
+        var open = window.open;
+        var el = document.querySelectorAll('${cssSelector}')[0];
+        var openNew = function() { 
+          var url = arguments[0]; 
+          el.dataset.webScraperExtractUrl = url; 
+          window.open = open; 
+        };
+        window.open = openNew; 
+        el.click(); 
+			})()`
     document.body.appendChild(script)
 
 		// wait for url to be available

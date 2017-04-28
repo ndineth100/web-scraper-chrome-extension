@@ -22,7 +22,7 @@ var ElementQuery = function (CSSSelector, parentElement) {
         addElement(element)
       })
     }		else {
-      var elements = $(selector, parentElement)
+      var elements = $(selector, $(parentElement))
       elements.each(function (i, element) {
         addElement(element)
       })

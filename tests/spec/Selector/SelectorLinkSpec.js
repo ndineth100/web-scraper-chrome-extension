@@ -1,14 +1,17 @@
+var Selector = require('../../../extension/scripts/Selector')
+const utils = require('./../../utils')
+const assert = require('chai').assert
+
 describe('Link Selector', function () {
   var $el
 
   beforeEach(function () {
-    $el = jQuery('#tests').html('')
-    if ($el.length === 0) {
-      $el = $("<div id='tests' style='display:none'></div>").appendTo('body')
-    }
+    document.body.innerHTML = utils.getTestHTML()
+    $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
+    document.body.appendChild($el)
   })
 
-  it('should extract single link', function () {
+  it('should extract single link', function (done) {
     var selector = new Selector({
       id: 'a',
       type: 'SelectorLink',
@@ -16,57 +19,46 @@ describe('Link Selector', function () {
       selector: 'a'
     })
 
-    var dataDeferred = selector.getData($('#selector-follow'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            a: 'a',
-            'a-href': 'http://example.com/a',
-            _follow: 'http://example.com/a',
-            _followSelectorId: 'a'
-          }
-        ])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#selector-follow')[0])
+    dataDeferred.then(function (data) {
+      var expected = [
+        {
+          a: 'a',
+          'a-href': 'http://example.com/a',
+          _follow: 'http://example.com/a',
+          _followSelectorId: 'a'
+        }
+      ]
+      assert.deepEqual(data, expected)
+      done()
     })
   })
 
-  it('should extract multiple links', function () {
+  it('should extract multiple links', function (done) {
     var selector = new Selector({
       id: 'a',
       type: 'SelectorLink',
       multiple: true,
       selector: 'a'
     })
-
-    var dataDeferred = selector.getData($('#selector-follow'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            a: 'a',
-            'a-href': 'http://example.com/a',
-            _follow: 'http://example.com/a',
-            _followSelectorId: 'a'
-          },
-          {
-            a: 'b',
-            'a-href': 'http://example.com/b',
-            _follow: 'http://example.com/b',
-            _followSelectorId: 'a'
-          }
-        ])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#selector-follow')[0])
+    dataDeferred.then(function (data) {
+      var expected = [
+        {
+          a: 'a',
+          'a-href': 'http://example.com/a',
+          _follow: 'http://example.com/a',
+          _followSelectorId: 'a'
+        },
+        {
+          a: 'b',
+          'a-href': 'http://example.com/b',
+          _follow: 'http://example.com/b',
+          _followSelectorId: 'a'
+        }
+      ]
+      assert.deepEqual(data, expected)
+      done()
     })
   })
 
@@ -79,27 +71,21 @@ describe('Link Selector', function () {
     })
 
     var columns = selector.getDataColumns()
-    expect(columns).toEqual(['id', 'id-href'])
+    assert.deepEqual(columns, ['id', 'id-href'])
   })
 
-  it('should return empty array when no links are found', function () {
+  it('should return empty array when no links are found', function (done) {
     var selector = new Selector({
       id: 'a',
       type: 'SelectorLink',
       multiple: true,
       selector: 'a'
     })
-
-    var dataDeferred = selector.getData($('#not-exist'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#not-exist')[0])
+    dataDeferred.then(function (data) {
+      var expected = []
+      assert.deepEqual(data, expected)
+      done()
     })
   })
 })

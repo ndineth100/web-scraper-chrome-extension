@@ -88,7 +88,6 @@ Selector.prototype = {
 
   getDataElements: function (parentElement) {
     var elements = ElementQuery(this.selector, parentElement)
-    console.log(elements)
     if (this.multiple) {
       return elements
     } else if (elements.length > 0) {

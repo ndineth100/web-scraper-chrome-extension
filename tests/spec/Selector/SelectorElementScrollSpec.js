@@ -1,15 +1,17 @@
+var Selector = require('../../../extension/scripts/Selector')
+const utils = require('./../../utils')
+const assert = require('chai').assert
+
 describe('Scroll Element Selector', function () {
   var $el
-
   beforeEach(function () {
-    $el = jQuery('#tests').html('')
-    if ($el.length === 0) {
-      $el = $("<div id='tests' style='display:none'></div>").appendTo('body')
-    }
+    document.body.innerHTML = utils.getTestHTML()
+    $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
+    document.body.appendChild($el)
   })
 
-  it('should return one element', function () {
-    $el.append('<div>a</div><div>b</div>')
+  it('should return one element', function (done) {
+    $el.innerHTML = '<div>a</div><div>b</div>'
     var selector = new Selector({
       id: 'a',
       type: 'SelectorElementScroll',
@@ -17,21 +19,16 @@ describe('Scroll Element Selector', function () {
       selector: 'div'
     })
 
-    var dataDeferred = selector.getData($el[0])
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([$el.find('div')[0]])
-      })
+    var dataDeferred = selector.getData($el)
+    dataDeferred.then(function (data) {
+      assert.equal(data.length, 1)
+      assert.equal(data[0], $el.querySelectorAll('div')[0])
+      done()
     })
   })
 
-  it('should return multiple elements', function () {
-    $el.append('<div>a</div><div>b</div>')
+  it('should return multiple elements', function (done) {
+    $el.innerHTML = '<div>a</div><div>b</div>'
     var selector = new Selector({
       id: 'a',
       type: 'SelectorElementScroll',
@@ -39,21 +36,16 @@ describe('Scroll Element Selector', function () {
       selector: 'div'
     })
 
-    var dataDeferred = selector.getData($el[0])
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual($el.find('div').get())
-      })
+    var dataDeferred = selector.getData($el)
+    dataDeferred.then(function (data) {
+      assert.equal(data.length, 2)
+      assert.deepEqual(data, Array.from($el.querySelectorAll('div')))
+      done()
     })
   })
 
-  it('should get elements when scrolling is not needed', function () {
-    $el.append($('<a>a</a>'))
+  it('should get elements when scrolling is not needed', function (done) {
+    $el.innerHTML = '<a>a</a>'
     var selector = new Selector({
       id: 'a',
       type: 'SelectorElementScroll',
@@ -61,25 +53,19 @@ describe('Scroll Element Selector', function () {
       selector: 'a',
       delay: 100
     })
-
-    var dataDeferred = selector.getData($el[0])
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual($el.find('a').get())
-      })
+    var dataDeferred = selector.getData($el)
+    dataDeferred.then(function (data) {
+      assert.equal(data.length, 1)
+      assert.equal(data[0], $el.querySelectorAll('a')[0])
+      done()
     })
   })
 
-  it('should get elements which are added a delay', function () {
-    $el.append($('<a>a</a>'))
-		// add extra element after a little delay
+  it('should get elements which are added a delay', function (done) {
+    $el.innerHTML = '<a>a</a>'
+    // add extra element after a little delay
     setTimeout(function () {
-      $el.append($('<a>a</a>'))
+      utils.appendHTML($el, '<a>a</a>')
     }, 100)
 
     var selector = new Selector({
@@ -89,21 +75,13 @@ describe('Scroll Element Selector', function () {
       selector: 'a',
       delay: 200
     })
-
-    var dataDeferred = selector.getData($el[0])
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect($el.find('a').length).toEqual(2)
-        expect(data).toEqual($el.find('a').get())
-      })
+    var dataDeferred = selector.getData($el)
+    dataDeferred.then(function (data) {
+      assert.equal(data.length, 2)
+      assert.deepEqual(data, Array.from($el.querySelectorAll('a')))
+      done()
     })
   })
-
   it('should return no data columns', function () {
     var selector = new Selector({
       id: 'a',
@@ -113,6 +91,6 @@ describe('Scroll Element Selector', function () {
     })
 
     var columns = selector.getDataColumns()
-    expect(columns).toEqual([])
+    assert.deepEqual(columns, [])
   })
 })

@@ -1,9 +1,13 @@
+var Selector = require('../../../extension/scripts/Selector')
+const utils = require('./../../utils')
+const assert = require('chai').assert
+
 describe('Group Selector', function () {
   beforeEach(function () {
-
+    document.body.innerHTML = utils.getTestHTML()
   })
 
-  it('should extract text data', function () {
+  it('should extract text data', function (done) {
     var selector = new Selector({
       id: 'a',
       type: 'SelectorGroup',
@@ -11,31 +15,27 @@ describe('Group Selector', function () {
       selector: 'div'
     })
 
-    var dataDeferred = selector.getData($('#selector-group-text'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            a: [
-              {
-                a: 'a'
-              },
-              {
-                a: 'b'
-              }
-            ]
-          }
-        ])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#selector-group-text')[0])
+    dataDeferred.then(function (data) {
+      assert.equal(data.length, 1)
+      var expected = [
+        {
+          a: [
+            {
+              a: 'a'
+            },
+            {
+              a: 'b'
+            }
+          ]
+        }
+      ]
+      assert.deepEqual(data, expected)
+      done()
     })
   })
 
-  it('should extract link urls', function () {
+  it('should extract link urls', function (done) {
     var selector = new Selector({
       id: 'a',
       type: 'SelectorGroup',
@@ -43,30 +43,25 @@ describe('Group Selector', function () {
       selector: 'a',
       extractAttribute: 'href'
     })
-
-    var dataDeferred = selector.getData($('#selector-group-url'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            a: [
-              {
-                a: 'a',
-                'a-href': 'http://aa/'
-              },
-              {
-                a: 'b',
-                'a-href': 'http://bb/'
-              }
-            ]
-          }
-        ])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#selector-group-url')[0])
+    dataDeferred.then(function (data) {
+      assert.equal(data.length, 1)
+      var expected = [
+        {
+          a: [
+            {
+              a: 'a',
+              'a-href': 'http://aa/'
+            },
+            {
+              a: 'b',
+              'a-href': 'http://bb/'
+            }
+          ]
+        }
+      ]
+      assert.deepEqual(data, expected)
+      done()
     })
   })
 
@@ -79,6 +74,6 @@ describe('Group Selector', function () {
     })
 
     var columns = selector.getDataColumns()
-    expect(columns).toEqual(['id'])
+    assert.deepEqual(columns, ['id'])
   })
 })

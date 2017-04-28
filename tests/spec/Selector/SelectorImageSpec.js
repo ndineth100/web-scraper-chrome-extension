@@ -1,16 +1,17 @@
+const Selector = require('../../../extension/scripts/Selector')
+const SelectorImage = require('../../../extension/scripts/Selector/SelectorImage')
+const utils = require('./../../utils')
+const assert = require('chai').assert
+
 describe('Image Selector', function () {
   var $el
-
   beforeEach(function () {
-    this.addMatchers(selectorMatchers)
-
-    $el = jQuery('#tests').html('')
-    if ($el.length === 0) {
-      $el = $("<div id='tests' style='display:none'></div>").appendTo('body')
-    }
+    document.body.innerHTML = utils.getTestHTML()
+    $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
+    document.body.appendChild($el)
   })
 
-  it('should extract single image', function () {
+  it('should extract single image', function (done) {
     var selector = new Selector({
       id: 'img',
       type: 'SelectorImage',
@@ -18,48 +19,39 @@ describe('Image Selector', function () {
       selector: 'img'
     })
 
-    var dataDeferred = selector.getData($('#selector-image-one-image'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            'img-src': 'http://aa/'
-          }
-        ])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#selector-image-one-image')[0])
+    dataDeferred.then(function (data) {
+      assert.equal(data.length, 1)
+      var expected = [
+        {
+          'img-src': 'http://aa/'
+        }
+      ]
+      assert.deepEqual(data, expected)
+      done()
     })
   })
 
-  it('should extract multiple images', function () {
+  it('should extract multiple images', function (done) {
     var selector = new Selector({
       id: 'img',
       type: 'SelectorImage',
       multiple: true,
       selector: 'img'
     })
-
-    var dataDeferred = selector.getData($('#selector-image-multiple-images'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([
-          {
-            'img-src': 'http://aa/'
-          },
-          {
-            'img-src': 'http://bb/'
-          }
-        ])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#selector-image-multiple-images')[0])
+    dataDeferred.then(function (data) {
+      assert.equal(data.length, 2)
+      var expected = [
+        {
+          'img-src': 'http://aa/'
+        },
+        {
+          'img-src': 'http://bb/'
+        }
+      ]
+      assert.deepEqual(data, expected)
+      done()
     })
   })
 
@@ -72,46 +64,36 @@ describe('Image Selector', function () {
     })
 
     var columns = selector.getDataColumns()
-    expect(columns).toEqual(['id-src'])
+    assert.deepEqual(columns, ['id-src'])
   })
 
-  it('should return empty array when no images are found', function () {
+  it('should return empty array when no images are found', function (done) {
     var selector = new Selector({
       id: 'img',
       type: 'SelectorImage',
       multiple: true,
       selector: 'img.not-exist'
     })
-
-    var dataDeferred = selector.getData($('#not-exist'))
-
-    waitsFor(function () {
-      return dataDeferred.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      dataDeferred.done(function (data) {
-        expect(data).toEqual([])
-      })
+    var dataDeferred = selector.getData(document.querySelectorAll('#not-exist')[0])
+    dataDeferred.then(function (data) {
+      assert.equal(data.length, 0)
+      var expected = []
+      assert.deepEqual(data, expected)
+      done()
     })
   })
 
-  it('should be able to download image as base64', function () {
-    var deferredImage = SelectorImage.downloadImageBase64('../docs/images/chrome-store-logo.png')
+  it('should be able to download image as base64', function (done) {
+    var deferredImage = SelectorImage.downloadImageBase64('base/docs/images/chrome-store-logo.png')
 
-    waitsFor(function () {
-      return deferredImage.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      deferredImage.done(function (imageResponse) {
-        expect(imageResponse.imageBase64.length > 100).toEqual(true)
-      })
+    deferredImage.then(function (imageResponse) {
+      assert.isTrue(imageResponse.imageBase64.length > 100)
+      done()
     })
   })
 
-  it('should be able to get data with image data attached', function () {
-    $el.append('<img src="../docs/images/chrome-store-logo.png">')
+  it('should be able to get data with image data attached', function (done) {
+    $el.innerHTML = '<img src="base/docs/images/chrome-store-logo.png">'
 
     var selector = new Selector({
       id: 'img',
@@ -120,17 +102,14 @@ describe('Image Selector', function () {
       selector: 'img',
       downloadImage: true
     })
-    var deferredData = selector.getData($el[0])
 
-    waitsFor(function () {
-      return deferredData.state() === 'resolved'
-    }, 'wait for data extraction', 5000)
-
-    runs(function () {
-      deferredData.done(function (data) {
-        expect(!!data[0]['_imageBase64-img']).toEqual(true)
-        expect(!!data[0]['_imageMimeType-img']).toEqual(true)
-      })
+    console.log($el.innerHTML)
+    var dataDeferred = selector.getData($el)
+    dataDeferred.then(function (data) {
+      assert.equal(data.length, 1)
+      assert.isTrue(!!data[0]['_imageBase64-img'])
+      assert.isTrue(!!data[0]['_imageMimeType-img'])
+      done()
     })
   })
 })
