@@ -61,7 +61,7 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
 
     browserConsoleLogOptions: {
-      terminal: true,
+      terminal: false,
       level: ''
     },
     // enable / disable watching file and executing tests whenever any file changes

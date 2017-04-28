@@ -23,7 +23,7 @@ var SelectorTable = {
   getTableHeaderColumns: function ($table) {
     var columns = {}
     var headerRowSelector = this.getTableHeaderRowSelector()
-    var $headerRow = $table.find(headerRowSelector)
+    var $headerRow = $($table).find(headerRowSelector)
     if ($headerRow.length > 0) {
       $headerRow.find('td,th').each(function (i) {
         var header = $(this).text().trim()
