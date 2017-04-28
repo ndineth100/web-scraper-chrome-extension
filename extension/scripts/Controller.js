@@ -2,7 +2,7 @@ var selectors = require('./Selectors')
 var Selector = require('./Selector')
 var SelectorTable = selectors.SelectorTable
 var Sitemap = require('./Sitemap')
-var SelectorGraphv2 = require('./SelectorGraphv2')
+//var SelectorGraphv2 = require('./SelectorGraphv2')
 var getBackgroundScript = require('./getBackgroundScript')
 var getContentScript = require('./getContentScript')
 var SitemapController = function (options) {
@@ -54,7 +54,7 @@ SitemapController.prototype = {
       'SelectorListItem',
       'SelectorEdit',
       'SelectorEditTableColumn',
-      'SitemapSelectorGraph',
+      //'SitemapSelectorGraph',
       'DataPreview'
     ]
     var templatesLoaded = 0
@@ -111,10 +111,10 @@ SitemapController.prototype = {
         },
         '#sitemap-selector-list-nav-button': {
           click: this.showSitemapSelectorList
-        },
+        }/*,
         '#sitemap-selector-graph-nav-button': {
           click: this.showSitemapSelectorGraph
-        },
+        }*/,
         '#sitemap-browse-nav-button': {
           click: this.browseSitemapData
         },
@@ -575,7 +575,7 @@ SitemapController.prototype = {
     $('#viewport').html($selectorListPanel)
 
     return true
-  },
+  },/*
   showSitemapSelectorGraph: function () {
     this.setActiveNavigationButton('sitemap-selector-graph')
     var sitemap = this.state.currentSitemap
@@ -585,7 +585,7 @@ SitemapController.prototype = {
     var graph = new SelectorGraphv2(sitemap)
     graph.draw(graphDiv, $(document).width(), 200)
     return true
-  },
+  },*/
   showChildSelectors: function (tr) {
     var selector = $(tr).data('selector')
     var parentSelectors = this.state.editSitemapBreadcumbsSelectors

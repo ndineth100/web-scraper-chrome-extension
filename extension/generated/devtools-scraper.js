@@ -37,7 +37,7 @@ var Base64 = {
 
 module.exports = Base64
 
-},{"jquery-deferred":29}],2:[function(require,module,exports){
+},{"jquery-deferred":28}],2:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 /**
  * @author Martins Balodis
@@ -87,7 +87,7 @@ module.exports = function whenCallSequentially (functionCalls) {
   return deferredResonse.promise()
 }
 
-},{"jquery-deferred":29}],3:[function(require,module,exports){
+},{"jquery-deferred":28}],3:[function(require,module,exports){
 var StoreDevtools = require('./StoreDevtools')
 var SitemapController = require('./Controller')
 
@@ -102,7 +102,7 @@ $(function () {
   })
 })
 
-},{"./Controller":7,"./StoreDevtools":25}],4:[function(require,module,exports){
+},{"./Controller":7,"./StoreDevtools":24}],4:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 /**
  * ContentScript that can be called from anywhere within the extension
@@ -160,7 +160,7 @@ var BackgroundScript = {
 
 module.exports = BackgroundScript
 
-},{"jquery-deferred":29}],5:[function(require,module,exports){
+},{"jquery-deferred":28}],5:[function(require,module,exports){
 var ContentSelector = require('./ContentSelector')
 var jquery = require('jquery-deferred')
 /**
@@ -255,7 +255,7 @@ var ContentScript = {
 
 module.exports = ContentScript
 
-},{"./ContentSelector":6,"jquery-deferred":29}],6:[function(require,module,exports){
+},{"./ContentSelector":6,"jquery-deferred":28}],6:[function(require,module,exports){
 var ElementQuery = require('./ElementQuery')
 var jquery = require('jquery-deferred')
 /**
@@ -624,12 +624,12 @@ ContentSelector.prototype = {
 
 module.exports = ContentSelector
 
-},{"./ElementQuery":8,"jquery-deferred":29}],7:[function(require,module,exports){
+},{"./ElementQuery":8,"jquery-deferred":28}],7:[function(require,module,exports){
 var selectors = require('./Selectors')
 var Selector = require('./Selector')
 var SelectorTable = selectors.SelectorTable
 var Sitemap = require('./Sitemap')
-var SelectorGraphv2 = require('./SelectorGraphv2')
+//var SelectorGraphv2 = require('./SelectorGraphv2')
 var getBackgroundScript = require('./getBackgroundScript')
 var getContentScript = require('./getContentScript')
 var SitemapController = function (options) {
@@ -681,7 +681,7 @@ SitemapController.prototype = {
       'SelectorListItem',
       'SelectorEdit',
       'SelectorEditTableColumn',
-      'SitemapSelectorGraph',
+      //'SitemapSelectorGraph',
       'DataPreview'
     ]
     var templatesLoaded = 0
@@ -738,10 +738,10 @@ SitemapController.prototype = {
         },
         '#sitemap-selector-list-nav-button': {
           click: this.showSitemapSelectorList
-        },
+        }/*,
         '#sitemap-selector-graph-nav-button': {
           click: this.showSitemapSelectorGraph
-        },
+        }*/,
         '#sitemap-browse-nav-button': {
           click: this.browseSitemapData
         },
@@ -1202,7 +1202,7 @@ SitemapController.prototype = {
     $('#viewport').html($selectorListPanel)
 
     return true
-  },
+  },/*
   showSitemapSelectorGraph: function () {
     this.setActiveNavigationButton('sitemap-selector-graph')
     var sitemap = this.state.currentSitemap
@@ -1212,7 +1212,7 @@ SitemapController.prototype = {
     var graph = new SelectorGraphv2(sitemap)
     graph.draw(graphDiv, $(document).width(), 200)
     return true
-  },
+  },*/
   showChildSelectors: function (tr) {
     var selector = $(tr).data('selector')
     var parentSelectors = this.state.editSitemapBreadcumbsSelectors
@@ -1981,7 +1981,7 @@ SitemapController.prototype = {
 
 module.exports = SitemapController
 
-},{"./Selector":9,"./SelectorGraphv2":21,"./Selectors":23,"./Sitemap":24,"./getBackgroundScript":27,"./getContentScript":28}],8:[function(require,module,exports){
+},{"./Selector":9,"./Selectors":22,"./Sitemap":23,"./getBackgroundScript":26,"./getContentScript":27}],8:[function(require,module,exports){
 /**
  * Element selector. Uses jQuery as base and adds some more features
  * @param parentElement
@@ -2006,7 +2006,7 @@ var ElementQuery = function (CSSSelector, parentElement) {
         addElement(element)
       })
     }		else {
-      var elements = $(selector, parentElement)
+      var elements = $(selector, $(parentElement))
       elements.each(function (i, element) {
         addElement(element)
       })
@@ -2131,7 +2131,6 @@ Selector.prototype = {
 
   getDataElements: function (parentElement) {
     var elements = ElementQuery(this.selector, parentElement)
-    console.log(elements)
     if (this.multiple) {
       return elements
     } else if (elements.length > 0) {
@@ -2166,7 +2165,7 @@ Selector.prototype = {
 
 module.exports = Selector
 
-},{"./ElementQuery":8,"./Selectors":23,"jquery-deferred":29}],10:[function(require,module,exports){
+},{"./ElementQuery":8,"./Selectors":22,"jquery-deferred":28}],10:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 
 var SelectorElement = {
@@ -2210,7 +2209,7 @@ var SelectorElement = {
 
 module.exports = SelectorElement
 
-},{"jquery-deferred":29}],11:[function(require,module,exports){
+},{"jquery-deferred":28}],11:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 var SelectorElementAttribute = {
   canReturnMultipleRecords: function () {
@@ -2265,7 +2264,7 @@ var SelectorElementAttribute = {
 
 module.exports = SelectorElementAttribute
 
-},{"jquery-deferred":29}],12:[function(require,module,exports){
+},{"jquery-deferred":28}],12:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 var UniqueElementList = require('./../UniqueElementList')
 var ElementQuery = require('./../ElementQuery')
@@ -2423,7 +2422,7 @@ var SelectorElementClick = {
 
 module.exports = SelectorElementClick
 
-},{"./../ElementQuery":8,"./../UniqueElementList":26,"jquery-deferred":29}],13:[function(require,module,exports){
+},{"./../ElementQuery":8,"./../UniqueElementList":25,"jquery-deferred":28}],13:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 var SelectorElementScroll = {
 
@@ -2492,7 +2491,7 @@ var SelectorElementScroll = {
 
 module.exports = SelectorElementScroll
 
-},{"jquery-deferred":29}],14:[function(require,module,exports){
+},{"jquery-deferred":28}],14:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 var SelectorGroup = {
 
@@ -2551,7 +2550,7 @@ var SelectorGroup = {
 
 module.exports = SelectorGroup
 
-},{"jquery-deferred":29}],15:[function(require,module,exports){
+},{"jquery-deferred":28}],15:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 var SelectorHTML = {
 
@@ -2617,7 +2616,7 @@ var SelectorHTML = {
 
 module.exports = SelectorHTML
 
-},{"jquery-deferred":29}],16:[function(require,module,exports){
+},{"jquery-deferred":28}],16:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 var whenCallSequentially = require('../../assets/jquery.whencallsequentially')
 var Base64 = require('../../assets/base64')
@@ -2739,7 +2738,7 @@ var SelectorImage = {
 
 module.exports = SelectorImage
 
-},{"../../assets/base64":1,"../../assets/jquery.whencallsequentially":2,"jquery-deferred":29}],17:[function(require,module,exports){
+},{"../../assets/base64":1,"../../assets/jquery.whencallsequentially":2,"jquery-deferred":28}],17:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 var whenCallSequentially = require('../../assets/jquery.whencallsequentially')
 
@@ -2818,7 +2817,7 @@ var SelectorLink = {
 
 module.exports = SelectorLink
 
-},{"../../assets/jquery.whencallsequentially":2,"jquery-deferred":29}],18:[function(require,module,exports){
+},{"../../assets/jquery.whencallsequentially":2,"jquery-deferred":28}],18:[function(require,module,exports){
 var whenCallSequentially = require('../../assets/jquery.whencallsequentially')
 var jquery = require('jquery-deferred')
 
@@ -2896,26 +2895,29 @@ var SelectorPopupLink = {
 		// we need to know how to find this element from page scope.
     var cs = new CssSelector({
       enableSmartTableSelector: false,
-      parent: $('body')[0],
+      parent: document.body,
       enableResultStripping: false
     })
     var cssSelector = cs.getCssSelector([element])
-
+    console.log(cssSelector)
+    console.log(document.body.querySelectorAll(cssSelector))
 		// this function will catch window.open call and place the requested url as the elements data attribute
     var script = document.createElement('script')
     script.type = 'text/javascript'
-    script.text = '' +
-			'(function(){ ' +
-			'var open = window.open; ' +
-			"var el = document.querySelectorAll('" + cssSelector + "')[0]; " +
-			'var openNew = function() { ' +
-			'var url = arguments[0]; ' +
-			'el.dataset.webScraperExtractUrl = url; ' +
-			'window.open = open; ' +
-			'};' +
-			'window.open = openNew; ' +
-			'el.click(); ' +
-			'})();'
+  console.log(cssSelector)
+    console.log(document.querySelectorAll(cssSelector))
+    script.text = `
+			(function(){
+        var open = window.open;
+        var el = document.querySelectorAll('${cssSelector}')[0];
+        var openNew = function() { 
+          var url = arguments[0]; 
+          el.dataset.webScraperExtractUrl = url; 
+          window.open = open; 
+        };
+        window.open = openNew; 
+        el.click(); 
+			})()`
     document.body.appendChild(script)
 
 		// wait for url to be available
@@ -2953,7 +2955,7 @@ var SelectorPopupLink = {
 
 module.exports = SelectorPopupLink
 
-},{"../../assets/jquery.whencallsequentially":2,"jquery-deferred":29}],19:[function(require,module,exports){
+},{"../../assets/jquery.whencallsequentially":2,"jquery-deferred":28}],19:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 
 var SelectorTable = {
@@ -2979,7 +2981,7 @@ var SelectorTable = {
   getTableHeaderColumns: function ($table) {
     var columns = {}
     var headerRowSelector = this.getTableHeaderRowSelector()
-    var $headerRow = $table.find(headerRowSelector)
+    var $headerRow = $($table).find(headerRowSelector)
     if ($headerRow.length > 0) {
       $headerRow.find('td,th').each(function (i) {
         var header = $(this).text().trim()
@@ -3118,7 +3120,7 @@ var SelectorTable = {
 
 module.exports = SelectorTable
 
-},{"jquery-deferred":29}],20:[function(require,module,exports){
+},{"jquery-deferred":28}],20:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 var SelectorText = {
 
@@ -3190,220 +3192,7 @@ var SelectorText = {
 
 module.exports = SelectorText
 
-},{"jquery-deferred":29}],21:[function(require,module,exports){
-var SelectorGraphv2 = function (sitemap) {
-  this.sitemap = sitemap
-}
-
-SelectorGraphv2.prototype = {
-
-	/**
-	 * Inits d3.layout.tree
-	 */
-  initTree: function (w, h) {
-    this.tree = d3.layout.tree().size([h, w])
-    this.tree.children(this.getSelectorVisibleChildren.bind(this))
-  },
-  getSelectorChildren: function (parentSelector) {
-    if (parentSelector.childSelectors === undefined) {
-      parentSelector.childSelectors = this.sitemap.selectors.getDirectChildSelectors(parentSelector.id).fullClone()
-    }
-
-    if (parentSelector.childSelectors.length === 0) {
-      return null
-    } else {
-      return parentSelector.childSelectors
-    }
-  },
-
-  getSelectorVisibleChildren: function (parentSelector) {
-		// initially hide selector children
-    if (parentSelector.visibleChildren === undefined) {
-      parentSelector.visibleChildren = false
-    }
-
-    if (parentSelector.visibleChildren === false) {
-      return null
-    }
-
-    return this.getSelectorChildren(parentSelector)
-  },
-
-  selectorHasChildren: function (parentSelector) {
-    var children = this.sitemap.selectors.getDirectChildSelectors(parentSelector.id)
-    var selectorHasChildren = children.length > 0
-    return selectorHasChildren
-  },
-
-	/**
-	 * function for line drawing between two nodes
-	 */
-  diagonal: d3.svg.diagonal()
-		.projection(function (d) {
-  return [d.y, d.x]
-}),
-
-  draw: function (element, w, h) {
-    var m = [20, 120, 20, 120],
-      w = w - m[1] - m[3],
-      h = h - m[0] - m[2],
-      i = 0,
-      root,
-      selectorList
-
-    this.initTree(w, h)
-
-		// @TODO use element
-    this.svg = d3.select(element).append('svg:svg')
-			.attr('width', w + m[1] + m[3])
-			.attr('height', h + m[0] + m[2])
-			.append('svg:g')
-			.attr('transform', 'translate(' + m[3] + ',' + m[0] + ')')
-
-    this.root = {
-      id: '_root',
-      x0: h / 2,
-      y0: 0,
-      i: '_root'
-    }
-
-    this.update(this.root)
-  },
-
-	/**
-	 * Color for selectors circle
-	 * @param selector
-	 */
-  getNodeColor: function (selector) {
-    if (this.selectorHasChildren(selector) && !selector.visibleChildren) {
-      return 'lightsteelblue'
-    }		else {
-      return '#fff'
-    }
-  },
-
-  update: function (source) {
-    var duration = 500
-
-		// Compute the new tree layout.
-    var nodes = this.tree.nodes(this.root).reverse()
-
-		// Normalize for fixed-depth.
-    nodes.forEach(function (d) {
-      d.y = d.depth * 100
-    })
-    var i = 0
-		// Update the nodes…
-    var node = this.svg.selectAll('g.node')
-			.data(nodes, function (d) {
-  if (d.i === undefined) {
-    d.i = d.id
-    d.i = source.i + '/' + d.i
-  }
-  return d.i
-})
-
-		// Enter any new nodes at the parent's previous position.
-    var nodeEnter = node.enter().append('svg:g')
-			.attr('class', 'node')
-			.attr('transform', function (d) {
-  return 'translate(' + source.y0 + ',' + source.x0 + ')'
-})
-			.on('click', function (d) {
-  this.toggle(d)
-  this.update(d)
-}.bind(this))
-
-    nodeEnter.append('svg:circle')
-			.attr('r', 1e-6)
-			.style('fill', this.getNodeColor.bind(this))
-
-    nodeEnter.append('svg:text')
-			.attr('x', function (d) {
-  return this.selectorHasChildren(d) ? -10 : 10
-}.bind(this))
-			.attr('dy', '.35em')
-			.attr('text-anchor', function (d) {
-  return this.selectorHasChildren(d) ? 'end' : 'start'
-}.bind(this))
-			.text(function (d) {
-  return d.id
-})
-			.style('fill-opacity', 1e-6)
-
-		// Transition nodes to their new position.
-    var nodeUpdate = node.transition()
-			.duration(duration)
-			.attr('transform', function (d) {
-  return 'translate(' + d.y + ',' + d.x + ')'
-})
-
-    nodeUpdate.select('circle')
-			.attr('r', 6)
-			.style('fill', this.getNodeColor.bind(this))
-
-    nodeUpdate.select('text')
-			.style('fill-opacity', 1)
-
-		// Transition exiting nodes to the parent's new position.
-    var nodeExit = node.exit().transition()
-			.duration(duration)
-			.attr('transform', function (d) {
-  return 'translate(' + source.y + ',' + source.x + ')'
-})
-			.remove()
-
-    nodeExit.select('circle')
-			.attr('r', 1e-6)
-
-    nodeExit.select('text')
-			.style('fill-opacity', 1e-6)
-
-		// Update the links…
-    var link = this.svg.selectAll('path.link')
-			.data(this.tree.links(nodes), function (d) {
-  return d.target.i
-})
-
-		// Enter any new links at the parent's previous position.
-    link.enter().insert('svg:path', 'g')
-			.attr('class', 'link')
-			.attr('d', function (d) {
-  var o = {x: source.x0, y: source.y0}
-  var res = this.diagonal({source: o, target: o})
-  return res
-}.bind(this))
-			.transition()
-			.duration(duration)
-			.attr('d', this.diagonal)
-
-		// Transition links to their new position.
-    link.transition()
-			.duration(duration)
-			.attr('d', this.diagonal)
-
-		// Transition exiting nodes to the parent's new position.
-    link.exit().transition()
-			.duration(duration)
-			.attr('d', function (d) {
-  var o = {x: source.x, y: source.y}
-  return this.diagonal({source: o, target: o})
-}.bind(this))
-			.remove()
-
-		// Stash the old positions for transition.
-    nodes.forEach(function (d) {
-      d.x0 = d.x
-      d.y0 = d.y
-    })
-  },
-
-  toggle: function (d) {
-    d.visibleChildren = !d.visibleChildren
-  }
-}
-
-},{}],22:[function(require,module,exports){
+},{"jquery-deferred":28}],21:[function(require,module,exports){
 var Selector = require('./Selector')
 
 var SelectorList = function (selectors) {
@@ -3674,7 +3463,7 @@ SelectorList.prototype.hasRecursiveElementSelectors = function () {
 
 module.exports = SelectorList
 
-},{"./Selector":9}],23:[function(require,module,exports){
+},{"./Selector":9}],22:[function(require,module,exports){
 var SelectorElement = require('./Selector/SelectorElement')
 var SelectorElementAttribute = require('./Selector/SelectorElementAttribute')
 var SelectorElementClick = require('./Selector/SelectorElementClick')
@@ -3701,7 +3490,7 @@ module.exports = {
   SelectorText
 }
 
-},{"./Selector/SelectorElement":10,"./Selector/SelectorElementAttribute":11,"./Selector/SelectorElementClick":12,"./Selector/SelectorElementScroll":13,"./Selector/SelectorGroup":14,"./Selector/SelectorHTML":15,"./Selector/SelectorImage":16,"./Selector/SelectorLink":17,"./Selector/SelectorPopupLink":18,"./Selector/SelectorTable":19,"./Selector/SelectorText":20}],24:[function(require,module,exports){
+},{"./Selector/SelectorElement":10,"./Selector/SelectorElementAttribute":11,"./Selector/SelectorElementClick":12,"./Selector/SelectorElementScroll":13,"./Selector/SelectorGroup":14,"./Selector/SelectorHTML":15,"./Selector/SelectorImage":16,"./Selector/SelectorLink":17,"./Selector/SelectorPopupLink":18,"./Selector/SelectorTable":19,"./Selector/SelectorText":20}],23:[function(require,module,exports){
 var Selector = require('./Selector')
 var SelectorList = require('./SelectorList')
 var Sitemap = function (sitemapObj) {
@@ -3711,9 +3500,12 @@ var Sitemap = function (sitemapObj) {
 Sitemap.prototype = {
 
   initData: function (sitemapObj) {
+    console.log(this)
     for (var key in sitemapObj) {
+      console.log(key)
       this[key] = sitemapObj[key]
     }
+    console.log(this)
 
     var selectors = this.selectors
     this.selectors = new SelectorList(this.selectors)
@@ -3913,7 +3705,7 @@ Sitemap.prototype = {
 
 module.exports = Sitemap
 
-},{"./Selector":9,"./SelectorList":22}],25:[function(require,module,exports){
+},{"./Selector":9,"./SelectorList":21}],24:[function(require,module,exports){
 var Sitemap = require('./Sitemap')
 
 /**
@@ -3988,7 +3780,9 @@ StoreDevtools.prototype = {
 
 module.exports = StoreDevtools
 
-},{"./Sitemap":24}],26:[function(require,module,exports){
+},{"./Sitemap":23}],25:[function(require,module,exports){
+// TODO get rid of jquery
+
 /**
  * Only Elements unique will be added to this array
  * @constructor
@@ -3998,7 +3792,7 @@ function UniqueElementList (clickElementUniquenessType) {
   this.addedElements = {}
 }
 
-UniqueElementList.prototype = new Array()
+UniqueElementList.prototype = []
 
 UniqueElementList.prototype.push = function (element) {
   if (this.isAdded(element)) {
@@ -4056,7 +3850,7 @@ UniqueElementList.prototype.isAdded = function (element) {
   return isAdded
 }
 
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 var BackgroundScript = require('./BackgroundScript')
 /**
@@ -4101,7 +3895,7 @@ var getBackgroundScript = function (location) {
 
 module.exports = getBackgroundScript
 
-},{"./BackgroundScript":4,"jquery-deferred":29}],28:[function(require,module,exports){
+},{"./BackgroundScript":4,"jquery-deferred":28}],27:[function(require,module,exports){
 var getBackgroundScript = require('./getBackgroundScript')
 var ContentScript = require('./ContentScript')
 /**
@@ -4147,10 +3941,10 @@ var getContentScript = function (location) {
 
 module.exports = getContentScript
 
-},{"./ContentScript":5,"./getBackgroundScript":27}],29:[function(require,module,exports){
+},{"./ContentScript":5,"./getBackgroundScript":26}],28:[function(require,module,exports){
 
 module.exports = require('./lib/jquery-deferred');
-},{"./lib/jquery-deferred":32}],30:[function(require,module,exports){
+},{"./lib/jquery-deferred":31}],29:[function(require,module,exports){
 var jQuery = module.exports = require("./jquery-core.js"),
 	core_rspace = /\s+/;
 /**
@@ -4358,7 +4152,7 @@ jQuery.Callbacks = function( options ) {
 };
 
 
-},{"./jquery-core.js":31}],31:[function(require,module,exports){
+},{"./jquery-core.js":30}],30:[function(require,module,exports){
 /**
 * jQuery core object.
 *
@@ -4515,7 +4309,7 @@ function extend() {
 
 
 
-},{}],32:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 
 /*!
 * jquery-deferred
@@ -4680,5 +4474,5 @@ jQuery.extend({
 	}
 });
 
-},{"./jquery-callbacks.js":30}]},{},[3])(3)
+},{"./jquery-callbacks.js":29}]},{},[3])(3)
 });

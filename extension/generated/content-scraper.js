@@ -984,7 +984,7 @@ var ElementQuery = function (CSSSelector, parentElement) {
         addElement(element)
       })
     }		else {
-      var elements = $(selector, parentElement)
+      var elements = $(selector, $(parentElement))
       elements.each(function (i, element) {
         addElement(element)
       })
@@ -1109,7 +1109,6 @@ Selector.prototype = {
 
   getDataElements: function (parentElement) {
     var elements = ElementQuery(this.selector, parentElement)
-    console.log(elements)
     if (this.multiple) {
       return elements
     } else if (elements.length > 0) {
@@ -1874,26 +1873,29 @@ var SelectorPopupLink = {
 		// we need to know how to find this element from page scope.
     var cs = new CssSelector({
       enableSmartTableSelector: false,
-      parent: $('body')[0],
+      parent: document.body,
       enableResultStripping: false
     })
     var cssSelector = cs.getCssSelector([element])
-
+    console.log(cssSelector)
+    console.log(document.body.querySelectorAll(cssSelector))
 		// this function will catch window.open call and place the requested url as the elements data attribute
     var script = document.createElement('script')
     script.type = 'text/javascript'
-    script.text = '' +
-			'(function(){ ' +
-			'var open = window.open; ' +
-			"var el = document.querySelectorAll('" + cssSelector + "')[0]; " +
-			'var openNew = function() { ' +
-			'var url = arguments[0]; ' +
-			'el.dataset.webScraperExtractUrl = url; ' +
-			'window.open = open; ' +
-			'};' +
-			'window.open = openNew; ' +
-			'el.click(); ' +
-			'})();'
+  console.log(cssSelector)
+    console.log(document.querySelectorAll(cssSelector))
+    script.text = `
+			(function(){
+        var open = window.open;
+        var el = document.querySelectorAll('${cssSelector}')[0];
+        var openNew = function() { 
+          var url = arguments[0]; 
+          el.dataset.webScraperExtractUrl = url; 
+          window.open = open; 
+        };
+        window.open = openNew; 
+        el.click(); 
+			})()`
     document.body.appendChild(script)
 
 		// wait for url to be available
@@ -1957,7 +1959,7 @@ var SelectorTable = {
   getTableHeaderColumns: function ($table) {
     var columns = {}
     var headerRowSelector = this.getTableHeaderRowSelector()
-    var $headerRow = $table.find(headerRowSelector)
+    var $headerRow = $($table).find(headerRowSelector)
     if ($headerRow.length > 0) {
       $headerRow.find('td,th').each(function (i) {
         var header = $(this).text().trim()
@@ -2476,9 +2478,12 @@ var Sitemap = function (sitemapObj) {
 Sitemap.prototype = {
 
   initData: function (sitemapObj) {
+    console.log(this)
     for (var key in sitemapObj) {
+      console.log(key)
       this[key] = sitemapObj[key]
     }
+    console.log(this)
 
     var selectors = this.selectors
     this.selectors = new SelectorList(this.selectors)
@@ -2679,6 +2684,8 @@ Sitemap.prototype = {
 module.exports = Sitemap
 
 },{"./Selector":9,"./SelectorList":21}],24:[function(require,module,exports){
+// TODO get rid of jquery
+
 /**
  * Only Elements unique will be added to this array
  * @constructor
@@ -2688,7 +2695,7 @@ function UniqueElementList (clickElementUniquenessType) {
   this.addedElements = {}
 }
 
-UniqueElementList.prototype = new Array()
+UniqueElementList.prototype = []
 
 UniqueElementList.prototype.push = function (element) {
   if (this.isAdded(element)) {
