@@ -41,7 +41,6 @@
 			"js": [
 				"assets/jquery-2.0.3.js",
 				"assets/sugar-1.4.1.js",
-				"assets/css-selector/lib/CssSelector.js",
 				"generated/content-scraper.js",
 				"content_script/content_script.js"
 			],

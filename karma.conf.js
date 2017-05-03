@@ -18,7 +18,6 @@ module.exports = function (config) {
       'extension/assets/jquery-2.0.3.js',
       'extension/assets/sugar-1.4.1.js',
       'extension/assets/pouchdb-nightly.min.js',
-      'extension/assets/css-selector/lib/CssSelector.js',
       'tests/ChromeAPI.js',
       'extension/generated/background-scraper.js', // not very nice, we need to load the background script to listen to the messages
       'extension/generated/content-scraper.js',

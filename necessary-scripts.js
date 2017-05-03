@@ -25,4 +25,4 @@ module.exports = [
   'scripts/ContentScript.js',
   'scripts/BackgroundScript.js',
   'content_script/content_script.js'
-  ]
+]

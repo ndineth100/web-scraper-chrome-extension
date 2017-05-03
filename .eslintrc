@@ -5,7 +5,6 @@
     "d3": true,
     "$": true,
     "chrome": true,
-    "CSSSelector": true,
     "jQuery": true,
     "describe": true,
     "it": true,

@@ -16,6 +16,21 @@
       "extensions": "js"
     }
   },
+  "standard": {
+    "ignore": "extension/generated",
+    "globals": [
+      "d3",
+      "$",
+      "chrome",
+      "jQuery",
+      "describe",
+      "it",
+      "beforeEach",
+      "afterEach",
+      "after",
+      "before"
+    ]
+  },
   "scripts": {
     "test": "karma start",
     "test-jasmine": "jasmine-node tests/spec/ScraperSpec.js",
@@ -50,6 +65,7 @@
     "watchify": "^3.9.0"
   },
   "dependencies": {
+    "css-selector": "git://github.com/furstenheim/css-selector.git#1333c3ba8b452e65b1c0e40ef8c4a8a5bf9a601c",
     "browserify": "^14.1.0",
     "chrome-remote-interface": "^0.18.0",
     "jquery-deferred": "^0.3.1"

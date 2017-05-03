@@ -1,6 +1,6 @@
 var whenCallSequentially = require('../../assets/jquery.whencallsequentially')
 var jquery = require('jquery-deferred')
-
+var CssSelector = require('css-selector').CssSelector
 var SelectorPopupLink = {
   canReturnMultipleRecords: function () {
     return true
@@ -84,7 +84,7 @@ var SelectorPopupLink = {
 		// this function will catch window.open call and place the requested url as the elements data attribute
     var script = document.createElement('script')
     script.type = 'text/javascript'
-  console.log(cssSelector)
+    console.log(cssSelector)
     console.log(document.querySelectorAll(cssSelector))
     script.text = `
 			(function(){

@@ -6,7 +6,6 @@ const DataExtractor = require('../../extension/scripts/DataExtractor')
 const utils = require('./../utils')
 
 describe('DataExtractor', function () {
-
   beforeEach(function () {
     document.body.innerHTML = utils.getTestHTML()
   })

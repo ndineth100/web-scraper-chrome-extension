@@ -1,3 +1,4 @@
+var CssSelector = require('css-selector').CssSelector
 // TODO get rid of jquery
 
 /**

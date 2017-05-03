@@ -53,7 +53,7 @@ describe('ContentSelector', function () {
 
     var deferredCSSSelector = contentSelector.getCSSSelector()
 
-    console.log( document.querySelector('#-selector-toolbar .done-selecting-button'))
+    console.log(document.querySelector('#-selector-toolbar .done-selecting-button'))
 
     // finish selection
     document.querySelector('#-selector-toolbar .done-selecting-button').click()

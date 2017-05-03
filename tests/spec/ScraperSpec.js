@@ -43,7 +43,6 @@ describe('Scraper', function () {
       ]
     })
 
-
     var browser = new ChromePopupBrowser({
       pageLoadDelay: 100
     })
@@ -93,7 +92,6 @@ describe('Scraper', function () {
       store: store,
       delay: 0
     })
-
 
     s.run(function () {
       assert.deepEqual(store.data, [

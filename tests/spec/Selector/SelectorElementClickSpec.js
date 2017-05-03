@@ -186,7 +186,6 @@ describe('Click Element Selector', function () {
       clickType: 'clickOnce'
     })
 
-
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 3)

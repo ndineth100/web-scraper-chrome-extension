@@ -1,4 +1,505 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.devtoolsApp = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+module.exports = {
+	CssSelector,
+	ElementSelector,
+	ElementSelectorList
+}
+
+
+function CssSelector (options) {
+
+	var me = this;
+
+	// defaults
+	this.ignoredTags = ['font', 'b', 'i', 's'];
+	this.parent = document;
+	this.ignoredClassBase = false;
+	this.enableResultStripping = true;
+	this.enableSmartTableSelector = false;
+	this.ignoredClasses = [];
+    this.allowMultipleSelectors = false;
+	this.query = function (selector) {
+		return me.parent.querySelectorAll(selector);
+	};
+
+	// overrides defaults with options
+	for (var i in options) {
+		this[i] = options[i];
+	}
+
+	// jquery parent selector fix
+	if (this.query === window.jQuery) {
+		this.query = function (selector) {
+			return jQuery(me.parent).find(selector);
+		};
+	}
+};
+
+// TODO refactor element selector list into a ~ class
+function ElementSelector (element, ignoredClasses) {
+
+	this.element = element;
+	this.isDirectChild = true;
+	this.tag = element.localName;
+	this.tag = this.tag.replace(/:/g, '\\:');
+
+	// nth-of-child(n+1)
+	this.indexn = null;
+	this.index = 1;
+	this.id = null;
+	this.classes = new Array();
+
+	// do not add additinal info to html, body tags.
+	// html:nth-of-type(1) cannot be selected
+	if(this.tag === 'html' || this.tag === 'HTML'
+		|| this.tag === 'body' || this.tag === 'BODY') {
+		this.index = null;
+		return;
+	}
+
+	if (element.parentNode !== undefined) {
+		// nth-child
+		//this.index = [].indexOf.call(element.parentNode.children, element)+1;
+
+		// nth-of-type
+		for (var i = 0; i < element.parentNode.children.length; i++) {
+			var child = element.parentNode.children[i];
+			if (child === element) {
+				break;
+			}
+			if (child.tagName === element.tagName) {
+				this.index++;
+			}
+		}
+	}
+
+	if (element.id !== '') {
+		if (typeof element.id === 'string') {
+			this.id = element.id;
+			this.id = this.id.replace(/:/g, '\\:');
+		}
+	}
+
+	for (var i = 0; i < element.classList.length; i++) {
+		var cclass = element.classList[i];
+		if (ignoredClasses.indexOf(cclass) === -1) {
+			cclass = cclass.replace(/:/g, '\\:');
+			this.classes.push(cclass);
+		}
+	}
+};
+
+function ElementSelectorList (CssSelector) {
+	this.CssSelector = CssSelector;
+};
+
+ElementSelectorList.prototype = new Array();
+
+ElementSelectorList.prototype.getCssSelector = function () {
+
+	var resultSelectors = [];
+
+	// TDD
+	for (var i = 0; i < this.length; i++) {
+		var selector = this[i];
+
+		var isFirstSelector = i === this.length-1;
+		var resultSelector = selector.getCssSelector(isFirstSelector);
+
+		if (this.CssSelector.enableSmartTableSelector) {
+			if (selector.tag === 'tr') {
+				if (selector.element.children.length === 2) {
+					if (selector.element.children[0].tagName === 'TD'
+						|| selector.element.children[0].tagName === 'TH'
+						|| selector.element.children[0].tagName === 'TR') {
+
+						var text = selector.element.children[0].textContent;
+						text = text.trim();
+
+						// escape quotes
+						text.replace(/(\\*)(')/g, function (x) {
+							var l = x.length;
+							return (l % 2) ? x : x.substring(0, l - 1) + "\\'";
+						});
+						resultSelector += ":contains('" + text + "')";
+					}
+				}
+			}
+		}
+
+		resultSelectors.push(resultSelector);
+	}
+
+	var resultCSSSelector = resultSelectors.reverse().join(' ');
+	return resultCSSSelector;
+};
+
+ElementSelector.prototype = {
+
+	getCssSelector: function (isFirstSelector) {
+
+		if(isFirstSelector === undefined) {
+			isFirstSelector = false;
+		}
+
+		var selector = this.tag;
+		if (this.id !== null) {
+			selector += '#' + this.id;
+		}
+		if (this.classes.length) {
+			for (var i = 0; i < this.classes.length; i++) {
+				selector += "." + this.classes[i];
+			}
+		}
+		if (this.index !== null) {
+			selector += ':nth-of-type(' + this.index + ')';
+		}
+		if (this.indexn !== null && this.indexn !== -1) {
+			selector += ':nth-of-type(n+' + this.indexn + ')';
+		}
+		if(this.isDirectChild && isFirstSelector === false) {
+			selector = "> "+selector;
+		}
+
+		return selector;
+	},
+	// merges this selector with another one.
+	merge: function (mergeSelector) {
+
+		if (this.tag !== mergeSelector.tag) {
+			throw "different element selected (tag)";
+		}
+
+		if (this.index !== null) {
+			if (this.index !== mergeSelector.index) {
+
+				// use indexn only for two elements
+				if (this.indexn === null) {
+					var indexn = Math.min(mergeSelector.index, this.index);
+					if (indexn > 1) {
+						this.indexn = Math.min(mergeSelector.index, this.index);
+					}
+				}
+				else {
+					this.indexn = -1;
+				}
+
+				this.index = null;
+			}
+		}
+
+		if(this.isDirectChild === true) {
+			this.isDirectChild = mergeSelector.isDirectChild;
+		}
+
+		if (this.id !== null) {
+			if (this.id !== mergeSelector.id) {
+				this.id = null;
+			}
+		}
+
+		if (this.classes.length !== 0) {
+			var classes = new Array();
+
+			for (var i in this.classes) {
+				var cclass = this.classes[i];
+				if (mergeSelector.classes.indexOf(cclass) !== -1) {
+					classes.push(cclass);
+				}
+			}
+
+			this.classes = classes;
+		}
+	}
+};
+
+CssSelector.prototype = {
+	mergeElementSelectors: function (newSelecors) {
+
+		if (newSelecors.length < 1) {
+			throw "No selectors specified";
+		}
+		else if (newSelecors.length === 1) {
+			return newSelecors[0];
+		}
+
+		// check selector total count
+		var elementCountInSelector = newSelecors[0].length;
+		for (var i = 0; i < newSelecors.length; i++) {
+			var selector = newSelecors[i];
+			if (selector.length !== elementCountInSelector) {
+				throw "Invalid element count in selector";
+			}
+		}
+
+		// merge selectors
+		var resultingElements = newSelecors[0];
+		for (var i = 1; i < newSelecors.length; i++) {
+			var mergeElements = newSelecors[i];
+
+			for (var j = 0; j < elementCountInSelector; j++) {
+				resultingElements[j].merge(mergeElements[j]);
+			}
+		}
+		return resultingElements;
+	},
+	stripSelector: function (selectors) {
+
+		var cssSeletor = selectors.getCssSelector();
+		var baseSelectedElements = this.query(cssSeletor);
+
+		var compareElements = function (elements) {
+			if (baseSelectedElements.length !== elements.length) {
+				return false;
+			}
+
+			for (var j = 0; j < baseSelectedElements.length; j++) {
+				if ([].indexOf.call(elements, baseSelectedElements[j]) === -1) {
+					return false;
+				}
+			}
+			return true;
+		};
+		// strip indexes
+		for (var i = 0; i < selectors.length; i++) {
+			var selector = selectors[i];
+			if (selector.index !== null) {
+				var index = selector.index;
+				selector.index = null;
+				var cssSeletor = selectors.getCssSelector();
+				var newSelectedElements = this.query(cssSeletor);
+				// if results doesn't match then undo changes
+				if (!compareElements(newSelectedElements)) {
+					selector.index = index;
+				}
+			}
+		}
+
+		// strip isDirectChild
+		for (var i = 0; i < selectors.length; i++) {
+			var selector = selectors[i];
+			if (selector.isDirectChild === true) {
+				selector.isDirectChild = false;
+				var cssSeletor = selectors.getCssSelector();
+				var newSelectedElements = this.query(cssSeletor);
+				// if results doesn't match then undo changes
+				if (!compareElements(newSelectedElements)) {
+					selector.isDirectChild = true;
+				}
+			}
+		}
+
+		// strip ids
+		for (var i = 0; i < selectors.length; i++) {
+			var selector = selectors[i];
+			if (selector.id !== null) {
+				var id = selector.id;
+				selector.id = null;
+				var cssSeletor = selectors.getCssSelector();
+				var newSelectedElements = this.query(cssSeletor);
+				// if results doesn't match then undo changes
+				if (!compareElements(newSelectedElements)) {
+					selector.id = id;
+				}
+			}
+		}
+
+		// strip classes
+		for (var i = 0; i < selectors.length; i++) {
+			var selector = selectors[i];
+			if (selector.classes.length !== 0) {
+				for (var j = selector.classes.length - 1; j > 0; j--) {
+					var cclass = selector.classes[j];
+					selector.classes.splice(j, 1);
+					var cssSeletor = selectors.getCssSelector();
+					var newSelectedElements = this.query(cssSeletor);
+					// if results doesn't match then undo changes
+					if (!compareElements(newSelectedElements)) {
+						selector.classes.splice(j, 0, cclass);
+					}
+				}
+			}
+		}
+
+		// strip tags
+		for (var i = selectors.length - 1; i > 0; i--) {
+			var selector = selectors[i];
+			selectors.splice(i, 1);
+			var cssSeletor = selectors.getCssSelector();
+			var newSelectedElements = this.query(cssSeletor);
+			// if results doesn't match then undo changes
+			if (!compareElements(newSelectedElements)) {
+				selectors.splice(i, 0, selector);
+			}
+		}
+
+		return selectors;
+	},
+	getElementSelectors: function (elements, top) {
+		var elementSelectors = [];
+
+		for (var i = 0; i < elements.length; i++) {
+			var element = elements[i];
+			var elementSelector = this.getElementSelector(element, top);
+			elementSelectors.push(elementSelector);
+		}
+
+		return elementSelectors;
+	},
+	getElementSelector: function (element, top) {
+
+		var elementSelectorList = new ElementSelectorList(this);
+		while (true) {
+			if (element === this.parent) {
+				break;
+			}
+			else if (element === undefined || element === document) {
+				throw 'element is not a child of the given parent';
+			}
+			if (this.isIgnoredTag(element.tagName)) {
+
+				element = element.parentNode;
+				continue;
+			}
+			if (top > 0) {
+				top--;
+				element = element.parentNode;
+				continue;
+			}
+
+			var selector = new ElementSelector(element, this.ignoredClasses);
+			// document does not have a tagName
+			if(element.parentNode === document || this.isIgnoredTag(element.parentNode.tagName)) {
+				selector.isDirectChild = false;
+			}
+
+			elementSelectorList.push(selector);
+			element = element.parentNode;
+		}
+
+		return elementSelectorList;
+	},
+
+    /**
+     * Compares whether two elements are similar. Similar elements should
+     * have a common parrent and all parent elements should be the same type.
+     * @param element1
+     * @param element2
+     */
+    checkSimilarElements: function(element1, element2) {
+
+        while (true) {
+
+            if(element1.tagName !== element2.tagName) {
+                return false;
+            }
+            if(element1 === element2) {
+                return true;
+            }
+
+            // stop at body tag
+            if (element1 === undefined || element1.tagName === 'body'
+                || element1.tagName === 'BODY') {
+                return false;
+            }
+            if (element2 === undefined || element2.tagName === 'body'
+                || element2.tagName === 'BODY') {
+                return false;
+            }
+
+            element1 = element1.parentNode;
+            element2 = element2.parentNode;
+        }
+    },
+
+    /**
+     * Groups elements into groups if the emelents are not similar
+     * @param elements
+     */
+    getElementGroups: function(elements) {
+
+        // first elment is in the first group
+        // @TODO maybe i dont need this?
+        var groups = [[elements[0]]];
+
+        for(var i = 1; i < elements.length; i++) {
+            var elementNew = elements[i];
+            var addedToGroup = false;
+            for(var j = 0; j < groups.length; j++) {
+                var group = groups[j];
+                var elementGroup = group[0];
+                if(this.checkSimilarElements(elementNew, elementGroup)) {
+                    group.push(elementNew);
+                    addedToGroup = true;
+                    break;
+                }
+            }
+
+            // add new group
+            if(!addedToGroup) {
+                groups.push([elementNew]);
+            }
+        }
+
+        return groups;
+    },
+	getCssSelector: function (elements, top) {
+
+		top = top || 0;
+
+		var enableSmartTableSelector = this.enableSmartTableSelector;
+		if (elements.length > 1) {
+			this.enableSmartTableSelector = false;
+		}
+
+        // group elements into similarity groups
+        var elementGroups = this.getElementGroups(elements);
+
+        var resultCSSSelector;
+
+        if(this.allowMultipleSelectors) {
+
+            var groupSelectors = [];
+
+            for(var i = 0; i < elementGroups.length; i++) {
+                var groupElements = elementGroups[i];
+
+                var elementSelectors = this.getElementSelectors(groupElements, top);
+                var resultSelector = this.mergeElementSelectors(elementSelectors);
+                if (this.enableResultStripping) {
+                    resultSelector = this.stripSelector(resultSelector);
+                }
+
+                groupSelectors.push(resultSelector.getCssSelector());
+            }
+
+            resultCSSSelector = groupSelectors.join(', ');
+        }
+        else {
+            if(elementGroups.length !== 1) {
+                throw "found multiple element groups, but allowMultipleSelectors disabled";
+            }
+
+            var elementSelectors = this.getElementSelectors(elements, top);
+            var resultSelector = this.mergeElementSelectors(elementSelectors);
+            if (this.enableResultStripping) {
+                resultSelector = this.stripSelector(resultSelector);
+            }
+
+            resultCSSSelector = resultSelector.getCssSelector();
+        }
+
+		this.enableSmartTableSelector = enableSmartTableSelector;
+
+		// strip down selector
+		return resultCSSSelector;
+	},
+	isIgnoredTag: function (tag) {
+		return this.ignoredTags.indexOf(tag.toLowerCase()) !== -1;
+	}
+};
+
+},{}],2:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 /**
  * @url http://jsperf.com/blob-base64-conversion
@@ -37,7 +538,7 @@ var Base64 = {
 
 module.exports = Base64
 
-},{"jquery-deferred":28}],2:[function(require,module,exports){
+},{"jquery-deferred":29}],3:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 /**
  * @author Martins Balodis
@@ -87,7 +588,7 @@ module.exports = function whenCallSequentially (functionCalls) {
   return deferredResonse.promise()
 }
 
-},{"jquery-deferred":28}],3:[function(require,module,exports){
+},{"jquery-deferred":29}],4:[function(require,module,exports){
 var StoreDevtools = require('./StoreDevtools')
 var SitemapController = require('./Controller')
 
@@ -102,7 +603,7 @@ $(function () {
   })
 })
 
-},{"./Controller":7,"./StoreDevtools":24}],4:[function(require,module,exports){
+},{"./Controller":8,"./StoreDevtools":25}],5:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 /**
  * ContentScript that can be called from anywhere within the extension
@@ -160,7 +661,7 @@ var BackgroundScript = {
 
 module.exports = BackgroundScript
 
-},{"jquery-deferred":28}],5:[function(require,module,exports){
+},{"jquery-deferred":29}],6:[function(require,module,exports){
 var ContentSelector = require('./ContentSelector')
 var jquery = require('jquery-deferred')
 /**
@@ -255,9 +756,10 @@ var ContentScript = {
 
 module.exports = ContentScript
 
-},{"./ContentSelector":6,"jquery-deferred":28}],6:[function(require,module,exports){
+},{"./ContentSelector":7,"jquery-deferred":29}],7:[function(require,module,exports){
 var ElementQuery = require('./ElementQuery')
 var jquery = require('jquery-deferred')
+var CssSelector = require('css-selector').CssSelector
 /**
  * @param options.parentCSSSelector	Elements can be only selected within this element
  * @param options.allowedElements	Elements that can only be selected
@@ -624,12 +1126,12 @@ ContentSelector.prototype = {
 
 module.exports = ContentSelector
 
-},{"./ElementQuery":8,"jquery-deferred":28}],7:[function(require,module,exports){
+},{"./ElementQuery":9,"css-selector":1,"jquery-deferred":29}],8:[function(require,module,exports){
 var selectors = require('./Selectors')
 var Selector = require('./Selector')
 var SelectorTable = selectors.SelectorTable
 var Sitemap = require('./Sitemap')
-//var SelectorGraphv2 = require('./SelectorGraphv2')
+// var SelectorGraphv2 = require('./SelectorGraphv2')
 var getBackgroundScript = require('./getBackgroundScript')
 var getContentScript = require('./getContentScript')
 var SitemapController = function (options) {
@@ -681,7 +1183,7 @@ SitemapController.prototype = {
       'SelectorListItem',
       'SelectorEdit',
       'SelectorEditTableColumn',
-      //'SitemapSelectorGraph',
+      // 'SitemapSelectorGraph',
       'DataPreview'
     ]
     var templatesLoaded = 0
@@ -738,10 +1240,9 @@ SitemapController.prototype = {
         },
         '#sitemap-selector-list-nav-button': {
           click: this.showSitemapSelectorList
-        }/*,
-        '#sitemap-selector-graph-nav-button': {
+        }, /*,        '#sitemap-selector-graph-nav-button': {
           click: this.showSitemapSelectorGraph
-        }*/,
+        } */
         '#sitemap-browse-nav-button': {
           click: this.browseSitemapData
         },
@@ -1202,7 +1703,7 @@ SitemapController.prototype = {
     $('#viewport').html($selectorListPanel)
 
     return true
-  },/*
+  }, /*
   showSitemapSelectorGraph: function () {
     this.setActiveNavigationButton('sitemap-selector-graph')
     var sitemap = this.state.currentSitemap
@@ -1212,7 +1713,7 @@ SitemapController.prototype = {
     var graph = new SelectorGraphv2(sitemap)
     graph.draw(graphDiv, $(document).width(), 200)
     return true
-  },*/
+  }, */
   showChildSelectors: function (tr) {
     var selector = $(tr).data('selector')
     var parentSelectors = this.state.editSitemapBreadcumbsSelectors
@@ -1981,7 +2482,7 @@ SitemapController.prototype = {
 
 module.exports = SitemapController
 
-},{"./Selector":9,"./Selectors":22,"./Sitemap":23,"./getBackgroundScript":26,"./getContentScript":27}],8:[function(require,module,exports){
+},{"./Selector":10,"./Selectors":23,"./Sitemap":24,"./getBackgroundScript":27,"./getContentScript":28}],9:[function(require,module,exports){
 /**
  * Element selector. Uses jQuery as base and adds some more features
  * @param parentElement
@@ -2040,7 +2541,7 @@ ElementQuery.getSelectorParts = function (CSSSelector) {
 
 module.exports = ElementQuery
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var selectors = require('./Selectors')
 var ElementQuery = require('./ElementQuery')
 var jquery = require('jquery-deferred')
@@ -2165,7 +2666,7 @@ Selector.prototype = {
 
 module.exports = Selector
 
-},{"./ElementQuery":8,"./Selectors":22,"jquery-deferred":28}],10:[function(require,module,exports){
+},{"./ElementQuery":9,"./Selectors":23,"jquery-deferred":29}],11:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 
 var SelectorElement = {
@@ -2209,7 +2710,7 @@ var SelectorElement = {
 
 module.exports = SelectorElement
 
-},{"jquery-deferred":28}],11:[function(require,module,exports){
+},{"jquery-deferred":29}],12:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 var SelectorElementAttribute = {
   canReturnMultipleRecords: function () {
@@ -2264,10 +2765,11 @@ var SelectorElementAttribute = {
 
 module.exports = SelectorElementAttribute
 
-},{"jquery-deferred":28}],12:[function(require,module,exports){
+},{"jquery-deferred":29}],13:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 var UniqueElementList = require('./../UniqueElementList')
 var ElementQuery = require('./../ElementQuery')
+var CssSelector = require('css-selector').CssSelector
 var SelectorElementClick = {
 
   canReturnMultipleRecords: function () {
@@ -2422,7 +2924,7 @@ var SelectorElementClick = {
 
 module.exports = SelectorElementClick
 
-},{"./../ElementQuery":8,"./../UniqueElementList":25,"jquery-deferred":28}],13:[function(require,module,exports){
+},{"./../ElementQuery":9,"./../UniqueElementList":26,"css-selector":1,"jquery-deferred":29}],14:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 var SelectorElementScroll = {
 
@@ -2491,7 +2993,7 @@ var SelectorElementScroll = {
 
 module.exports = SelectorElementScroll
 
-},{"jquery-deferred":28}],14:[function(require,module,exports){
+},{"jquery-deferred":29}],15:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 var SelectorGroup = {
 
@@ -2550,7 +3052,7 @@ var SelectorGroup = {
 
 module.exports = SelectorGroup
 
-},{"jquery-deferred":28}],15:[function(require,module,exports){
+},{"jquery-deferred":29}],16:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 var SelectorHTML = {
 
@@ -2616,7 +3118,7 @@ var SelectorHTML = {
 
 module.exports = SelectorHTML
 
-},{"jquery-deferred":28}],16:[function(require,module,exports){
+},{"jquery-deferred":29}],17:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 var whenCallSequentially = require('../../assets/jquery.whencallsequentially')
 var Base64 = require('../../assets/base64')
@@ -2738,7 +3240,7 @@ var SelectorImage = {
 
 module.exports = SelectorImage
 
-},{"../../assets/base64":1,"../../assets/jquery.whencallsequentially":2,"jquery-deferred":28}],17:[function(require,module,exports){
+},{"../../assets/base64":2,"../../assets/jquery.whencallsequentially":3,"jquery-deferred":29}],18:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 var whenCallSequentially = require('../../assets/jquery.whencallsequentially')
 
@@ -2817,10 +3319,10 @@ var SelectorLink = {
 
 module.exports = SelectorLink
 
-},{"../../assets/jquery.whencallsequentially":2,"jquery-deferred":28}],18:[function(require,module,exports){
+},{"../../assets/jquery.whencallsequentially":3,"jquery-deferred":29}],19:[function(require,module,exports){
 var whenCallSequentially = require('../../assets/jquery.whencallsequentially')
 var jquery = require('jquery-deferred')
-
+var CssSelector = require('css-selector').CssSelector
 var SelectorPopupLink = {
   canReturnMultipleRecords: function () {
     return true
@@ -2904,7 +3406,7 @@ var SelectorPopupLink = {
 		// this function will catch window.open call and place the requested url as the elements data attribute
     var script = document.createElement('script')
     script.type = 'text/javascript'
-  console.log(cssSelector)
+    console.log(cssSelector)
     console.log(document.querySelectorAll(cssSelector))
     script.text = `
 			(function(){
@@ -2955,7 +3457,7 @@ var SelectorPopupLink = {
 
 module.exports = SelectorPopupLink
 
-},{"../../assets/jquery.whencallsequentially":2,"jquery-deferred":28}],19:[function(require,module,exports){
+},{"../../assets/jquery.whencallsequentially":3,"css-selector":1,"jquery-deferred":29}],20:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 
 var SelectorTable = {
@@ -3120,7 +3622,7 @@ var SelectorTable = {
 
 module.exports = SelectorTable
 
-},{"jquery-deferred":28}],20:[function(require,module,exports){
+},{"jquery-deferred":29}],21:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 var SelectorText = {
 
@@ -3192,7 +3694,7 @@ var SelectorText = {
 
 module.exports = SelectorText
 
-},{"jquery-deferred":28}],21:[function(require,module,exports){
+},{"jquery-deferred":29}],22:[function(require,module,exports){
 var Selector = require('./Selector')
 
 var SelectorList = function (selectors) {
@@ -3463,7 +3965,7 @@ SelectorList.prototype.hasRecursiveElementSelectors = function () {
 
 module.exports = SelectorList
 
-},{"./Selector":9}],22:[function(require,module,exports){
+},{"./Selector":10}],23:[function(require,module,exports){
 var SelectorElement = require('./Selector/SelectorElement')
 var SelectorElementAttribute = require('./Selector/SelectorElementAttribute')
 var SelectorElementClick = require('./Selector/SelectorElementClick')
@@ -3490,7 +3992,7 @@ module.exports = {
   SelectorText
 }
 
-},{"./Selector/SelectorElement":10,"./Selector/SelectorElementAttribute":11,"./Selector/SelectorElementClick":12,"./Selector/SelectorElementScroll":13,"./Selector/SelectorGroup":14,"./Selector/SelectorHTML":15,"./Selector/SelectorImage":16,"./Selector/SelectorLink":17,"./Selector/SelectorPopupLink":18,"./Selector/SelectorTable":19,"./Selector/SelectorText":20}],23:[function(require,module,exports){
+},{"./Selector/SelectorElement":11,"./Selector/SelectorElementAttribute":12,"./Selector/SelectorElementClick":13,"./Selector/SelectorElementScroll":14,"./Selector/SelectorGroup":15,"./Selector/SelectorHTML":16,"./Selector/SelectorImage":17,"./Selector/SelectorLink":18,"./Selector/SelectorPopupLink":19,"./Selector/SelectorTable":20,"./Selector/SelectorText":21}],24:[function(require,module,exports){
 var Selector = require('./Selector')
 var SelectorList = require('./SelectorList')
 var Sitemap = function (sitemapObj) {
@@ -3705,7 +4207,7 @@ Sitemap.prototype = {
 
 module.exports = Sitemap
 
-},{"./Selector":9,"./SelectorList":21}],24:[function(require,module,exports){
+},{"./Selector":10,"./SelectorList":22}],25:[function(require,module,exports){
 var Sitemap = require('./Sitemap')
 
 /**
@@ -3777,10 +4279,10 @@ StoreDevtools.prototype = {
   }
 }
 
-
 module.exports = StoreDevtools
 
-},{"./Sitemap":23}],25:[function(require,module,exports){
+},{"./Sitemap":24}],26:[function(require,module,exports){
+var CssSelector = require('css-selector').CssSelector
 // TODO get rid of jquery
 
 /**
@@ -3850,7 +4352,7 @@ UniqueElementList.prototype.isAdded = function (element) {
   return isAdded
 }
 
-},{}],26:[function(require,module,exports){
+},{"css-selector":1}],27:[function(require,module,exports){
 var jquery = require('jquery-deferred')
 var BackgroundScript = require('./BackgroundScript')
 /**
@@ -3895,7 +4397,7 @@ var getBackgroundScript = function (location) {
 
 module.exports = getBackgroundScript
 
-},{"./BackgroundScript":4,"jquery-deferred":28}],27:[function(require,module,exports){
+},{"./BackgroundScript":5,"jquery-deferred":29}],28:[function(require,module,exports){
 var getBackgroundScript = require('./getBackgroundScript')
 var ContentScript = require('./ContentScript')
 /**
@@ -3941,10 +4443,10 @@ var getContentScript = function (location) {
 
 module.exports = getContentScript
 
-},{"./ContentScript":5,"./getBackgroundScript":26}],28:[function(require,module,exports){
+},{"./ContentScript":6,"./getBackgroundScript":27}],29:[function(require,module,exports){
 
 module.exports = require('./lib/jquery-deferred');
-},{"./lib/jquery-deferred":31}],29:[function(require,module,exports){
+},{"./lib/jquery-deferred":32}],30:[function(require,module,exports){
 var jQuery = module.exports = require("./jquery-core.js"),
 	core_rspace = /\s+/;
 /**
@@ -4152,7 +4654,7 @@ jQuery.Callbacks = function( options ) {
 };
 
 
-},{"./jquery-core.js":30}],30:[function(require,module,exports){
+},{"./jquery-core.js":31}],31:[function(require,module,exports){
 /**
 * jQuery core object.
 *
@@ -4309,7 +4811,7 @@ function extend() {
 
 
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 
 /*!
 * jquery-deferred
@@ -4474,5 +4976,5 @@ jQuery.extend({
 	}
 });
 
-},{"./jquery-callbacks.js":29}]},{},[3])(3)
+},{"./jquery-callbacks.js":30}]},{},[4])(4)
 });

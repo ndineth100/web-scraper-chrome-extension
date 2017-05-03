@@ -1,78 +1,74 @@
 $(function () {
-	console.log('opening config page')
+  console.log('opening config page')
 	// popups for Storage setting input fields
-	$("#sitemapDb")
+  $('#sitemapDb')
 		.popover({
-			title: 'Database for sitemap storage',
-			html: true,
-			content: "CouchDB database url<br /> http://example.com/scraper-sitemaps/",
-			placement: 'bottom'
-		})
+  title: 'Database for sitemap storage',
+  html: true,
+  content: 'CouchDB database url<br /> http://example.com/scraper-sitemaps/',
+  placement: 'bottom'
+})
 		.blur(function () {
-			$(this).popover('hide');
-		});
+  $(this).popover('hide')
+})
 
-	$("#dataDb")
+  $('#dataDb')
 		.popover({
-			title: 'Database for scraped data',
-			html: true,
-			content: "CouchDB database url. For each sitemap a new DB will be created.<br />http://example.com/",
-			placement: 'bottom'
-		})
+  title: 'Database for scraped data',
+  html: true,
+  content: 'CouchDB database url. For each sitemap a new DB will be created.<br />http://example.com/',
+  placement: 'bottom'
+})
 		.blur(function () {
-			$(this).popover('hide');
-		});
+  $(this).popover('hide')
+})
 
 	// switch between configuration types
-	$("select[name=storageType]").change(function () {
-		var type = $(this).val();
+  $('select[name=storageType]').change(function () {
+    var type = $(this).val()
 
-		if (type === 'couchdb') {
-			$(".form-group.couchdb").show();
-		}
-		else {
-			$(".form-group.couchdb").hide();
-		}
-	});
+    if (type === 'couchdb') {
+      $('.form-group.couchdb').show()
+    } else {
+      $('.form-group.couchdb').hide()
+    }
+  })
 
 	// Extension configuration
-	var config = new Config();
+  var config = new Config()
 
 	// load previously synced data
-	config.loadConfiguration(function () {
+  config.loadConfiguration(function () {
+    $('#storageType').val(config.storageType)
+    $('#sitemapDb').val(config.sitemapDb)
+    $('#dataDb').val(config.dataDb)
 
-		$("#storageType").val(config.storageType);
-		$("#sitemapDb").val(config.sitemapDb);
-		$("#dataDb").val(config.dataDb);
-
-		$("select[name=storageType]").change();
-	});
+    $('select[name=storageType]').change()
+  })
 
 	// Sync storage settings
-	$("form#storage_configuration").submit(function () {
+  $('form#storage_configuration').submit(function () {
+    var sitemapDb = $('#sitemapDb').val()
+    var dataDb = $('#dataDb').val()
+    var storageType = $('#storageType').val()
 
-		var sitemapDb = $("#sitemapDb").val();
-		var dataDb = $("#dataDb").val();
-		var storageType = $("#storageType").val();
+    var newConfig
 
-		var newConfig;
+    if (storageType === 'local') {
+      newConfig = {
+        storageType: storageType,
+        sitemapDb: ' ',
+        dataDb: ' '
+      }
+    }		else {
+      newConfig = {
+        storageType: storageType,
+        sitemapDb: sitemapDb,
+        dataDb: dataDb
+      }
+    }
 
-		if (storageType === 'local') {
-			newConfig = {
-				storageType: storageType,
-				sitemapDb: ' ',
-				dataDb: ' '
-			}
-		}
-		else {
-			newConfig = {
-				storageType: storageType,
-				sitemapDb: sitemapDb,
-				dataDb: dataDb
-			}
-		}
-
-		config.updateConfiguration(newConfig);
-		return false;
-	});
-});
+    config.updateConfiguration(newConfig)
+    return false
+  })
+})

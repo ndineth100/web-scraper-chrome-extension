@@ -59,7 +59,7 @@ var selectorMatchers = {
       await deferredData
       return Promise.reject(new Error('Promise not rejected'))
     } catch (e) {
-      return
+
     }
   }
 }

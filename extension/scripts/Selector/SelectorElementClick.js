@@ -1,6 +1,7 @@
 var jquery = require('jquery-deferred')
 var UniqueElementList = require('./../UniqueElementList')
 var ElementQuery = require('./../ElementQuery')
+var CssSelector = require('css-selector').CssSelector
 var SelectorElementClick = {
 
   canReturnMultipleRecords: function () {
