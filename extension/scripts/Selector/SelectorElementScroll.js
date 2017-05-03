@@ -43,7 +43,7 @@ var SelectorElementScroll = {
 			// no new elements found
       if (elements.length === foundElements.length) {
         clearInterval(interval)
-        deferredResponse.resolve(jQuery.makeArray(elements))
+        deferredResponse.resolve(this.$.makeArray(elements))
       } else {
 				// continue scrolling and add delay
         foundElements = elements

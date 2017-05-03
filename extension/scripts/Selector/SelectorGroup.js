@@ -21,18 +21,18 @@ var SelectorGroup = {
   },
   _getData: function (parentElement) {
     var dfd = jquery.Deferred()
-
+    var self = this
 		// cannot reuse this.getDataElements because it depends on *multiple* property
-    var elements = $(this.selector, parentElement)
+    var elements = self.$(this.selector, parentElement)
 
     var records = []
-    $(elements).each(function (k, element) {
+    self.$(elements).each(function (k, element) {
       var data = {}
 
-      data[this.id] = $(element).text()
+      data[this.id] = self.$(element).text()
 
       if (this.extractAttribute) {
-        data[this.id + '-' + this.extractAttribute] = $(element).attr(this.extractAttribute)
+        data[this.id + '-' + this.extractAttribute] = self.$(element).attr(this.extractAttribute)
       }
 
       records.push(data)

@@ -12,7 +12,8 @@ function CssSelector (options) {
 
 	// defaults
 	this.ignoredTags = ['font', 'b', 'i', 's'];
-	this.parent = document;
+	this.parent = options.document
+	this.document = options.document
 	this.ignoredClassBase = false;
 	this.enableResultStripping = true;
 	this.enableSmartTableSelector = false;
@@ -25,13 +26,6 @@ function CssSelector (options) {
 	// overrides defaults with options
 	for (var i in options) {
 		this[i] = options[i];
-	}
-
-	// jquery parent selector fix
-	if (this.query === window.jQuery) {
-		this.query = function (selector) {
-			return jQuery(me.parent).find(selector);
-		};
 	}
 };
 
@@ -353,7 +347,7 @@ CssSelector.prototype = {
 			if (element === this.parent) {
 				break;
 			}
-			else if (element === undefined || element === document) {
+			else if (element === undefined || element === this.document) {
 				throw 'element is not a child of the given parent';
 			}
 			if (this.isIgnoredTag(element.tagName)) {
@@ -369,7 +363,7 @@ CssSelector.prototype = {
 
 			var selector = new ElementSelector(element, this.ignoredClasses);
 			// document does not have a tagName
-			if(element.parentNode === document || this.isIgnoredTag(element.parentNode.tagName)) {
+			if(element.parentNode === this.document || this.isIgnoredTag(element.parentNode.tagName)) {
 				selector.isDirectChild = false;
 			}
 

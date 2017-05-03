@@ -1,11 +1,13 @@
 /**
  * Element selector. Uses jQuery as base and adds some more features
+ * @param CSSSelector
  * @param parentElement
- * @param selector
+ * @param options
  */
-var ElementQuery = function (CSSSelector, parentElement) {
+var ElementQuery = function (CSSSelector, parentElement, options) {
   CSSSelector = CSSSelector || ''
-
+  this.$ = options.$
+  if (!this.$) throw new Error('Missing jquery for ElementQuery')
   var selectedElements = []
 
   var addElement = function (element) {
@@ -15,14 +17,15 @@ var ElementQuery = function (CSSSelector, parentElement) {
   }
 
   var selectorParts = ElementQuery.getSelectorParts(CSSSelector)
+  var self = this
   selectorParts.forEach(function (selector) {
 		// handle special case when parent is selected
     if (selector === '_parent_') {
-      $(parentElement).each(function (i, element) {
+      self.$(parentElement).each(function (i, element) {
         addElement(element)
       })
     }		else {
-      var elements = $(selector, $(parentElement))
+      var elements = self.$(selector, self.$(parentElement))
       elements.each(function (i, element) {
         addElement(element)
       })

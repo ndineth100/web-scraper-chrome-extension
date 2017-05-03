@@ -22,6 +22,7 @@ var SelectorLink = {
   },
   _getData: function (parentElement) {
     var elements = this.getDataElements(parentElement)
+    var self = this
 
     var dfd = jquery.Deferred()
 
@@ -35,12 +36,12 @@ var SelectorLink = {
 
 		// extract links one by one
     var deferredDataExtractionCalls = []
-    $(elements).each(function (k, element) {
+    self.$(elements).each(function (k, element) {
       deferredDataExtractionCalls.push(function (element) {
         var deferredData = jquery.Deferred()
 
         var data = {}
-        data[this.id] = $(element).text()
+        data[this.id] = self.$(element).text()
         data._followSelectorId = this.id
         data[this.id + '-href'] = element.href
         data._follow = element.href
