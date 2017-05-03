@@ -1,9 +1,12 @@
 var Selector = require('../../../extension/scripts/Selector')
 const utils = require('./../../utils')
 const assert = require('chai').assert
+const globals = require('../../globals')
 
 describe('HTML Selector', function () {
+  let $
   beforeEach(function () {
+    $ = globals.$
     document.body.innerHTML = utils.getTestHTML()
   })
 
@@ -13,7 +16,7 @@ describe('HTML Selector', function () {
       type: 'SelectorHTML',
       multiple: false,
       selector: 'div'
-    })
+    }, {$})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-html-single-html')[0])
     dataDeferred.then(function (data) {
       assert.equal(data.length, 1)
@@ -33,7 +36,7 @@ describe('HTML Selector', function () {
       type: 'SelectorHTML',
       multiple: true,
       selector: 'div'
-    })
+    }, {$})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-html-multiple-html')[0])
     dataDeferred.then(function (data) {
       assert.equal(data.length, 2)
@@ -56,7 +59,7 @@ describe('HTML Selector', function () {
       type: 'SelectorHTML',
       multiple: false,
       selector: 'div'
-    })
+    }, {$})
     console.log(document.querySelectorAll('#selector-html-single-not-exist'))
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-html-single-not-exist')[0])
     dataDeferred.then(function (data) {
@@ -78,7 +81,7 @@ describe('HTML Selector', function () {
       multiple: false,
       selector: 'div',
       regex: 'wontmatch'
-    })
+    }, {$})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-html-single-html')[0])
     dataDeferred.then(function (data) {
       assert.equal(data.length, 1)
@@ -99,7 +102,7 @@ describe('HTML Selector', function () {
       multiple: false,
       selector: 'div',
       regex: '<b>\\w+'
-    })
+    }, {$})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-html-single-html')[0])
     dataDeferred.then(function (data) {
       assert.equal(data.length, 1)
@@ -119,7 +122,7 @@ describe('HTML Selector', function () {
       type: 'SelectorHTML',
       multiple: true,
       selector: 'div'
-    })
+    }, {$})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, ['id'])

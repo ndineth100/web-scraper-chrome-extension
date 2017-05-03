@@ -21,13 +21,13 @@ var SelectorHTML = {
   },
   _getData: function (parentElement) {
     var dfd = jquery.Deferred()
-
+    var self = this
     var elements = this.getDataElements(parentElement)
 
     var result = []
-    $(elements).each(function (k, element) {
+    self.$(elements).each(function (k, element) {
       var data = {}
-      var html = $(element).html()
+      var html = self.$(element).html()
 
       if (this.regex !== undefined && this.regex.length) {
         var matches = html.match(new RegExp(this.regex))

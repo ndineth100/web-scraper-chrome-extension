@@ -24,7 +24,8 @@ var SelectorElementClick = {
   },
 
   getClickElements: function (parentElement) {
-    var clickElements = ElementQuery(this.clickElementSelector, parentElement)
+    var $ = this.$
+    var clickElements = ElementQuery(this.clickElementSelector, parentElement, {$})
     return clickElements
   },
 
@@ -33,13 +34,13 @@ var SelectorElementClick = {
 	 * @param element
 	 */
   isElementInHTML: function (element) {
-    return $(element).closest('html').length !== 0
+    return this.$(element).closest('html').length !== 0
   },
 
   triggerButtonClick: function (clickElement) {
     var cs = new CssSelector({
       enableSmartTableSelector: false,
-      parent: $('body')[0],
+      parent: this.$('body')[0],
       enableResultStripping: false
     })
     var cssSelector = cs.getCssSelector([clickElement])
@@ -64,11 +65,12 @@ var SelectorElementClick = {
   },
 
   _getData: function (parentElement) {
+    var $ = this.$
     var delay = parseInt(this.delay) || 0
     var deferredResponse = jquery.Deferred()
-    var foundElements = new UniqueElementList('uniqueText')
+    var foundElements = new UniqueElementList('uniqueText', {$})
     var clickElements = this.getClickElements(parentElement)
-    var doneClickingElements = new UniqueElementList(this.getClickElementUniquenessType())
+    var doneClickingElements = new UniqueElementList(this.getClickElementUniquenessType(), {$})
 
 		// add elements that are available before clicking
     var elements = this.getDataElements(parentElement)
@@ -76,7 +78,7 @@ var SelectorElementClick = {
 
 		// discard initial elements
     if (this.discardInitialElements) {
-      foundElements = new UniqueElementList('uniqueText')
+      foundElements = new UniqueElementList('uniqueText', {$})
     }
 
 		// no elements to click at the beginning

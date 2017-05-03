@@ -1,11 +1,13 @@
 const ElementQuery = require('../../extension/scripts/ElementQuery')
 const assert = require('chai').assert
 const utils = require('./../utils')
+const globals = require('../globals')
 
 describe('ElementQuery', function () {
   var $el
-
+  let $
   beforeEach(function () {
+    $ = globals.$
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
     document.body.appendChild($el)
@@ -14,7 +16,7 @@ describe('ElementQuery', function () {
   it('should be able to select elements', function () {
     $el.innerHTML = '<a></a><span></span>'
 
-    var selectedElements = ElementQuery('a, span', $el)
+    var selectedElements = ElementQuery('a, span', $el, {$})
     var expectedElements = Array.from($el.querySelectorAll('a, span'))
 
     assert.deepEqual(selectedElements.sort(), expectedElements)
@@ -23,7 +25,7 @@ describe('ElementQuery', function () {
   it('should be able to select parent', function () {
     $el.innerHTML = '<a></a><span></span>'
 
-    var selectedElements = ElementQuery('a, span, _parent_', $el)
+    var selectedElements = ElementQuery('a, span, _parent_', $el, {$})
     var expectedElements = Array.from($el.querySelectorAll('a, span'))
     expectedElements.push($el)
 
@@ -33,7 +35,7 @@ describe('ElementQuery', function () {
   it('should should not return duplicates', function () {
     $el.innerHTML = '<a></a><span></span>'
 
-    var selectedElements = ElementQuery('*, a, span, _parent_', $el)
+    var selectedElements = ElementQuery('*, a, span, _parent_', $el, {$})
     var expectedElements = Array.from($el.querySelectorAll('a, span'))
     expectedElements.push($el)
 
@@ -44,7 +46,7 @@ describe('ElementQuery', function () {
   it('should be able to select parent when parent there are multiple parents', function () {
     $el.innerHTML = '<span></span><span></span>'
 
-    var selectedElements = ElementQuery('_parent_', $el.querySelectorAll('span'))
+    var selectedElements = ElementQuery('_parent_', $el.querySelectorAll('span'), {$})
     var expectedElements = Array.from($el.querySelectorAll('span'))
 
     assert.deepEqual(selectedElements.length, 2)
@@ -54,7 +56,7 @@ describe('ElementQuery', function () {
   it('should be able to select element with a comma ,', function () {
     $el.innerHTML = '<span>,</span>'
 
-    var selectedElements = ElementQuery(":contains(',')", $el)
+    var selectedElements = ElementQuery(":contains(',')", $el, {$})
     var expectedElements = Array.from($el.querySelectorAll('span'))
 
     assert.deepEqual(selectedElements.length, 1)

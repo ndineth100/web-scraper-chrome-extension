@@ -1,6 +1,8 @@
 var Selector = require('./Selector')
 var SelectorList = require('./SelectorList')
-var Sitemap = function (sitemapObj) {
+var Sitemap = function (sitemapObj, options) {
+  this.$ = options.$
+  if (!options.$) throw new Error('Missing jquery')
   this.initData(sitemapObj)
 }
 
@@ -15,7 +17,7 @@ Sitemap.prototype = {
     console.log(this)
 
     var selectors = this.selectors
-    this.selectors = new SelectorList(this.selectors)
+    this.selectors = new SelectorList(this.selectors, {$: this.$})
   },
 
 	/**
@@ -109,7 +111,7 @@ Sitemap.prototype = {
   updateSelector: function (selector, selectorData) {
 		// selector is undefined when creating a new one
     if (selector === undefined) {
-      selector = new Selector(selectorData)
+      selector = new Selector(selectorData, {$: this.$})
     }
 
 		// update child selectors

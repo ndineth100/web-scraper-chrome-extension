@@ -2,7 +2,10 @@ var selectors = require('./Selectors')
 var ElementQuery = require('./ElementQuery')
 var jquery = require('jquery-deferred')
 
-var Selector = function (selector) {
+var Selector = function (selector, options) {
+  this.$ = options.$
+  if (!options.$) throw new Error('Missing jquery')
+
   this.updateData(selector)
   this.initType()
 }
@@ -87,7 +90,8 @@ Selector.prototype = {
   },
 
   getDataElements: function (parentElement) {
-    var elements = ElementQuery(this.selector, parentElement)
+    var $ = this.$
+    var elements = ElementQuery(this.selector, parentElement, {$})
     if (this.multiple) {
       return elements
     } else if (elements.length > 0) {

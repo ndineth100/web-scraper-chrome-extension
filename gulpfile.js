@@ -26,7 +26,6 @@ gulp.task('build', () => generateBuilder(false))
 
 gulp.task('default', ['build:watch'])
 
-
 function generateBuilder (isWatch) {
   const wrapper = isWatch ? watchify : (x) => x
   const bundlerBackground = wrapper(browserify({

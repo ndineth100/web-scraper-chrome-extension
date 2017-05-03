@@ -21,6 +21,7 @@ var SelectorPopupLink = {
     return false
   },
   _getData: function (parentElement) {
+    var $ = this.$
     var elements = this.getDataElements(parentElement)
 
     var dfd = jquery.Deferred()
@@ -71,7 +72,8 @@ var SelectorPopupLink = {
 	 * @returns $.Deferred()
 	 */
   getPopupURL: function (element) {
-		// override window.open function. we need to execute this in page scope.
+    var $ = this.$
+    // override window.open function. we need to execute this in page scope.
 		// we need to know how to find this element from page scope.
     var cs = new CssSelector({
       enableSmartTableSelector: false,

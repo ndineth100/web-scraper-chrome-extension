@@ -1,10 +1,13 @@
 var Selector = require('../../../extension/scripts/Selector')
 const utils = require('./../../utils')
 const assert = require('chai').assert
+const globals = require('../../globals')
 
 describe('Text Selector', function () {
+  let $
   beforeEach(function () {
     document.body.innerHTML = utils.getTestHTML()
+    $ = globals.$
   })
 
   it('should extract single text record', function (done) {
@@ -13,7 +16,7 @@ describe('Text Selector', function () {
       type: 'SelectorText',
       multiple: false,
       selector: 'div'
-    })
+    }, {$})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-single-text')[0])
     dataDeferred.then(function (data) {
       var expected = [
@@ -32,7 +35,7 @@ describe('Text Selector', function () {
       type: 'SelectorText',
       multiple: true,
       selector: 'div'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-multiple-text')[0])
     dataDeferred.then(function (data) {
@@ -55,7 +58,7 @@ describe('Text Selector', function () {
       type: 'SelectorText',
       multiple: false,
       selector: 'div'
-    })
+    }, {$})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-single-not-exist')[0])
     dataDeferred.then(function (data) {
       var expected = [
@@ -75,7 +78,7 @@ describe('Text Selector', function () {
       multiple: false,
       selector: 'div',
       regex: 'wontmatch'
-    })
+    }, {$})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-single-regex')[0])
     dataDeferred.then(function (data) {
       var expected = [
@@ -95,7 +98,7 @@ describe('Text Selector', function () {
       multiple: false,
       selector: 'div',
       regex: '\\d+'
-    })
+    }, {$})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-single-regex')[0])
     dataDeferred.then(function (data) {
       var expected = [
@@ -114,7 +117,7 @@ describe('Text Selector', function () {
       type: 'SelectorText',
       multiple: true,
       selector: 'div'
-    })
+    }, {$})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, ['id'])
@@ -126,7 +129,7 @@ describe('Text Selector', function () {
       type: 'SelectorText',
       multiple: false,
       selector: 'div'
-    })
+    }, {$})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-ignore-script')[0])
     dataDeferred.then(function (data) {
       var expected = [
@@ -145,7 +148,7 @@ describe('Text Selector', function () {
       type: 'SelectorText',
       multiple: false,
       selector: 'p'
-    })
+    }, {$})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-newlines')[0])
     dataDeferred.then(function (data) {
       var expected = [

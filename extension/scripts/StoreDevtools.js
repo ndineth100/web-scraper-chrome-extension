@@ -5,8 +5,9 @@ var Sitemap = require('./Sitemap')
  * handled through Background page. StoreDevtools is a simply a proxy store
  * @constructor
  */
-var StoreDevtools = function () {
-
+var StoreDevtools = function (options) {
+  this.$ = options.$
+  if (!this.$) throw new Error('jquery required')
 }
 
 StoreDevtools.prototype = {
@@ -34,6 +35,7 @@ StoreDevtools.prototype = {
     })
   },
   getAllSitemaps: function (callback) {
+    var $ = this.$
     var request = {
       getAllSitemaps: true
     }
@@ -42,7 +44,7 @@ StoreDevtools.prototype = {
       var sitemaps = []
 
       for (var i in response) {
-        sitemaps.push(new Sitemap(response[i]))
+        sitemaps.push(new Sitemap(response[i], {$}))
       }
       callback(sitemaps)
     })

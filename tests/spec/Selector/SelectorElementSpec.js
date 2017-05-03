@@ -1,9 +1,12 @@
 var Selector = require('../../../extension/scripts/Selector')
 const utils = require('./../../utils')
 const assert = require('chai').assert
+const globals = require('../../globals')
 
 describe('Element Selector', function () {
+  let $
   beforeEach(function () {
+    $ = globals.$
     document.body.innerHTML = utils.getTestHTML()
   })
 
@@ -13,7 +16,7 @@ describe('Element Selector', function () {
       type: 'SelectorElement',
       multiple: false,
       selector: 'div'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-element-nodata')[0])
     dataDeferred.then(function (data) {
@@ -29,7 +32,7 @@ describe('Element Selector', function () {
       type: 'SelectorElement',
       multiple: true,
       selector: 'div'
-    })
+    }, {$})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-element-nodata')[0])
     dataDeferred.then(function (data) {
       assert.equal(data.length, 2)
@@ -44,7 +47,7 @@ describe('Element Selector', function () {
       type: 'SelectorElement',
       multiple: true,
       selector: 'div'
-    })
+    }, {$})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, [])

@@ -37,7 +37,7 @@ module.exports = function (config) {
     browserify: {
       debug: true,
       transform: [
-        ['babelify', {plugins: 'babel-plugin-meaningful-logs'}]
+        ['babelify', {ignore: /\/node_modules\//, plugins: 'babel-plugin-meaningful-logs'}]
       ]
     },
 
@@ -60,8 +60,8 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
 
     browserConsoleLogOptions: {
-      terminal: false,
-      level: ''
+      terminal: true,
+      level: 'error'
     },
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher

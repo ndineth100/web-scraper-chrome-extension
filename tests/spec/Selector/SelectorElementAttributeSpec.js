@@ -1,10 +1,14 @@
 const Selector = require('../../../extension/scripts/Selector')
 const utils = require('./../../utils')
 const assert = require('chai').assert
+const globals = require('../../globals')
+
 describe('Element Attribute Selector', function () {
   var $el
+  let $
 
   beforeEach(function () {
+    $ = globals.$
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
     document.body.appendChild($el)
@@ -17,7 +21,7 @@ describe('Element Attribute Selector', function () {
       multiple: false,
       extractAttribute: 'src',
       selector: 'img'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData(document.querySelector('#selector-image-one-image'))
     dataDeferred.then(function (data) {
@@ -37,7 +41,7 @@ describe('Element Attribute Selector', function () {
       multiple: true,
       extractAttribute: 'src',
       selector: 'img'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData(document.querySelector('#selector-image-multiple-images'))
 
@@ -60,7 +64,7 @@ describe('Element Attribute Selector', function () {
       type: 'SelectorElementAttribute',
       multiple: true,
       selector: 'img'
-    })
+    }, {$})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, ['id'])
@@ -73,7 +77,7 @@ describe('Element Attribute Selector', function () {
       multiple: true,
       selector: 'img.not-exist',
       extractAttribute: 'src'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData(document.querySelector('#not-exist'))
 
@@ -93,7 +97,7 @@ describe('Element Attribute Selector', function () {
       multiple: true,
       selector: 'li',
       extractAttribute: 'data-type'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData($el)
 

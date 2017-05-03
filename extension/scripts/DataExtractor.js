@@ -3,11 +3,16 @@ var Sitemap = require('./Sitemap')
 var whenCallSequentially = require('../assets/jquery.whencallsequentially')
 var jquery = require('jquery-deferred')
 
-var DataExtractor = function (options) {
+var DataExtractor = function (options, moreOptions) {
+  this.$ = moreOptions.$
+  if (!moreOptions.$) {
+    throw new Error('Missing jquery in Data Extractor')
+  }
+  var $ = this.$
   if (options.sitemap instanceof Sitemap) {
     this.sitemap = options.sitemap
   } else {
-    this.sitemap = new Sitemap(options.sitemap)
+    this.sitemap = new Sitemap(options.sitemap, {$})
   }
 
   this.parentSelectorId = options.parentSelectorId
@@ -21,7 +26,7 @@ DataExtractor.prototype = {
 	 * Two side by side type=multiple selectors split trees.
 	 */
   findSelectorTrees: function () {
-    return this._findSelectorTrees(this.parentSelectorId, new SelectorList())
+    return this._findSelectorTrees(this.parentSelectorId, new SelectorList(null, {$: this.$}))
   },
 
 	/**
@@ -260,7 +265,9 @@ DataExtractor.prototype = {
     return responseDeferred
   },
 
-  getSingleSelectorData: function (parentSelectorIds, selectorId) {
+  getSingleSelectorData: function (parentSelectorIds, selectorId, options) {
+    this.$ = options.$
+    if (!options.$) throw new Error('Missing jquery')
 		// to fetch only single selectors data we will create a sitemap that only contains this selector, his
 		// parents and all child selectors
     var sitemap = this.sitemap
@@ -280,7 +287,7 @@ DataExtractor.prototype = {
 		// merge all needed selectors together
     var selectors = parentSelectors.concat(childSelectors)
     selectors.push(selector)
-    sitemap.selectors = new SelectorList(selectors)
+    sitemap.selectors = new SelectorList(selectors, {$: this.$})
 
     var parentSelectorId
 		// find the parent that leaded to the page where required selector is being used

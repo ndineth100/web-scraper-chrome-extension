@@ -3,7 +3,7 @@ var whenCallSequentially = require('../assets/jquery.whencallsequentially')
 var Base64 = require('../assets/base64')
 var Job = require('./Job')
 
-var Scraper = function (options) {
+var Scraper = function (options, moreOptions) {
   this.queue = options.queue
   this.sitemap = options.sitemap
   this.store = options.store
@@ -11,6 +11,8 @@ var Scraper = function (options) {
   this.resultWriter = null // db instance for scraped data writing
   this.requestInterval = parseInt(options.requestInterval)
   this.pageLoadDelay = parseInt(options.pageLoadDelay)
+  this.$ = moreOptions.$
+  if (!moreOptions.$) throw new Error('Missing jquery')
 }
 
 Scraper.prototype = {

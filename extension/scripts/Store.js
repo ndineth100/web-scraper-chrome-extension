@@ -1,8 +1,9 @@
 var Sitemap = require('./Sitemap')
 
-var Store = function (config) {
+var Store = function (config, options) {
   this.config = config
-
+  this.$ = options.$
+  if (!this.$) throw new Error('jquery required')
     // configure couchdb
   this.sitemapDb = new PouchDB(this.config.sitemapDb)
 }
@@ -87,12 +88,13 @@ Store.prototype = {
     }.bind(this))
   },
   getAllSitemaps: function (callback) {
+    var $ = this.$
     this.sitemapDb.allDocs({include_docs: true}, function (err, response) {
       var sitemaps = []
       for (var i in response.rows) {
         var sitemap = response.rows[i].doc
         if (!chrome.extension) {
-          sitemap = new Sitemap(sitemap)
+          sitemap = new Sitemap(sitemap, {$})
         }
 
         sitemaps.push(sitemap)

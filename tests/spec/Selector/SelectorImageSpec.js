@@ -2,10 +2,13 @@ const Selector = require('../../../extension/scripts/Selector')
 const SelectorImage = require('../../../extension/scripts/Selector/SelectorImage')
 const utils = require('./../../utils')
 const assert = require('chai').assert
+const globals = require('../../globals')
 
 describe('Image Selector', function () {
+  let $
   var $el
   beforeEach(function () {
+    $ = globals.$
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
     document.body.appendChild($el)
@@ -17,7 +20,7 @@ describe('Image Selector', function () {
       type: 'SelectorImage',
       multiple: false,
       selector: 'img'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-image-one-image')[0])
     dataDeferred.then(function (data) {
@@ -38,7 +41,7 @@ describe('Image Selector', function () {
       type: 'SelectorImage',
       multiple: true,
       selector: 'img'
-    })
+    }, {$})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-image-multiple-images')[0])
     dataDeferred.then(function (data) {
       assert.equal(data.length, 2)
@@ -61,7 +64,7 @@ describe('Image Selector', function () {
       type: 'SelectorImage',
       multiple: true,
       selector: 'img'
-    })
+    }, {$})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, ['id-src'])
@@ -73,7 +76,7 @@ describe('Image Selector', function () {
       type: 'SelectorImage',
       multiple: true,
       selector: 'img.not-exist'
-    })
+    }, {$})
     var dataDeferred = selector.getData(document.querySelectorAll('#not-exist')[0])
     dataDeferred.then(function (data) {
       assert.equal(data.length, 0)
@@ -101,7 +104,7 @@ describe('Image Selector', function () {
       multiple: true,
       selector: 'img',
       downloadImage: true
-    })
+    }, {$})
 
     console.log($el.innerHTML)
     var dataDeferred = selector.getData($el)

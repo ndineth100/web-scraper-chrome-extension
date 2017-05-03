@@ -1,10 +1,13 @@
 var Selector = require('../../../extension/scripts/Selector')
 const utils = require('./../../utils')
 const assert = require('chai').assert
+const globals = require('../../globals')
 
 describe('Group Selector', function () {
+  let $
   beforeEach(function () {
     document.body.innerHTML = utils.getTestHTML()
+    $ = globals.$
   })
 
   it('should extract text data', function (done) {
@@ -13,7 +16,7 @@ describe('Group Selector', function () {
       type: 'SelectorGroup',
       multiple: false,
       selector: 'div'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-group-text')[0])
     dataDeferred.then(function (data) {
@@ -42,7 +45,7 @@ describe('Group Selector', function () {
       multiple: false,
       selector: 'a',
       extractAttribute: 'href'
-    })
+    }, {$})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-group-url')[0])
     dataDeferred.then(function (data) {
       assert.equal(data.length, 1)
@@ -71,7 +74,7 @@ describe('Group Selector', function () {
       type: 'SelectorGroup',
       multiple: true,
       selector: 'div'
-    })
+    }, {$})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, ['id'])

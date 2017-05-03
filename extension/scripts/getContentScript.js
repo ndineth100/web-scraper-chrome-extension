@@ -3,7 +3,7 @@ var ContentScript = require('./ContentScript')
 /**
  *
  * @param location	configure from where the content script is being accessed (ContentScript, BackgroundPage, DevTools)
- * @param backgroundScript	BackgroundScript client
+ * @param options
  * @returns ContentScript
  */
 var getContentScript = function (location) {

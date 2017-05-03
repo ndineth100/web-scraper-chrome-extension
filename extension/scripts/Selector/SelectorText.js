@@ -20,6 +20,7 @@ var SelectorText = {
     return false
   },
   _getData: function (parentElement) {
+    var $ = this.$
     var dfd = jquery.Deferred()
 
     var elements = this.getDataElements(parentElement)

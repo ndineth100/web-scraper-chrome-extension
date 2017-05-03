@@ -1,11 +1,14 @@
 var Selector = require('../../../extension/scripts/Selector')
 const utils = require('./../../utils')
 const assert = require('chai').assert
+const globals = require('../../globals')
 
 describe('Popup link Selector', function () {
   var $el
+  let $
 
   beforeEach(function () {
+    $ = globals.$
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
     document.body.appendChild($el)
@@ -19,7 +22,7 @@ describe('Popup link Selector', function () {
       type: 'SelectorPopupLink',
       multiple: false,
       selector: 'a'
-    })
+    }, {$})
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       var expected = [{
@@ -41,7 +44,7 @@ describe('Popup link Selector', function () {
       type: 'SelectorPopupLink',
       multiple: true,
       selector: 'a'
-    })
+    }, {$})
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       var expected = [
@@ -69,7 +72,7 @@ describe('Popup link Selector', function () {
       type: 'SelectorPopupLink',
       multiple: true,
       selector: 'div'
-    })
+    }, {$})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, ['id', 'id-href'])
@@ -81,7 +84,7 @@ describe('Popup link Selector', function () {
       type: 'SelectorPopupLink',
       multiple: true,
       selector: 'a'
-    })
+    }, {$})
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       var expected = []
@@ -94,7 +97,7 @@ describe('Popup link Selector', function () {
     $el.innerHTML = "<a onclick=\"setTimeout(function(){window.open('http://example.com/');},100)\"></a>"
     var selector = new Selector({
       type: 'SelectorPopupLink'
-    })
+    }, {$})
     var dataDeferred = selector.getPopupURL($el.querySelectorAll('a')[0])
     dataDeferred.then(function (data) {
       var expected = 'http://example.com/'
@@ -112,7 +115,7 @@ describe('Popup link Selector', function () {
     }))
     var selector = new Selector({
       type: 'SelectorPopupLink'
-    })
+    }, {$})
     var dataDeferred = selector.getPopupURL($el.querySelectorAll('a')[0])
     dataDeferred.then(function (data) {
       var expected = 'http://example.com/'
@@ -129,7 +132,7 @@ describe('Popup link Selector', function () {
       multiple: true,
       selector: 'a',
       clickPopup: true
-    })
+    }, {$})
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       var expected = [{

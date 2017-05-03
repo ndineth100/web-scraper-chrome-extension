@@ -9,5 +9,5 @@ $(function () {
   new SitemapController({
     store: store,
     templateDir: 'views/'
-  })
+  }, {$})
 })

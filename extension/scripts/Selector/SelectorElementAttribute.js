@@ -20,14 +20,14 @@ var SelectorElementAttribute = {
   },
   _getData: function (parentElement) {
     var dfd = jquery.Deferred()
-
+    var self = this
     var elements = this.getDataElements(parentElement)
 
     var result = []
-    $(elements).each(function (k, element) {
+    self.$(elements).each(function (k, element) {
       var data = {}
 
-      data[this.id] = $(element).attr(this.extractAttribute)
+      data[this.id] = self.$(element).attr(this.extractAttribute)
       result.push(data)
     }.bind(this))
 

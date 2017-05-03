@@ -2,12 +2,14 @@ const getContentScript = require('../../extension/scripts/getContentScript')
 const selectorMatchers = require('../Matchers')
 const utils = require('./../utils')
 const assert = require('chai').assert
-
+const globals = require('../globals')
 describe('ContentScript', function () {
   var contentScript = getContentScript('ContentScript')
   var $el
+  let $
 
   beforeEach(function () {
+    $ = globals.$
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
     document.body.appendChild($el)
@@ -18,7 +20,7 @@ describe('ContentScript', function () {
 
     var deferredHMTL = contentScript.getHTML({
       CSSSelector: 'div#content-script-html-selector-test'
-    })
+    }, {$})
     await selectorMatchers.deferredToEqual(deferredHMTL, '<div id="content-script-html-selector-test"></div>')
   })
 
@@ -29,7 +31,7 @@ describe('ContentScript', function () {
 
     var deferredHMTL = contentScript.getHTML({
       CSSSelector: 'div#content-script-html-selector-test'
-    })
+    }, {$})
     await selectorMatchers.deferredToEqual(deferredHMTL, '<div id="content-script-html-selector-test"></div>')
   })
 
@@ -40,7 +42,7 @@ describe('ContentScript', function () {
 
     var deferredHMTL = contentScript.getHTML({
       CSSSelector: 'div#content-script-html-selector-test'
-    })
+    }, {$})
 
     await selectorMatchers.deferredToEqual(deferredHMTL, '<div id="content-script-html-selector-test"></div>')
   })
@@ -52,7 +54,7 @@ describe('ContentScript', function () {
     var deferredCSSSelector = contentScript.selectSelector({
       parentCSSSelector: 'div#content-script-css-selector-test',
       allowedElements: 'a'
-    })
+    }, {$})
 
 		// click on the element that will be selected
     $el.querySelector('a.needed').click()
@@ -72,7 +74,7 @@ describe('ContentScript', function () {
     var deferredCSSSelector = contentScript.selectSelector({
       parentCSSSelector: 'div#content-script-css-selector-test',
       allowedElements: 'a'
-    })
+    }, {$})
 
 		// finish selection
     document.body.querySelector('#-selector-toolbar .done-selecting-button').click()
@@ -89,7 +91,7 @@ describe('ContentScript', function () {
     var deferredSelectorPreview = contentScript.previewSelector({
       parentCSSSelector: 'div#content-script-css-selector-test',
       elementCSSSelector: 'a'
-    })
+    }, {$})
 
     assert.equal($('.-sitemap-select-item-selected').length, 1)
     assert.isTrue(document.querySelector('#content-script-css-selector-test').classList.contains('-sitemap-parent'))

@@ -1,11 +1,13 @@
 var Selector = require('../../../extension/scripts/Selector')
 const utils = require('./../../utils')
 const assert = require('chai').assert
+const globals = require('../../globals')
 
 describe('Link Selector', function () {
   var $el
-
+  let $
   beforeEach(function () {
+    $ = globals.$
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
     document.body.appendChild($el)
@@ -17,7 +19,7 @@ describe('Link Selector', function () {
       type: 'SelectorLink',
       multiple: false,
       selector: 'a'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-follow')[0])
     dataDeferred.then(function (data) {
@@ -40,7 +42,7 @@ describe('Link Selector', function () {
       type: 'SelectorLink',
       multiple: true,
       selector: 'a'
-    })
+    }, {$})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-follow')[0])
     dataDeferred.then(function (data) {
       var expected = [
@@ -68,7 +70,7 @@ describe('Link Selector', function () {
       type: 'SelectorLink',
       multiple: true,
       selector: 'div'
-    })
+    }, {$})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, ['id', 'id-href'])
@@ -80,7 +82,7 @@ describe('Link Selector', function () {
       type: 'SelectorLink',
       multiple: true,
       selector: 'a'
-    })
+    }, {$})
     var dataDeferred = selector.getData(document.querySelectorAll('#not-exist')[0])
     dataDeferred.then(function (data) {
       var expected = []

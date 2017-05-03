@@ -6,14 +6,16 @@ const Sitemap = require('./../../extension/scripts/Sitemap')
 const FakeStore = require('./../FakeStore')
 const Scraper = require('./../../extension/scripts/Scraper')
 const utils = require('./../utils')
+const globals = require('../globals')
 process.on('unhandledRejection', function (err) {
   console.error(err)
 })
 
 describe('Scraper', function () {
-  var q, store, $el
+  var q, store, $el, $
 
   beforeEach(function () {
+    $ = globals.$
     q = new Queue()
     store = new FakeStore()
     document.body.innerHTML = utils.getTestHTML()
@@ -25,7 +27,6 @@ describe('Scraper', function () {
 
   it('should be able to scrape one page', function (done) {
     var b = document.querySelector('#scraper-test-one-page a')
-    console.error(1)
     console.log(b)
     var sitemap = new Sitemap({
       id: 'test',
@@ -41,7 +42,7 @@ describe('Scraper', function () {
           ]
         }
       ]
-    })
+    }, {$})
 
     var browser = new ChromePopupBrowser({
       pageLoadDelay: 100
@@ -52,7 +53,7 @@ describe('Scraper', function () {
       sitemap: sitemap,
       browser: browser,
       store: store
-    })
+    }, {$})
     s.run(function () {
       assert.deepEqual(store.data[0], {a: 'a'})
       done()
@@ -79,7 +80,7 @@ describe('Scraper', function () {
           'parentSelectors': ['link']
         }
       ]
-    })
+    }, {$})
 
     var browser = new ChromePopupBrowser({
       pageLoadDelay: 500
@@ -91,7 +92,7 @@ describe('Scraper', function () {
       browser: browser,
       store: store,
       delay: 0
-    })
+    }, {$})
 
     s.run(function () {
       assert.deepEqual(store.data, [
@@ -128,13 +129,13 @@ describe('Scraper', function () {
           'parentSelectors': ['link-w-children']
         }
       ]
-    })
+    }, {$})
 
     var s = new Scraper({
       queue: q,
       sitemap: sitemap,
       store: store
-    })
+    }, {$})
 
     var follow = s.recordCanHaveChildJobs({
       _follow: 'http://example.com/',
@@ -152,13 +153,13 @@ describe('Scraper', function () {
   it('should be able to create multiple start jobs', function () {
     var sitemap = new Sitemap({
       startUrl: 'http://test.lv/[1-100].html'
-    })
+    }, {$})
 
     var s = new Scraper({
       queue: q,
       sitemap: sitemap,
       store: store
-    })
+    }, {$})
 
     s.initFirstJobs()
     assert.equal(q.jobs.length, 100)
@@ -167,13 +168,13 @@ describe('Scraper', function () {
   it('should create multiple start jobs if multiple urls provided', function () {
     var sitemap = new Sitemap({
       startUrl: ['http://example.com/1', 'http://example.com/2', 'http://example.com/3']
-    })
+    }, {$})
 
     var s = new Scraper({
       queue: q,
       sitemap: sitemap,
       store: store
-    })
+    }, {$})
 
     s.initFirstJobs()
     assert.equal(q.jobs.length, 3)
@@ -213,11 +214,11 @@ describe('Scraper', function () {
 
     var sitemap = new Sitemap({
       id: 'test'
-    })
+    }, {$})
 
     var scraper = new Scraper({
       sitemap: sitemap
-    })
+    }, {$})
 
     var deferredSave = scraper.saveImages(record)
     var downloadAPICalled = false
@@ -255,7 +256,7 @@ describe('Scraper', function () {
           ]
         }
       ]
-    })
+    }, {$})
 
     var browser = new ChromePopupBrowser({
       pageLoadDelay: 500
@@ -266,7 +267,7 @@ describe('Scraper', function () {
       sitemap: sitemap,
       browser: browser,
       store: store
-    })
+    }, {$})
 
     var downloadAPICalled = false
     chrome.downloads.onChanged.addListener(function () {

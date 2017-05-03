@@ -2,12 +2,14 @@ const utils = require('./../utils')
 const assert = require('chai').assert
 const selectorMatchers = require('../Matchers')
 const ContentSelector = require('../../extension/scripts/ContentSelector')
-
+const globals = require('../globals')
 // This is to select elements
 describe('ContentSelector', function () {
   var $el
+  let $
 
   beforeEach(function () {
+    $ = globals.$
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
     document.body.appendChild($el)
@@ -25,7 +27,7 @@ describe('ContentSelector', function () {
     var contentSelector = new ContentSelector({
       parentCSSSelector: 'div#content-script-css-selector-test',
       allowedElements: 'a'
-    })
+    }, {$})
 
     var deferredCSSSelector = contentSelector.getCSSSelector()
 
@@ -46,7 +48,7 @@ describe('ContentSelector', function () {
     var contentSelector = new ContentSelector({
       parentCSSSelector: 'div#content-script-css-selector-test',
       allowedElements: 'a'
-    })
+    }, {$})
 
     var currentCSSSelector = contentSelector.getCurrentCSSSelector()
     assert.equal(currentCSSSelector, '')
@@ -68,7 +70,7 @@ describe('ContentSelector', function () {
     var contentSelector = new ContentSelector({
       parentCSSSelector: ' ',
       allowedElements: 'a'
-    })
+    }, {$})
 
 		// finish selection
     document.querySelector('#selector-toolbar .done-selecting-button').click()
@@ -81,7 +83,7 @@ describe('ContentSelector', function () {
       parentCSSSelector: 'div#content-script-css-selector-test',
       allowedElements: 'a',
       alert: function () {}
-    })
+    }, {$})
 
     var deferredCSSSelector = contentSelector.getCSSSelector()
     await selectorMatchers.deferredToFail(deferredCSSSelector)
@@ -92,9 +94,9 @@ describe('ContentSelector', function () {
 
     var contentSelector = new ContentSelector({
       parentCSSSelector: 'div#content-script-css-selector-test'
-    })
+    }, {$})
 
-    contentSelector.previewSelector('a')
+    contentSelector.previewSelector('a', {$})
 
     assert.equal(document.querySelectorAll('.-sitemap-select-item-selected').length, 1)
     assert.isTrue(document.querySelector('#content-script-css-selector-test').classList.contains('-sitemap-parent'))
@@ -111,9 +113,9 @@ describe('ContentSelector', function () {
     var contentSelector = new ContentSelector({
       parentCSSSelector: 'div#content-script-css-selector-test',
       alert: function () {}
-    })
+    }, {$})
 
-    var deferredSelectorPreview = contentSelector.previewSelector('a')
+    var deferredSelectorPreview = contentSelector.previewSelector('a', {$})
     await selectorMatchers.deferredToFail(deferredSelectorPreview)
 
     assert.equal(document.querySelectorAll('.-sitemap-select-item-selected').length, 0)

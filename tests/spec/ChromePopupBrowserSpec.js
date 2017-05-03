@@ -2,9 +2,11 @@ const ChromePopupBrowser = require('../../extension/scripts/ChromePopupBrowser')
 const Sitemap = require('../../extension/scripts/Sitemap')
 const assert = require('chai').assert
 const utils = require('./../utils')
-
+const globals = require('../globals')
 describe('Chrome popup browser', function () {
+  let $
   beforeEach(function () {
+    $ = globals.$
     window.chromeAPI.reset()
     document.body.innerHTML = utils.getTestHTML()
   })
@@ -40,7 +42,7 @@ describe('Chrome popup browser', function () {
           parentSelectors: ['_root']
         }
       ]
-    })
+    }, {$})
 
     var browser = new ChromePopupBrowser({
       pageLoadDelay: 500

@@ -1,11 +1,13 @@
 const Selector = require('../../../extension/scripts/Selector')
 const utils = require('./../../utils')
 const assert = require('chai').assert
+const globals = require('../../globals')
 
 describe('Click Element Selector', function () {
   var $el
-
+  var $
   beforeEach(function () {
+    $ = globals.$
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
     document.body.appendChild($el)
@@ -19,7 +21,7 @@ describe('Click Element Selector', function () {
       multiple: false,
       selector: 'div',
       clickType: 'clickOnce'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -36,7 +38,7 @@ describe('Click Element Selector', function () {
       multiple: true,
       selector: 'div',
       clickType: 'clickOnce'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -59,7 +61,7 @@ describe('Click Element Selector', function () {
       clickElementSelector: 'a',
       selector: 'div',
       clickType: 'clickOnce'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -87,7 +89,7 @@ describe('Click Element Selector', function () {
       selector: 'div',
       delay: 100,
       clickType: 'clickOnce'
-    })
+    }, {$})
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 1)
@@ -113,7 +115,7 @@ describe('Click Element Selector', function () {
       selector: 'div',
       delay: 100,
       clickType: 'clickOnce'
-    })
+    }, {$})
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 1)
@@ -128,7 +130,7 @@ describe('Click Element Selector', function () {
       type: 'SelectorElement',
       multiple: true,
       selector: 'div'
-    })
+    }, {$})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, [])
@@ -150,7 +152,7 @@ describe('Click Element Selector', function () {
       selector: 'div',
       delay: 100,
       clickType: 'clickOnce'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -184,7 +186,7 @@ describe('Click Element Selector', function () {
       selector: 'div',
       delay: 100,
       clickType: 'clickOnce'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -220,7 +222,7 @@ describe('Click Element Selector', function () {
       delay: 100,
       clickType: 'clickOnce',
       discardInitialElements: true
-    })
+    }, {$})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -255,7 +257,7 @@ describe('Click Element Selector', function () {
       selector: 'div',
       delay: 200,
       clickType: 'clickMore'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -292,7 +294,7 @@ describe('Click Element Selector', function () {
       selector: 'div',
       delay: 100,
       clickType: 'clickMore'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -327,7 +329,7 @@ describe('Click Element Selector', function () {
       delay: 100,
       clickType: 'clickMore',
       discardInitialElements: true
-    })
+    }, {$})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -359,7 +361,7 @@ describe('Click Element Selector', function () {
       selector: 'div',
       delay: 100,
       clickType: 'clickMore'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {

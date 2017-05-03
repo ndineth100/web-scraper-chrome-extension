@@ -1,11 +1,13 @@
 const Selector = require('./../../extension/scripts/Selector')
 const utils = require('./../utils')
 const assert = require('chai').assert
-
+const globals = require('../globals')
 describe('Selector', function () {
   var $el
+  let $
 
   beforeEach(function () {
+    $ = globals.$
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'>aaaaaaaaaaaa</div>")
     document.body.appendChild($el)
@@ -16,7 +18,7 @@ describe('Selector', function () {
     var selector = new Selector({
       selector: 'a',
       type: 'SelectorLink'
-    })
+    }, {$})
     var elements = selector.getDataElements($el)
 
     assert.deepEqual(elements, Object.values($el.querySelectorAll('a')))
@@ -27,7 +29,7 @@ describe('Selector', function () {
     var selector = new Selector({
       selector: '_parent_',
       type: 'SelectorLink'
-    })
+    }, {$})
     var elements = selector.getDataElements($el)
 
     assert.deepEqual(elements, [$el])
@@ -39,7 +41,7 @@ describe('Selector', function () {
       selector: 'a',
       type: 'SelectorText',
       delay: 100
-    })
+    }, {$})
     var dataDeferred = selector.getData($el)
 
 		// add data after data extraction called

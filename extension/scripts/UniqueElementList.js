@@ -5,7 +5,9 @@ var CssSelector = require('css-selector').CssSelector
  * Only Elements unique will be added to this array
  * @constructor
  */
-function UniqueElementList (clickElementUniquenessType) {
+function UniqueElementList (clickElementUniquenessType, options) {
+  this.$ = options.$
+  if (!this.$) throw new Error('jquery required')
   this.clickElementUniquenessType = clickElementUniquenessType
   this.addedElements = {}
 }
@@ -13,6 +15,7 @@ function UniqueElementList (clickElementUniquenessType) {
 UniqueElementList.prototype = []
 
 UniqueElementList.prototype.push = function (element) {
+  var $ = this.$
   if (this.isAdded(element)) {
     return false
   } else {
@@ -24,6 +27,7 @@ UniqueElementList.prototype.push = function (element) {
 }
 
 UniqueElementList.prototype.getElementUniqueId = function (element) {
+  var $ = this.$
   if (this.clickElementUniquenessType === 'uniqueText') {
     var elementText = $(element).text().trim()
     return elementText

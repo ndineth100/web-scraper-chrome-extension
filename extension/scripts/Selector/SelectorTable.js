@@ -22,6 +22,7 @@ var SelectorTable = {
   },
   getTableHeaderColumns: function ($table) {
     var columns = {}
+    var $ = this.$
     var headerRowSelector = this.getTableHeaderRowSelector()
     var $headerRow = $($table).find(headerRowSelector)
     if ($headerRow.length > 0) {
@@ -36,6 +37,7 @@ var SelectorTable = {
   },
   _getData: function (parentElement) {
     var dfd = jquery.Deferred()
+    var $ = this.$
 
     var tables = this.getDataElements(parentElement)
 
@@ -82,7 +84,8 @@ var SelectorTable = {
     return 'table'
   },
 
-  getTableHeaderRowSelectorFromTableHTML: function (html) {
+  getTableHeaderRowSelectorFromTableHTML: function (html, options = {}) {
+    var $ = options.$ || this.$
     var $table = $(html)
     if ($table.find('thead tr:has(td:not(:empty)), thead tr:has(th:not(:empty))').length) {
       if ($table.find('thead tr').length === 1) {
@@ -103,7 +106,8 @@ var SelectorTable = {
     }
   },
 
-  getTableDataRowSelectorFromTableHTML: function (html) {
+  getTableDataRowSelectorFromTableHTML: function (html, options = {}) {
+    var $ = options.$ || this.$
     var $table = $(html)
     if ($table.find('thead tr:has(td:not(:empty)), thead tr:has(th:not(:empty))').length) {
       return 'tbody tr'
@@ -139,7 +143,8 @@ var SelectorTable = {
 	 * Extract table header column info from html
 	 * @param html
 	 */
-  getTableHeaderColumnsFromHTML: function (headerRowSelector, html) {
+  getTableHeaderColumnsFromHTML: function (headerRowSelector, html, options = {}) {
+    var $ = options.$ || this.$
     var $table = $(html)
     var $headerRowColumns = $table.find(headerRowSelector).find('td,th')
 

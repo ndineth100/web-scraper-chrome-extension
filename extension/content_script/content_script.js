@@ -1,1 +1,3 @@
-chrome.runtime.onMessage.addListener(contentScraper)
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  contentScraper(request, sender, sendResponse, {$})
+})

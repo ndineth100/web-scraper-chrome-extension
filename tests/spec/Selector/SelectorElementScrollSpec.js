@@ -1,10 +1,13 @@
 var Selector = require('../../../extension/scripts/Selector')
 const utils = require('./../../utils')
 const assert = require('chai').assert
+const globals = require('../../globals')
 
 describe('Scroll Element Selector', function () {
   var $el
+  let $
   beforeEach(function () {
+    $ = globals.$
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
     document.body.appendChild($el)
@@ -17,7 +20,7 @@ describe('Scroll Element Selector', function () {
       type: 'SelectorElementScroll',
       multiple: false,
       selector: 'div'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -34,7 +37,7 @@ describe('Scroll Element Selector', function () {
       type: 'SelectorElementScroll',
       multiple: true,
       selector: 'div'
-    })
+    }, {$})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -52,7 +55,7 @@ describe('Scroll Element Selector', function () {
       multiple: true,
       selector: 'a',
       delay: 100
-    })
+    }, {$})
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 1)
@@ -74,7 +77,7 @@ describe('Scroll Element Selector', function () {
       multiple: true,
       selector: 'a',
       delay: 200
-    })
+    }, {$})
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 2)
@@ -88,7 +91,7 @@ describe('Scroll Element Selector', function () {
       type: 'SelectorElementScroll',
       multiple: true,
       selector: 'div'
-    })
+    }, {$})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, [])

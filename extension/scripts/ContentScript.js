@@ -10,7 +10,8 @@ var ContentScript = {
 	 * @param request.CSSSelector	css selector as string
 	 * @returns jquery.Deferred()
 	 */
-  getHTML: function (request) {
+  getHTML: function (request, options) {
+    var $ = options.$
     var deferredHTML = jquery.Deferred()
     var html = $(request.CSSSelector).clone().wrap('<p>').parent().html()
     deferredHTML.resolve(html)
@@ -40,14 +41,15 @@ var ContentScript = {
 	 * @param request.parentCSSSelector
 	 * @param request.allowedElements
 	 */
-  selectSelector: function (request) {
+  selectSelector: function (request, options) {
+    var $ = options.$
     var deferredResponse = jquery.Deferred()
 
     this.removeCurrentContentSelector().done(function () {
       var contentSelector = new ContentSelector({
         parentCSSSelector: request.parentCSSSelector,
         allowedElements: request.allowedElements
-      })
+      }, {$})
       window.cs = contentSelector
 
       var deferredCSSSelector = contentSelector.getCSSSelector()
@@ -70,12 +72,13 @@ var ContentScript = {
 	 * @param request.parentCSSSelector
 	 * @param request.elementCSSSelector
 	 */
-  previewSelector: function (request) {
+  previewSelector: function (request, options) {
+    var $ = options.$
     var deferredResponse = jquery.Deferred()
     this.removeCurrentContentSelector().done(function () {
       var contentSelector = new ContentSelector({
         parentCSSSelector: request.parentCSSSelector
-      })
+      }, {$})
       window.cs = contentSelector
 
       var deferredSelectorPreview = contentSelector.previewSelector(request.elementCSSSelector)
