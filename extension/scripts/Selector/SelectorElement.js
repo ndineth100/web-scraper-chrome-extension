@@ -20,7 +20,6 @@ var SelectorElement = {
   willReturnElements: function () {
     return true
   },
-
   _getData: function (parentElement) {
     var dfd = jquery.Deferred()
 

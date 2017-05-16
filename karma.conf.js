@@ -63,20 +63,9 @@ module.exports = function (config) {
       terminal: false,
       level: ''
     },
-    // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
-    watchify: {
-      poll: true
-    },
-    // https://stackoverflow.com/questions/23361550/karma-not-picking-the-changes-have-to-run-tests-twice/26407061
-    usePolling: true,
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     browsers: ['ChromeOutOfFocus'],
-
-    // Continuous Integration mode
-    // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false,
 
     // Concurrency level
     // how many browser should be started simultaneous
