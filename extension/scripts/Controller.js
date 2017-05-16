@@ -6,8 +6,6 @@ var Sitemap = require('./Sitemap')
 var getBackgroundScript = require('./getBackgroundScript')
 var getContentScript = require('./getContentScript')
 var SitemapController = function (options) {
-  this.$ = options.$
-  if (!this.$) throw new Error('Missing jquery in Controller')
   for (var i in options) {
     this[i] = options[i]
   }
@@ -24,7 +22,7 @@ SitemapController.prototype = {
 
     for (var selector in controls) {
       for (var event in controls[selector]) {
-        this.$(document).on(event, selector, (function (selector, event) {
+        $(document).on(event, selector, (function (selector, event) {
           return function () {
             var continueBubbling = controls[selector][event].call(controller, this)
             if (continueBubbling !== true) {
@@ -69,7 +67,7 @@ SitemapController.prototype = {
     }
 
     templateIds.forEach(function (templateId) {
-      this.$.get(this.templateDir + templateId + '.html', cbLoaded.bind(this, templateId))
+      $.get(this.templateDir + templateId + '.html', cbLoaded.bind(this, templateId))
     }.bind(this))
   },
 
@@ -82,7 +80,7 @@ SitemapController.prototype = {
       ich.Viewport().appendTo('body')
 
 			// cancel all form submits
-      this.$('form').bind('submit', function () {
+      $('form').bind('submit', function () {
         return false
       })
 
@@ -232,20 +230,20 @@ SitemapController.prototype = {
   },
 
   setActiveNavigationButton: function (navigationId) {
-    this.$('.nav .active').removeClass('active')
-    this.$('#' + navigationId + '-nav-button').closest('li').addClass('active')
+    $('.nav .active').removeClass('active')
+    $('#' + navigationId + '-nav-button').closest('li').addClass('active')
 
     if (navigationId.match(/^sitemap-/)) {
-      this.$('#sitemap-nav-button').removeClass('disabled')
-      this.$('#sitemap-nav-button').closest('li').addClass('active')
-      this.$('#navbar-active-sitemap-id').text('(' + this.state.currentSitemap._id + ')')
+      $('#sitemap-nav-button').removeClass('disabled')
+      $('#sitemap-nav-button').closest('li').addClass('active')
+      $('#navbar-active-sitemap-id').text('(' + this.state.currentSitemap._id + ')')
     }		else {
-      this.$('#sitemap-nav-button').addClass('disabled')
-      this.$('#navbar-active-sitemap-id').text('')
+      $('#sitemap-nav-button').addClass('disabled')
+      $('#navbar-active-sitemap-id').text('')
     }
 
     if (navigationId.match(/^create-sitemap-/)) {
-      this.$('#create-sitemap-nav-button').closest('li').addClass('active')
+      $('#create-sitemap-nav-button').closest('li').addClass('active')
     }
   },
 
@@ -253,7 +251,7 @@ SitemapController.prototype = {
 	 * Simple info popup for sitemap start url input field
 	 */
   initMultipleStartUrlHelper: function () {
-    this.$('#startUrl')
+    $('#startUrl')
 			.popover({
   title: 'Multiple start urls',
   html: true,
@@ -261,7 +259,7 @@ SitemapController.prototype = {
   placement: 'bottom'
 })
 			.blur(function () {
-  this.$(this).popover('hide')
+  $(this).popover('hide')
 })
   },
 
@@ -269,7 +267,7 @@ SitemapController.prototype = {
 	 * Returns bootstrapValidator object for current form in viewport
 	 */
   getFormValidator: function () {
-    var validator = this.$('#viewport form').data('bootstrapValidator')
+    var validator = $('#viewport form').data('bootstrapValidator')
     return validator
   },
 
@@ -294,7 +292,7 @@ SitemapController.prototype = {
 	 * Add validation to sitemap creation or editing form
 	 */
   initSitemapValidation: function () {
-    this.$('#viewport form').bootstrapValidator({
+    $('#viewport form').bootstrapValidator({
       fields: {
         '_id': {
           validators: {
@@ -335,7 +333,7 @@ SitemapController.prototype = {
   showCreateSitemap: function () {
     this.setActiveNavigationButton('create-sitemap-create')
     var sitemapForm = ich.SitemapCreate()
-    this.$('#viewport').html(sitemapForm)
+    $('#viewport').html(sitemapForm)
     this.initMultipleStartUrlHelper()
     this.initSitemapValidation()
 
@@ -343,7 +341,7 @@ SitemapController.prototype = {
   },
 
   initImportStiemapValidation: function () {
-    this.$('#viewport form').bootstrapValidator({
+    $('#viewport form').bootstrapValidator({
       fields: {
         '_id': {
           validators: {
@@ -389,7 +387,7 @@ SitemapController.prototype = {
   showImportSitemapPanel: function () {
     this.setActiveNavigationButton('create-sitemap-import')
     var sitemapForm = ich.SitemapImport()
-    this.$('#viewport').html(sitemapForm)
+    $('#viewport').html(sitemapForm)
     this.initImportStiemapValidation()
     return true
   },
@@ -401,7 +399,7 @@ SitemapController.prototype = {
     var sitemapExportForm = ich.SitemapExport({
       sitemapJSON: sitemapJSON
     })
-    this.$('#viewport').html(sitemapExportForm)
+    $('#viewport').html(sitemapExportForm)
     return true
   },
 
@@ -416,20 +414,20 @@ SitemapController.prototype = {
         $sitemap.data('sitemap', sitemap)
         $sitemapListPanel.find('tbody').append($sitemap)
       })
-      this.$('#viewport').html($sitemapListPanel)
+      $('#viewport').html($sitemapListPanel)
     })
   },
 
   getSitemapFromMetadataForm: function () {
-    var id = this.$('#viewport form input[name=_id]').val()
-    var $startUrlInputs = this.$('#viewport form .input-start-url')
+    var id = $('#viewport form input[name=_id]').val()
+    var $startUrlInputs = $('#viewport form .input-start-url')
     var startUrl
     if ($startUrlInputs.length === 1) {
       startUrl = $startUrlInputs.val()
     } else {
       startUrl = []
       $startUrlInputs.each(function (i, element) {
-        startUrl.push(this.$(element).val())
+        startUrl.push($(element).val())
       })
     }
 
@@ -472,8 +470,8 @@ SitemapController.prototype = {
     }
 
 		// load data from form
-    var sitemapJSON = this.$('[name=sitemapJSON]').val()
-    var id = this.$('input[name=_id]').val()
+    var sitemapJSON = $('[name=sitemapJSON]').val()
+    var id = $('input[name=_id]').val()
     var sitemap = new Sitemap()
     sitemap.importSitemap(sitemapJSON)
     if (id.length) {
@@ -497,7 +495,7 @@ SitemapController.prototype = {
 
     var sitemap = this.state.currentSitemap
     var $sitemapMetadataForm = ich.SitemapEditMetadata(sitemap)
-    this.$('#viewport').html($sitemapMetadataForm)
+    $('#viewport').html($sitemapMetadataForm)
     this.initMultipleStartUrlHelper()
     this.initSitemapValidation()
 
@@ -548,7 +546,7 @@ SitemapController.prototype = {
 	 * Callback when sitemap edit button is clicked in sitemap grid
 	 */
   editSitemap: function (tr) {
-    var sitemap = this.$(tr).data('sitemap')
+    var sitemap = $(tr).data('sitemap')
     this._editSitemap(sitemap)
   },
   _editSitemap: function (sitemap) {
@@ -573,7 +571,7 @@ SitemapController.prototype = {
       $selector.data('selector', selector)
       $selectorListPanel.find('tbody').append($selector)
     })
-    this.$('#viewport').html($selectorListPanel)
+    $('#viewport').html($selectorListPanel)
 
     return true
   }, /*
@@ -588,7 +586,7 @@ SitemapController.prototype = {
     return true
   }, */
   showChildSelectors: function (tr) {
-    var selector = this.$(tr).data('selector')
+    var selector = $(tr).data('selector')
     var parentSelectors = this.state.editSitemapBreadcumbsSelectors
     this.state.currentParentSelectorId = selector.id
     parentSelectors.push(selector)
@@ -599,7 +597,7 @@ SitemapController.prototype = {
   treeNavigationshowSitemapSelectorList: function (button) {
     var parentSelectors = this.state.editSitemapBreadcumbsSelectors
     var controller = this
-    this.$('#selector-tree .breadcrumb li a').each(function (i, parentSelectorButton) {
+    $('#selector-tree .breadcrumb li a').each(function (i, parentSelectorButton) {
       if (parentSelectorButton === button) {
         parentSelectors.splice(i + 1)
         controller.state.currentParentSelectorId = parentSelectors[i].id
@@ -609,7 +607,7 @@ SitemapController.prototype = {
   },
 
   initSelectorValidation: function () {
-    this.$('#viewport form').bootstrapValidator({
+    $('#viewport form').bootstrapValidator({
       fields: {
         'id': {
           validators: {
@@ -699,12 +697,12 @@ SitemapController.prototype = {
     })
   },
   editSelector: function (button) {
-    var selector = this.$(button).closest('tr').data('selector')
+    var selector = $(button).closest('tr').data('selector')
     this._editSelector(selector)
   },
   updateSelectorParentListOnIdChange: function () {
     var selector = this.getCurrentlyEditedSelector()
-    this.$('.currently-edited').val(selector.id).text(selector.id)
+    $('.currently-edited').val(selector.id).text(selector.id)
   },
   _editSelector: function (selector) {
     var sitemap = this.state.currentSitemap
@@ -760,12 +758,11 @@ SitemapController.prototype = {
         }
       ]
     })
-    this.$('#viewport').html($editSelectorForm)
+    $('#viewport').html($editSelectorForm)
 		// mark initially opened selector as currently edited
-    var self = this
-    this.$('#edit-selector #parentSelectors option').each(function (i, element) {
-      if (self.$(element).val() === selector.id) {
-        self.$(element).addClass('currently-edited')
+    $('#edit-selector #parentSelectors option').each(function (i, element) {
+      if ($(element).val() === selector.id) {
+        $(element).addClass('currently-edited')
       }
     })
 
@@ -789,25 +786,24 @@ SitemapController.prototype = {
     this.initSelectorValidation()
   },
   selectorTypeChanged: function () {
-    var type = this.$('#edit-selector select[name=type]').val()
+    var type = $('#edit-selector select[name=type]').val()
     var features = selectors[type].getFeatures()
-    this.$('#edit-selector .feature').hide()
-    var self = this
+    $('#edit-selector .feature').hide()
     features.forEach(function (feature) {
-      self.$('#edit-selector .feature-' + feature).show()
+      $('#edit-selector .feature-' + feature).show()
     })
 
 		// add this selector to possible parent selector
     var selector = this.getCurrentlyEditedSelector()
     if (selector.canHaveChildSelectors()) {
-      if (this.$('#edit-selector #parentSelectors .currently-edited').length === 0) {
-        var $option = this.$('<option class="currently-edited"></option>')
+      if ($('#edit-selector #parentSelectors .currently-edited').length === 0) {
+        var $option = $('<option class="currently-edited"></option>')
         $option.text(selector.id).val(selector.id)
-        this.$('#edit-selector #parentSelectors').append($option)
+        $('#edit-selector #parentSelectors').append($option)
       }
     } else {
 		// remove if type doesn't allow to have child selectors
-      this.$('#edit-selector #parentSelectors .currently-edited').remove()
+      $('#edit-selector #parentSelectors .currently-edited').remove()
     }
   },
   saveSelector: function (button) {
@@ -833,32 +829,31 @@ SitemapController.prototype = {
 	 * Get selector from selector editing form
 	 */
   getCurrentlyEditedSelector: function () {
-    var id = this.$('#edit-selector [name=id]').val()
-    var selectorsSelector = this.$('#edit-selector [name=selector]').val()
-    var tableDataRowSelector = this.$('#edit-selector [name=tableDataRowSelector]').val()
-    var tableHeaderRowSelector = this.$('#edit-selector [name=tableHeaderRowSelector]').val()
-    var clickElementSelector = this.$('#edit-selector [name=clickElementSelector]').val()
-    var type = this.$('#edit-selector [name=type]').val()
-    var clickElementUniquenessType = this.$('#edit-selector [name=clickElementUniquenessType]').val()
-    var clickType = this.$('#edit-selector [name=clickType]').val()
-    var discardInitialElements = this.$('#edit-selector [name=discardInitialElements]').is(':checked')
-    var multiple = this.$('#edit-selector [name=multiple]').is(':checked')
-    var downloadImage = this.$('#edit-selector [name=downloadImage]').is(':checked')
-    var clickPopup = this.$('#edit-selector [name=clickPopup]').is(':checked')
-    var regex = this.$('#edit-selector [name=regex]').val()
-    var delay = this.$('#edit-selector [name=delay]').val()
-    var extractAttribute = this.$('#edit-selector [name=extractAttribute]').val()
-    var parentSelectors = this.$('#edit-selector [name=parentSelectors]').val()
+    var id = $('#edit-selector [name=id]').val()
+    var selectorsSelector = $('#edit-selector [name=selector]').val()
+    var tableDataRowSelector = $('#edit-selector [name=tableDataRowSelector]').val()
+    var tableHeaderRowSelector = $('#edit-selector [name=tableHeaderRowSelector]').val()
+    var clickElementSelector = $('#edit-selector [name=clickElementSelector]').val()
+    var type = $('#edit-selector [name=type]').val()
+    var clickElementUniquenessType = $('#edit-selector [name=clickElementUniquenessType]').val()
+    var clickType = $('#edit-selector [name=clickType]').val()
+    var discardInitialElements = $('#edit-selector [name=discardInitialElements]').is(':checked')
+    var multiple = $('#edit-selector [name=multiple]').is(':checked')
+    var downloadImage = $('#edit-selector [name=downloadImage]').is(':checked')
+    var clickPopup = $('#edit-selector [name=clickPopup]').is(':checked')
+    var regex = $('#edit-selector [name=regex]').val()
+    var delay = $('#edit-selector [name=delay]').val()
+    var extractAttribute = $('#edit-selector [name=extractAttribute]').val()
+    var parentSelectors = $('#edit-selector [name=parentSelectors]').val()
     var columns = []
-    var $columnHeaders = this.$('#edit-selector .column-header')
-    var $columnNames = this.$('#edit-selector .column-name')
-    var $columnExtracts = this.$('#edit-selector .column-extract')
+    var $columnHeaders = $('#edit-selector .column-header')
+    var $columnNames = $('#edit-selector .column-name')
+    var $columnExtracts = $('#edit-selector .column-extract')
 
-    var self = this
     $columnHeaders.each(function (i) {
-      var header = self.$($columnHeaders[i]).val()
-      var name = self.$($columnNames[i]).val()
-      var extract = self.$($columnExtracts[i]).is(':checked')
+      var header = $($columnHeaders[i]).val()
+      var name = $($columnNames[i]).val()
+      var extract = $($columnExtracts[i]).is(':checked')
       columns.push({
         header: header,
         name: name,
@@ -917,7 +912,7 @@ SitemapController.prototype = {
   },
   deleteSelector: function (button) {
     var sitemap = this.state.currentSitemap
-    var selector = this.$(button).closest('tr').data('selector')
+    var selector = $(button).closest('tr').data('selector')
     sitemap.deleteSelector(selector)
 
     this.store.saveSitemap(sitemap, function () {
@@ -925,14 +920,14 @@ SitemapController.prototype = {
     }.bind(this))
   },
   deleteSitemap: function (button) {
-    var sitemap = this.$(button).closest('tr').data('sitemap')
+    var sitemap = $(button).closest('tr').data('sitemap')
     var controller = this
     this.store.deleteSitemap(sitemap, function () {
       controller.showSitemaps()
     })
   },
   initScrapeSitemapConfigValidation: function () {
-    this.$('#viewport form').bootstrapValidator({
+    $('#viewport form').bootstrapValidator({
       fields: {
         'requestInterval': {
           validators: {
@@ -972,7 +967,7 @@ SitemapController.prototype = {
   showScrapeSitemapConfigPanel: function () {
     this.setActiveNavigationButton('sitemap-scrape')
     var scrapeConfigPanel = ich.SitemapScrapeConfig()
-    this.$('#viewport').html(scrapeConfigPanel)
+    $('#viewport').html(scrapeConfigPanel)
     this.initScrapeSitemapConfigValidation()
     return true
   },
@@ -981,8 +976,8 @@ SitemapController.prototype = {
       return false
     }
 
-    var requestInterval = this.$('input[name=requestInterval]').val()
-    var pageLoadDelay = this.$('input[name=pageLoadDelay]').val()
+    var requestInterval = $('input[name=requestInterval]').val()
+    var pageLoadDelay = $('input[name=pageLoadDelay]').val()
 
     var sitemap = this.state.currentSitemap
     var request = {
@@ -994,9 +989,9 @@ SitemapController.prototype = {
 
 		// show sitemap scraping panel
     this.getFormValidator().destroy()
-    this.$('.scraping-in-progress').removeClass('hide')
-    this.$('#submit-scrape-sitemap').closest('.form-group').hide()
-    this.$('#scrape-sitemap-config input').prop('disabled', true)
+    $('.scraping-in-progress').removeClass('hide')
+    $('#submit-scrape-sitemap').closest('.form-group').hide()
+    $('#scrape-sitemap-config input').prop('disabled', true)
 
     chrome.runtime.sendMessage(request, function (response) {
       this.browseSitemapData()
@@ -1004,7 +999,7 @@ SitemapController.prototype = {
     return false
   },
   sitemapListBrowseSitemapData: function (button) {
-    var sitemap = this.$(button).closest('tr').data('sitemap')
+    var sitemap = $(button).closest('tr').data('sitemap')
     this.setStateEditSitemap(sitemap)
     this.browseSitemapData()
   },
@@ -1017,17 +1012,16 @@ SitemapController.prototype = {
       var dataPanel = ich.SitemapBrowseData({
         columns: dataColumns
       })
-      this.$('#viewport').html(dataPanel)
+      $('#viewport').html(dataPanel)
 
 			// display data
 			// Doing this the long way so there aren't xss vulnerubilites
 			// while working with data or with the selector titles
-      var $tbody = this.$('#sitemap-data tbody')
-      var self = this
+      var $tbody = $('#sitemap-data tbody')
       data.forEach(function (row) {
-        var $tr = self.$('<tr></tr>')
+        var $tr = $('<tr></tr>')
         dataColumns.forEach(function (column) {
-          var $td = self.$('<td></td>')
+          var $td = $('<td></td>')
           var cellData = row[column]
           if (typeof cellData === 'object') {
             cellData = JSON.stringify(cellData)
@@ -1047,22 +1041,22 @@ SitemapController.prototype = {
 
     var sitemap = this.state.currentSitemap
     var exportPanel = ich.SitemapExportDataCSV(sitemap)
-    this.$('#viewport').html(exportPanel)
+    $('#viewport').html(exportPanel)
 
 		// generate data
-    this.$('.download-button').hide()
+    $('.download-button').hide()
     this.store.getSitemapData(sitemap, function (data) {
       var blob = sitemap.getDataExportCsvBlob(data)
-      this.$('.download-button a').attr('href', window.URL.createObjectURL(blob))
-      this.$('.download-button a').attr('download', sitemap._id + '.csv')
-      this.$('.download-button').show()
+      $('.download-button a').attr('href', window.URL.createObjectURL(blob))
+      $('.download-button a').attr('download', sitemap._id + '.csv')
+      $('.download-button').show()
     })
 
     return true
   },
 
   selectSelector: function (button) {
-    var input = this.$(button).closest('.form-group').find('input.selector-value')
+    var input = $(button).closest('.form-group').find('input.selector-value')
     var sitemap = this.getCurrentlyEditedSelectorSitemap()
     var selector = this.getCurrentlyEditedSelector()
     var currentStateParentSelectorIds = this.getCurrentStateParentSelectorIds()
@@ -1074,7 +1068,7 @@ SitemapController.prototype = {
     })
 
     deferredSelector.done(function (result) {
-      this.$(input).val(result.CSSSelector)
+      $(input).val(result.CSSSelector)
 
 			// update validation for selector field
       var validator = this.getFormValidator()
@@ -1087,8 +1081,8 @@ SitemapController.prototype = {
         this.getSelectorHTML().done(function (html) {
           var tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html)
           var tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html)
-          this.$('input[name=tableHeaderRowSelector]').val(tableHeaderRowSelector)
-          this.$('input[name=tableDataRowSelector]').val(tableDataRowSelector)
+          $('input[name=tableHeaderRowSelector]').val(tableHeaderRowSelector)
+          $('input[name=tableDataRowSelector]').val(tableDataRowSelector)
 
           var headerColumns = SelectorTable.getTableHeaderColumnsFromHTML(tableHeaderRowSelector, html)
           this.renderTableHeaderColumns(headerColumns)
@@ -1106,7 +1100,7 @@ SitemapController.prototype = {
   },
 
   selectTableHeaderRowSelector: function (button) {
-    var input = this.$(button).closest('.form-group').find('input.selector-value')
+    var input = $(button).closest('.form-group').find('input.selector-value')
     var sitemap = this.getCurrentlyEditedSelectorSitemap()
     var selector = this.getCurrentlyEditedSelector()
     var currentStateParentSelectorIds = this.getCurrentStateParentSelectorIds()
@@ -1119,7 +1113,7 @@ SitemapController.prototype = {
 
     deferredSelector.done(function (result) {
       var tableHeaderRowSelector = result.CSSSelector
-      this.$(input).val(tableHeaderRowSelector)
+      $(input).val(tableHeaderRowSelector)
 
       this.getSelectorHTML().done(function (html) {
         var headerColumns = SelectorTable.getTableHeaderColumnsFromHTML(tableHeaderRowSelector, html)
@@ -1133,7 +1127,7 @@ SitemapController.prototype = {
   },
 
   selectTableDataRowSelector: function (button) {
-    var input = this.$(button).closest('.form-group').find('input.selector-value')
+    var input = $(button).closest('.form-group').find('input.selector-value')
     var sitemap = this.getCurrentlyEditedSelectorSitemap()
     var selector = this.getCurrentlyEditedSelector()
     var currentStateParentSelectorIds = this.getCurrentStateParentSelectorIds()
@@ -1144,9 +1138,8 @@ SitemapController.prototype = {
       allowedElements: 'tr'
     })
 
-    var self = this
     deferredSelector.done(function (result) {
-      self.$(input).val(result.CSSSelector)
+      $(input).val(result.CSSSelector)
 
 			// update validation for selector field
       var validator = this.getFormValidator()
@@ -1159,7 +1152,7 @@ SitemapController.prototype = {
 	 */
   renderTableHeaderColumns: function (headerColumns) {
 		// reset previous columns
-    var $tbody = this.$('.feature-columns table tbody')
+    var $tbody = $('.feature-columns table tbody')
     $tbody.html('')
     headerColumns.forEach(function (column) {
       var $row = ich.SelectorEditTableColumn(column)
@@ -1180,8 +1173,7 @@ SitemapController.prototype = {
     return deferredHTML
   },
   previewSelector: function (button) {
-    var self = this
-    if (!this.$(button).hasClass('preview')) {
+    if (!$(button).hasClass('preview')) {
       var sitemap = this.getCurrentlyEditedSelectorSitemap()
       var selector = this.getCurrentlyEditedSelector()
       var currentStateParentSelectorIds = this.getCurrentStateParentSelectorIds()
@@ -1192,16 +1184,15 @@ SitemapController.prototype = {
       })
 
       deferredSelectorPreview.done(function () {
-        self.$(button).addClass('preview')
+        $(button).addClass('preview')
       })
     } else {
       this.contentScript.removeCurrentContentSelector()
-      self.$(button).removeClass('preview')
+      $(button).removeClass('preview')
     }
   },
   previewClickElementSelector: function (button) {
-    var self = this
-    if (!self.$(button).hasClass('preview')) {
+    if (!$(button).hasClass('preview')) {
       var sitemap = this.state.currentSitemap
       var selector = this.getCurrentlyEditedSelector()
       var currentStateParentSelectorIds = this.getCurrentStateParentSelectorIds()
@@ -1213,21 +1204,20 @@ SitemapController.prototype = {
       })
 
       deferredSelectorPreview.done(function () {
-        self.$(button).addClass('preview')
+        $(button).addClass('preview')
       })
     } else {
       this.contentScript.removeCurrentContentSelector()
-      self.$(button).removeClass('preview')
+      $(button).removeClass('preview')
     }
   },
   previewTableRowSelector: function (button) {
-    var self = this
-    if (!self.$(button).hasClass('preview')) {
+    if (!$(button).hasClass('preview')) {
       var sitemap = this.getCurrentlyEditedSelectorSitemap()
       var selector = this.getCurrentlyEditedSelector()
       var currentStateParentSelectorIds = this.getCurrentStateParentSelectorIds()
       var parentCSSSelector = sitemap.selectors.getCSSSelectorWithinOnePage(selector.id, currentStateParentSelectorIds)
-      var rowSelector = self.$(button).closest('.form-group').find('input').val()
+      var rowSelector = $(button).closest('.form-group').find('input').val()
 
       var deferredSelectorPreview = this.contentScript.previewSelector({
         parentCSSSelector: parentCSSSelector,
@@ -1235,18 +1225,17 @@ SitemapController.prototype = {
       })
 
       deferredSelectorPreview.done(function () {
-        self.$(button).addClass('preview')
+        $(button).addClass('preview')
       })
     } else {
       this.contentScript.removeCurrentContentSelector()
-      self.$(button).removeClass('preview')
+      $(button).removeClass('preview')
     }
   },
   previewSelectorFromSelectorTree: function (button) {
-    var self = this
-    if (!self.$(button).hasClass('preview')) {
+    if (!$(button).hasClass('preview')) {
       var sitemap = this.state.currentSitemap
-      var selector = self.$(button).closest('tr').data('selector')
+      var selector = $(button).closest('tr').data('selector')
       var currentStateParentSelectorIds = this.getCurrentStateParentSelectorIds()
       var parentCSSSelector = sitemap.selectors.getParentCSSSelectorWithinOnePage(currentStateParentSelectorIds)
       var deferredSelectorPreview = this.contentScript.previewSelector({
@@ -1255,17 +1244,16 @@ SitemapController.prototype = {
       })
 
       deferredSelectorPreview.done(function () {
-        self.$(button).addClass('preview')
+        $(button).addClass('preview')
       })
     } else {
       this.contentScript.removeCurrentContentSelector()
-      self.$(button).removeClass('preview')
+      $(button).removeClass('preview')
     }
   },
   previewSelectorDataFromSelectorTree: function (button) {
-    var self = this
     var sitemap = this.state.currentSitemap
-    var selector = self.$(button).closest('tr').data('selector')
+    var selector = $(button).closest('tr').data('selector')
     this.previewSelectorData(sitemap, selector.id)
   },
   previewSelectorDataFromSelectorEditing: function () {
@@ -1290,8 +1278,6 @@ SitemapController.prototype = {
 		// data preview will be base on how the selector tree is opened
     var parentSelectorIds = this.getStateParentSelectorIds()
 
-    var self = this
-
     var request = {
       previewSelectorData: true,
       sitemap: JSON.parse(JSON.stringify(sitemap)),
@@ -1309,16 +1295,16 @@ SitemapController.prototype = {
       var $dataPreviewPanel = ich.DataPreview({
         columns: dataColumns
       })
-      self.$('#viewport').append($dataPreviewPanel)
+      $('#viewport').append($dataPreviewPanel)
       $dataPreviewPanel.modal('show')
 			// display data
 			// Doing this the long way so there aren't xss vulnerubilites
 			// while working with data or with the selector titles
-      var $tbody = self.$('tbody', $dataPreviewPanel)
+      var $tbody = $('tbody', $dataPreviewPanel)
       response.forEach(function (row) {
-        var $tr = self.$('<tr></tr>')
+        var $tr = $('<tr></tr>')
         dataColumns.forEach(function (column) {
-          var $td = self.$('<td></td>')
+          var $td = $('<td></td>')
           var cellData = row[column]
           if (typeof cellData === 'object') {
             cellData = JSON.stringify(cellData)
@@ -1329,13 +1315,13 @@ SitemapController.prototype = {
         $tbody.append($tr)
       })
 
-      var windowHeight = self.$(window).height()
+      var windowHeight = $(window).height()
 
-      self.$('.data-preview-modal .modal-body').height(windowHeight - 130)
+      $('.data-preview-modal .modal-body').height(windowHeight - 130)
 
 			// remove modal from dom after it is closed
       $dataPreviewPanel.on('hidden.bs.modal', function () {
-        self.$(this).remove()
+        $(this).remove()
       })
     })
   },
@@ -1344,9 +1330,8 @@ SitemapController.prototype = {
 	 * @param button
 	 */
   addStartUrl: function (button) {
-    var self = this
     var $startUrlInputField = ich.SitemapStartUrlField()
-    self.$('#viewport .start-url-block:last').after($startUrlInputField)
+    $('#viewport .start-url-block:last').after($startUrlInputField)
     var validator = this.getFormValidator()
     validator.addField($startUrlInputField.find('input'))
   },
@@ -1355,9 +1340,8 @@ SitemapController.prototype = {
 	 * @param button
 	 */
   removeStartUrl: function (button) {
-    var self = this
-    var $block = self.$(button).closest('.start-url-block')
-    if (self.$('#viewport .start-url-block').length > 1) {
+    var $block = $(button).closest('.start-url-block')
+    if ($('#viewport .start-url-block').length > 1) {
 			// remove from validator
       var validator = this.getFormValidator()
       validator.removeField($block.find('input'))

@@ -26,7 +26,7 @@ var SelectorImage = {
     var elements = this.getDataElements(parentElement)
 
     var deferredDataCalls = []
-    this.$(elements).each(function (i, element) {
+    $(elements).each(function (i, element) {
       deferredDataCalls.push(function () {
         var deferredData = jquery.Deferred()
 

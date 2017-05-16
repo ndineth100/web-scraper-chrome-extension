@@ -33,13 +33,13 @@ var SelectorElementClick = {
 	 * @param element
 	 */
   isElementInHTML: function (element) {
-    return this.$(element).closest('html').length !== 0
+    return $(element).closest('html').length !== 0
   },
 
   triggerButtonClick: function (clickElement) {
     var cs = new CssSelector({
       enableSmartTableSelector: false,
-      parent: this.$('body')[0],
+      parent: $('body')[0],
       enableResultStripping: false
     })
     var cssSelector = cs.getCssSelector([clickElement])

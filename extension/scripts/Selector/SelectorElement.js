@@ -25,7 +25,7 @@ var SelectorElement = {
     var dfd = jquery.Deferred()
 
     var elements = this.getDataElements(parentElement)
-    dfd.resolve(this.$.makeArray(elements))
+    dfd.resolve(jQuery.makeArray(elements))
 
     return dfd.promise()
   },

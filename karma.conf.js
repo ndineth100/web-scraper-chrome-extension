@@ -37,7 +37,7 @@ module.exports = function (config) {
     browserify: {
       debug: true,
       transform: [
-        ['babelify', {ignore: /\/node_modules\//, plugins: 'babel-plugin-meaningful-logs'}]
+        ['babelify', {plugins: 'babel-plugin-meaningful-logs'}]
       ]
     },
 
