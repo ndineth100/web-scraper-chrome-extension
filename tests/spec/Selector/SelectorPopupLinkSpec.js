@@ -7,10 +7,12 @@ describe('Popup link Selector', function () {
   var $el
   let $
 let document
+let window
 
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
 
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>", document)
@@ -25,7 +27,7 @@ document = globals.document
       type: 'SelectorPopupLink',
       multiple: false,
       selector: 'a'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       var expected = [{
@@ -47,7 +49,7 @@ document = globals.document
       type: 'SelectorPopupLink',
       multiple: true,
       selector: 'a'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       var expected = [
@@ -75,7 +77,7 @@ document = globals.document
       type: 'SelectorPopupLink',
       multiple: true,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, ['id', 'id-href'])
@@ -87,7 +89,7 @@ document = globals.document
       type: 'SelectorPopupLink',
       multiple: true,
       selector: 'a'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       var expected = []
@@ -100,7 +102,7 @@ document = globals.document
     $el.innerHTML = "<a onclick=\"setTimeout(function(){window.open('http://example.com/');},100)\"></a>"
     var selector = new Selector({
       type: 'SelectorPopupLink'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getPopupURL($el.querySelectorAll('a')[0])
     dataDeferred.then(function (data) {
       var expected = 'http://example.com/'
@@ -118,7 +120,7 @@ document = globals.document
     }))
     var selector = new Selector({
       type: 'SelectorPopupLink'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getPopupURL($el.querySelectorAll('a')[0])
     dataDeferred.then(function (data) {
       var expected = 'http://example.com/'
@@ -135,7 +137,7 @@ document = globals.document
       multiple: true,
       selector: 'a',
       clickPopup: true
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       var expected = [{

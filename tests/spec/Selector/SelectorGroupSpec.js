@@ -6,9 +6,11 @@ const globals = require('../../globals')
 describe('Group Selector', function () {
   let $
 let document
+let window
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
     document.body.innerHTML = utils.getTestHTML()
 
   })
@@ -19,7 +21,7 @@ document = globals.document
       type: 'SelectorGroup',
       multiple: false,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-group-text')[0])
     dataDeferred.then(function (data) {
@@ -48,7 +50,7 @@ document = globals.document
       multiple: false,
       selector: 'a',
       extractAttribute: 'href'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-group-url')[0])
     dataDeferred.then(function (data) {
       assert.equal(data.length, 1)
@@ -77,7 +79,7 @@ document = globals.document
       type: 'SelectorGroup',
       multiple: true,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, ['id'])

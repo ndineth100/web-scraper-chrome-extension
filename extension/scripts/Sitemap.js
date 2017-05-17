@@ -19,9 +19,11 @@ Sitemap.prototype = {
       this[key] = sitemapObj[key]
     }
     console.log(this)
-
+    var $ = this.$
+    var window = this.window
+    var document = this.document
     var selectors = this.selectors
-    this.selectors = new SelectorList(this.selectors, {$: this.$})
+    this.selectors = new SelectorList(this.selectors, {$, window, document})
   },
 
 	/**
@@ -211,8 +213,10 @@ Sitemap.prototype = {
 	 */
   clone: function () {
     var $ = this.$
+var document = this.document
+var window = this.window
     var clonedJSON = JSON.parse(JSON.stringify(this))
-    var sitemap = new Sitemap(clonedJSON, {$})
+    var sitemap = new Sitemap(clonedJSON, {$, document, window})
     return sitemap
   }
 }

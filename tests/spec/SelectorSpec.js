@@ -6,10 +6,12 @@ describe('Selector', function () {
   var $el
   let $
 let document
+let window
 
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
 
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'>aaaaaaaaaaaa</div>", document)
@@ -21,7 +23,7 @@ document = globals.document
     var selector = new Selector({
       selector: 'a',
       type: 'SelectorLink'
-    }, {$})
+    }, {$, document, window})
     var elements = selector.getDataElements($el)
 
     assert.deepEqual(elements, Object.values($el.querySelectorAll('a')))
@@ -32,7 +34,7 @@ document = globals.document
     var selector = new Selector({
       selector: '_parent_',
       type: 'SelectorLink'
-    }, {$})
+    }, {$, document, window})
     var elements = selector.getDataElements($el)
 
     assert.deepEqual(elements, [$el])
@@ -44,7 +46,7 @@ document = globals.document
       selector: 'a',
       type: 'SelectorText',
       delay: 100
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData($el)
 
 		// add data after data extraction called

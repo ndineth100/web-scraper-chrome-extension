@@ -10,7 +10,9 @@ function UniqueElementList (clickElementUniquenessType, options) {
 this.document = options.document
 this.window = options.window
   if (!this.$) throw new Error('jquery required')
-if (!this.document) throw new Error("Missing document")
+if (!this.document) {
+  throw new Error("Missing document")
+}
 if(!this.window)throw new Error("Missing window")
   this.clickElementUniquenessType = clickElementUniquenessType
   this.addedElements = {}
@@ -20,6 +22,8 @@ UniqueElementList.prototype = []
 
 UniqueElementList.prototype.push = function (element) {
   var $ = this.$
+var document = this.document
+var window = this.window
   if (this.isAdded(element)) {
     return false
   } else {
@@ -32,6 +36,8 @@ UniqueElementList.prototype.push = function (element) {
 
 UniqueElementList.prototype.getElementUniqueId = function (element) {
   var $ = this.$
+var document = this.document
+var window = this.window
   if (this.clickElementUniquenessType === 'uniqueText') {
     var elementText = $(element).text().trim()
     return elementText

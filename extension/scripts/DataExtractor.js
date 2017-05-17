@@ -12,10 +12,12 @@ this.window = moreOptions.window
     throw new Error('Missing jquery in Data Extractor')
   }
   var $ = this.$
+var document = this.document
+var window = this.window
   if (options.sitemap instanceof Sitemap) {
     this.sitemap = options.sitemap
   } else {
-    this.sitemap = new Sitemap(options.sitemap, {$})
+    this.sitemap = new Sitemap(options.sitemap, {$, document, window})
   }
 
   this.parentSelectorId = options.parentSelectorId

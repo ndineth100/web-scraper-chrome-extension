@@ -7,9 +7,11 @@ describe('Link Selector', function () {
   var $el
   let $
 let document
+let window
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
 
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>", document)
@@ -22,7 +24,7 @@ document = globals.document
       type: 'SelectorLink',
       multiple: false,
       selector: 'a'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-follow')[0])
     dataDeferred.then(function (data) {
@@ -45,7 +47,7 @@ document = globals.document
       type: 'SelectorLink',
       multiple: true,
       selector: 'a'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-follow')[0])
     dataDeferred.then(function (data) {
       var expected = [
@@ -73,7 +75,7 @@ document = globals.document
       type: 'SelectorLink',
       multiple: true,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, ['id', 'id-href'])
@@ -85,7 +87,7 @@ document = globals.document
       type: 'SelectorLink',
       multiple: true,
       selector: 'a'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData(document.querySelectorAll('#not-exist')[0])
     dataDeferred.then(function (data) {
       var expected = []

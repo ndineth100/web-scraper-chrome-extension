@@ -49,7 +49,7 @@ var ContentScript = {
       var contentSelector = new ContentSelector({
         parentCSSSelector: request.parentCSSSelector,
         allowedElements: request.allowedElements
-      }, {$})
+      }, {$, document, window})
       window.cs = contentSelector
 
       var deferredCSSSelector = contentSelector.getCSSSelector()
@@ -78,7 +78,7 @@ var ContentScript = {
     this.removeCurrentContentSelector().done(function () {
       var contentSelector = new ContentSelector({
         parentCSSSelector: request.parentCSSSelector
-      }, {$})
+      }, {$, document, window})
       window.cs = contentSelector
 
       var deferredSelectorPreview = contentSelector.previewSelector(request.elementCSSSelector)

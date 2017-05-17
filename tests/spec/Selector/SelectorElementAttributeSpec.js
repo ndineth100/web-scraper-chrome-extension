@@ -7,10 +7,12 @@ describe('Element Attribute Selector', function () {
   var $el
   let $
 let document
+let window
 
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
 
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>", document)
@@ -24,7 +26,7 @@ document = globals.document
       multiple: false,
       extractAttribute: 'src',
       selector: 'img'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData(document.querySelector('#selector-image-one-image'))
     dataDeferred.then(function (data) {
@@ -44,7 +46,7 @@ document = globals.document
       multiple: true,
       extractAttribute: 'src',
       selector: 'img'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData(document.querySelector('#selector-image-multiple-images'))
 
@@ -67,7 +69,7 @@ document = globals.document
       type: 'SelectorElementAttribute',
       multiple: true,
       selector: 'img'
-    }, {$})
+    }, {$, document, window})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, ['id'])
@@ -80,7 +82,7 @@ document = globals.document
       multiple: true,
       selector: 'img.not-exist',
       extractAttribute: 'src'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData(document.querySelector('#not-exist'))
 
@@ -100,7 +102,7 @@ document = globals.document
       multiple: true,
       selector: 'li',
       extractAttribute: 'data-type'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData($el)
 

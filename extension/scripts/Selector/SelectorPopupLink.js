@@ -22,6 +22,8 @@ var SelectorPopupLink = {
   },
   _getData: function (parentElement) {
     var $ = this.$
+var document = this.document
+var window = this.window
     var elements = this.getDataElements(parentElement)
 
     var dfd = jquery.Deferred()
@@ -73,7 +75,8 @@ var SelectorPopupLink = {
 	 */
   getPopupURL: function (element) {
     var $ = this.$
-    var document = this.document
+var document = this.document
+var window = this.window
     // override window.open function. we need to execute this in page scope.
 		// we need to know how to find this element from page scope.
     var cs = new CssSelector({

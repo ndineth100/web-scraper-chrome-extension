@@ -92,12 +92,14 @@ Store.prototype = {
   },
   getAllSitemaps: function (callback) {
     var $ = this.$
+var document = this.document
+var window = this.window
     this.sitemapDb.allDocs({include_docs: true}, function (err, response) {
       var sitemaps = []
       for (var i in response.rows) {
         var sitemap = response.rows[i].doc
         if (!chrome.extension) {
-          sitemap = new Sitemap(sitemap, {$})
+          sitemap = new Sitemap(sitemap, {$, document, window})
         }
 
         sitemaps.push(sitemap)

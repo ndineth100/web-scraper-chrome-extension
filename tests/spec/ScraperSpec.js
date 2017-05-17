@@ -17,6 +17,7 @@ describe('Scraper', function () {
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
 
     q = new Queue()
     store = new FakeStore()
@@ -44,7 +45,7 @@ document = globals.document
           ]
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var browser = new ChromePopupBrowser({
       pageLoadDelay: 100
@@ -55,7 +56,7 @@ document = globals.document
       sitemap: sitemap,
       browser: browser,
       store: store
-    }, {$})
+    }, {$, document, window})
     s.run(function () {
       assert.deepEqual(store.data[0], {a: 'a'})
       done()
@@ -82,7 +83,7 @@ document = globals.document
           'parentSelectors': ['link']
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var browser = new ChromePopupBrowser({
       pageLoadDelay: 500
@@ -94,7 +95,7 @@ document = globals.document
       browser: browser,
       store: store,
       delay: 0
-    }, {$})
+    }, {$, document, window})
 
     s.run(function () {
       assert.deepEqual(store.data, [
@@ -131,13 +132,13 @@ document = globals.document
           'parentSelectors': ['link-w-children']
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var s = new Scraper({
       queue: q,
       sitemap: sitemap,
       store: store
-    }, {$})
+    }, {$, document, window})
 
     var follow = s.recordCanHaveChildJobs({
       _follow: 'http://example.com/',
@@ -155,13 +156,13 @@ document = globals.document
   it('should be able to create multiple start jobs', function () {
     var sitemap = new Sitemap({
       startUrl: 'http://test.lv/[1-100].html'
-    }, {$})
+    }, {$, document, window})
 
     var s = new Scraper({
       queue: q,
       sitemap: sitemap,
       store: store
-    }, {$})
+    }, {$, document, window})
 
     s.initFirstJobs()
     assert.equal(q.jobs.length, 100)
@@ -170,13 +171,13 @@ document = globals.document
   it('should create multiple start jobs if multiple urls provided', function () {
     var sitemap = new Sitemap({
       startUrl: ['http://example.com/1', 'http://example.com/2', 'http://example.com/3']
-    }, {$})
+    }, {$, document, window})
 
     var s = new Scraper({
       queue: q,
       sitemap: sitemap,
       store: store
-    }, {$})
+    }, {$, document, window})
 
     s.initFirstJobs()
     assert.equal(q.jobs.length, 3)
@@ -216,11 +217,11 @@ document = globals.document
 
     var sitemap = new Sitemap({
       id: 'test'
-    }, {$})
+    }, {$, document, window})
 
     var scraper = new Scraper({
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
 
     var deferredSave = scraper.saveImages(record)
     var downloadAPICalled = false
@@ -258,7 +259,7 @@ document = globals.document
           ]
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var browser = new ChromePopupBrowser({
       pageLoadDelay: 500
@@ -269,7 +270,7 @@ document = globals.document
       sitemap: sitemap,
       browser: browser,
       store: store
-    }, {$})
+    }, {$, document, window})
 
     var downloadAPICalled = false
     chrome.downloads.onChanged.addListener(function () {

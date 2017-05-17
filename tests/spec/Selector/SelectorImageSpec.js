@@ -7,10 +7,12 @@ const globals = require('../../globals')
 describe('Image Selector', function () {
   let $
 let document
+let window
   var $el
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
 
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>", document)
@@ -23,7 +25,7 @@ document = globals.document
       type: 'SelectorImage',
       multiple: false,
       selector: 'img'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-image-one-image')[0])
     dataDeferred.then(function (data) {
@@ -44,7 +46,7 @@ document = globals.document
       type: 'SelectorImage',
       multiple: true,
       selector: 'img'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-image-multiple-images')[0])
     dataDeferred.then(function (data) {
       assert.equal(data.length, 2)
@@ -67,7 +69,7 @@ document = globals.document
       type: 'SelectorImage',
       multiple: true,
       selector: 'img'
-    }, {$})
+    }, {$, document, window})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, ['id-src'])
@@ -79,7 +81,7 @@ document = globals.document
       type: 'SelectorImage',
       multiple: true,
       selector: 'img.not-exist'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData(document.querySelectorAll('#not-exist')[0])
     dataDeferred.then(function (data) {
       assert.equal(data.length, 0)
@@ -107,7 +109,7 @@ document = globals.document
       multiple: true,
       selector: 'img',
       downloadImage: true
-    }, {$})
+    }, {$, document, window})
 
     console.log($el.innerHTML)
     var dataDeferred = selector.getData($el)

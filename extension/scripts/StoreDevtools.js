@@ -40,6 +40,8 @@ StoreDevtools.prototype = {
   },
   getAllSitemaps: function (callback) {
     var $ = this.$
+var document = this.document
+var window = this.window
     var request = {
       getAllSitemaps: true
     }
@@ -48,7 +50,7 @@ StoreDevtools.prototype = {
       var sitemaps = []
 
       for (var i in response) {
-        sitemaps.push(new Sitemap(response[i], {$}))
+        sitemaps.push(new Sitemap(response[i], {$, document, window}))
       }
       callback(sitemaps)
     })

@@ -8,9 +8,11 @@ describe('Table Selector', function () {
   var $el
   let $
 let document
+let window
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
 
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>", document)
@@ -30,7 +32,7 @@ document = globals.document
           extract: true
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     const columns = selector.getTableHeaderColumns(document.querySelectorAll('#selector-table-single-table-single-row table')[0])
     const expected = {
@@ -54,7 +56,7 @@ document = globals.document
           extract: true
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-table-single-table-single-row')[0])
     dataDeferred.then(function (data) {
@@ -86,7 +88,7 @@ document = globals.document
           extract: true
         }
       ]
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-table-single-table-multiple-rows')[0])
     dataDeferred.then(function (data) {
       var expected = [
@@ -122,7 +124,7 @@ document = globals.document
           extract: false
         }
       ]
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-table-single-table-multiple-rows')[0])
     dataDeferred.then(function (data) {
       var expected = [
@@ -161,7 +163,7 @@ document = globals.document
           extract: false
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, ['a_renamed', 'b_renamed'])
@@ -170,7 +172,7 @@ document = globals.document
   it('should return thead tr as table header selector for legacy table selectors', function () {
     var selector = new Selector({
       type: 'SelectorTable'
-    }, {$})
+    }, {$, document, window})
 
     var headerSelector = selector.getTableHeaderRowSelector()
 
@@ -180,7 +182,7 @@ document = globals.document
   it('should return tbody tr as table row selector for legacy table selectors', function () {
     var selector = new Selector({
       type: 'SelectorTable'
-    }, {$})
+    }, {$, document, window})
 
     var headerSelector = selector.getTableDataRowSelector()
 
@@ -189,7 +191,7 @@ document = globals.document
 
   it('should return thead tr while selecting tableHeaderRow when single row available within thead', function () {
     var html = '<table><thead><tr><td>asd</td></tr></thead></table>'
-    var tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html, {$})
+    var tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html, {$, document, window})
     assert.equal(tableHeaderRowSelector, 'thead tr')
   })
 
@@ -197,31 +199,31 @@ document = globals.document
     var html
 
     html = '<table><thead><tr><td>asd</td></tr><tr><td>asd</td></tr></thead></table>'
-    var tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html, {$})
+    var tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html, {$, document, window})
     assert.equal(tableHeaderRowSelector, 'thead tr:nth-of-type(1)')
 
     html = '<table><thead><tr><td></td></tr><tr><td>asd</td></tr></thead></table>'
-    tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html, {$})
+    tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html, {$, document, window})
     assert.equal(tableHeaderRowSelector, 'thead tr:nth-of-type(2)')
 
     html = '<table><thead><tr><td>asd</td></tr><tr><th>asd</th></tr></thead></table>'
-    tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html, {$})
+    tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html, {$, document, window})
     assert.equal(tableHeaderRowSelector, 'thead tr:nth-of-type(1)')
 
     html = '<table><thead><tr><td></td></tr><tr><th>asd</th></tr></thead></table>'
-    tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html, {$})
+    tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html, {$, document, window})
     assert.equal(tableHeaderRowSelector, 'thead tr:nth-of-type(2)')
   })
 
   it('should return empty string while selecting tableHeaderRow when no rows with data available', function () {
     var html = '<table><thead><tr><td></td></tr></thead><tr><td></td></tr></table>'
-    var tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html, {$})
+    var tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html, {$, document, window})
     assert.equal(tableHeaderRowSelector, '')
   })
 
   it('should return tbody tr while selecting tableDataRow when thead is available', function () {
     var html = '<table><thead><tr><td>asd</td></tr></thead></table>'
-    var tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html, {$})
+    var tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html, {$, document, window})
     assert.equal(tableDataRowSelector, 'tbody tr')
   })
 
@@ -229,32 +231,32 @@ document = globals.document
     var html
 
     html = '<table><tr><td>asd</td></tr><tr><td>asd</td></tr></table>'
-    var tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html, {$})
+    var tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html, {$, document, window})
     assert.equal(tableDataRowSelector, 'tr:nth-of-type(n+2)')
 
     html = '<table><tr><td></td></tr><tr><td>asd</td></tr><</table>'
-    tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html, {$})
+    tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html, {$, document, window})
     assert.equal(tableDataRowSelector, 'tr:nth-of-type(n+3)')
 
     html = '<table><tr><td>asd</td></tr><tr><th>asd</th></tr></table>'
-    tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html, {$})
+    tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html, {$, document, window})
     assert.equal(tableDataRowSelector, 'tr:nth-of-type(n+2)')
 
     html = '<table><tr><td></td></tr><tr><th>asd</th></tr></table>'
-    tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html, {$})
+    tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html, {$, document, window})
     assert.equal(tableDataRowSelector, 'tr:nth-of-type(n+3)')
   })
 
   it('should return empty string when selecting tableDataRow with no data rows', function () {
     var html = '<table><thead><tr><td></td></tr></thead><tr><td></td></tr></table>'
-    var tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html, {$})
+    var tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html, {$, document, window})
     assert.equal(tableDataRowSelector, '')
   })
 
   it('should get heder columns from html', function () {
     var html = '<table><thead><tr><td>a</td><td>b</td></tr></thead></table>'
     var tableHeaderSelector = 'thead tr'
-    var headerColumns = SelectorTable.getTableHeaderColumnsFromHTML(tableHeaderSelector, html, {$})
+    var headerColumns = SelectorTable.getTableHeaderColumnsFromHTML(tableHeaderSelector, html, {$, document, window})
 
     assert.deepEqual(headerColumns, [{ header: 'a', name: 'a', extract: true }, { header: 'b', name: 'b', extract: true }])
   })
@@ -262,7 +264,7 @@ document = globals.document
   it('should ignore empty columns when getting table header columns', function () {
     var html = '<table><thead><tr><td>a</td><td> </td></tr></thead></table>'
     var tableHeaderSelector = 'thead tr'
-    var headerColumns = SelectorTable.getTableHeaderColumnsFromHTML(tableHeaderSelector, html, {$})
+    var headerColumns = SelectorTable.getTableHeaderColumnsFromHTML(tableHeaderSelector, html, {$, document, window})
 
     assert.deepEqual(headerColumns, [{ header: 'a', name: 'a', extract: true }])
   })
@@ -300,7 +302,7 @@ document = globals.document
           extract: true
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -344,7 +346,7 @@ document = globals.document
           extract: true
         }
       ]
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       var expected = [{c: 'g', d: 'h'}]
@@ -387,7 +389,7 @@ document = globals.document
           extract: true
         }
       ]
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       var expected = [{c: 'g', d: 'h'}]
@@ -428,7 +430,7 @@ document = globals.document
           extract: true
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {

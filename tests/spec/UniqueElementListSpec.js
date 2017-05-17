@@ -6,10 +6,12 @@ describe('UniqueElementList', function () {
   var $el
   let $
 let document
+let window
 
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
 
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>", document)
@@ -19,7 +21,7 @@ document = globals.document
   it('it should add only unique elements', function () {
     $el.innerHTML = '<a>1</a><a>2</a>'
 
-    var list = new UniqueElementList('uniqueText', {$})
+    var list = new UniqueElementList('uniqueText', {$, document, window})
     assert.equal(list.length, 0)
 
     var $a = $el.querySelectorAll('a')
@@ -36,7 +38,7 @@ document = globals.document
   it('it should add only unique elements when using uniqueHTMLText type', function () {
     $el.innerHTML = "<a id='1'>a</a><a id='2'>a</a>"
 
-    var list = new UniqueElementList('uniqueHTMLText', {$})
+    var list = new UniqueElementList('uniqueHTMLText', {$, document, window})
     assert.equal(list.length, 0)
 
     var $a = $el.querySelectorAll('a')
@@ -53,7 +55,7 @@ document = globals.document
   it('it should add only unique elements when using uniqueHTML type', function () {
     $el.innerHTML = "<a class='1'>a<span>a</span></a><a class='2'>a<span>b</span></a><a class='1'>c<span>c</span></a>"
 
-    var list = new UniqueElementList('uniqueHTML', {$})
+    var list = new UniqueElementList('uniqueHTML', {$, document, window})
     assert.equal(list.length, 0)
 
     var $a = $el.querySelectorAll('a')
@@ -72,7 +74,7 @@ document = globals.document
   it('it should add only unique elements when using uniqueCSSSelector type', function () {
     $el.innerHTML = '<a></a><a></a>'
 
-    var list = new UniqueElementList('uniqueCSSSelector', {$})
+    var list = new UniqueElementList('uniqueCSSSelector', {$, document, window})
     assert.equal(list.length, 0)
 
     var $a = $el.querySelectorAll('a')

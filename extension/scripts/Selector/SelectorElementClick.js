@@ -25,7 +25,9 @@ var SelectorElementClick = {
 
   getClickElements: function (parentElement) {
     var $ = this.$
-    var clickElements = ElementQuery(this.clickElementSelector, parentElement, {$})
+var document = this.document
+var window = this.window
+    var clickElements = ElementQuery(this.clickElementSelector, parentElement, {$, document, window})
     return clickElements
   },
 
@@ -67,11 +69,13 @@ var SelectorElementClick = {
 
   _getData: function (parentElement) {
     var $ = this.$
+var document = this.document
+var window = this.window
     var delay = parseInt(this.delay) || 0
     var deferredResponse = jquery.Deferred()
-    var foundElements = new UniqueElementList('uniqueText', {$})
+    var foundElements = new UniqueElementList('uniqueText', {$, document, window})
     var clickElements = this.getClickElements(parentElement)
-    var doneClickingElements = new UniqueElementList(this.getClickElementUniquenessType(), {$})
+    var doneClickingElements = new UniqueElementList(this.getClickElementUniquenessType(), {$, document, window})
 
 		// add elements that are available before clicking
     var elements = this.getDataElements(parentElement)
@@ -79,7 +83,7 @@ var SelectorElementClick = {
 
 		// discard initial elements
     if (this.discardInitialElements) {
-      foundElements = new UniqueElementList('uniqueText', {$})
+      foundElements = new UniqueElementList('uniqueText', {$, document, window})
     }
 
 		// no elements to click at the beginning

@@ -15,6 +15,8 @@ var Scraper = function (options, moreOptions) {
 this.document = moreOptions.document
 this.window = moreOptions.window
   if (!moreOptions.$) throw new Error('Missing jquery')
+  if (!moreOptions.window) throw new Error('Missing window')
+  if (!moreOptions.document) throw new Error('Missing document')
 }
 
 Scraper.prototype = {

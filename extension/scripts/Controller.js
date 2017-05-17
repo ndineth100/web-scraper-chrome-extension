@@ -445,6 +445,8 @@ SitemapController.prototype = {
 
   createSitemap: function (form) {
     var $ = this.$
+var document = this.document
+var window = this.window
 		// cancel submit if invalid form
     if (!this.isValidForm()) {
       return false
@@ -462,7 +464,7 @@ SitemapController.prototype = {
           _id: sitemapData.id,
           startUrl: sitemapData.startUrl,
           selectors: []
-        }, {$})
+        }, {$, document, window})
         this.store.createSitemap(sitemap, function (sitemap) {
           this._editSitemap(sitemap, ['_root'])
         }.bind(this, sitemap))
@@ -472,6 +474,8 @@ SitemapController.prototype = {
 
   importSitemap: function () {
     var $ = this.$
+var document = this.document
+var window = this.window
 		// cancel submit if invalid form
     if (!this.isValidForm()) {
       return false
@@ -480,7 +484,7 @@ SitemapController.prototype = {
 		// load data from form
     var sitemapJSON = this.$('[name=sitemapJSON]').val()
     var id = this.$('input[name=_id]').val()
-    var sitemap = new Sitemap(null, {$})
+    var sitemap = new Sitemap(null, {$, document, window})
     sitemap.importSitemap(sitemapJSON)
     if (id.length) {
       sitemap._id = id
@@ -512,6 +516,8 @@ SitemapController.prototype = {
 
   editSitemapMetadataSave: function (button) {
     var $ = this.$
+var document = this.document
+var window = this.window
     var sitemap = this.state.currentSitemap
     var sitemapData = this.getSitemapFromMetadataForm()
 
@@ -538,7 +544,7 @@ SitemapController.prototype = {
         }.bind(this))
       } else {
         // id changed. we need to delete the old one and create a new one
-        var newSitemap = new Sitemap(sitemap, {$})
+        var newSitemap = new Sitemap(sitemap, {$, document, window})
         var oldSitemap = sitemap
         newSitemap._id = sitemapData.id
         this.store.createSitemap(newSitemap, function (newSitemap) {
@@ -1072,6 +1078,8 @@ SitemapController.prototype = {
 
   selectSelector: function (button) {
     var $ = this.$
+var document = this.document
+var window = this.window
     var input = $(button).closest('.form-group').find('input.selector-value')
     var sitemap = this.getCurrentlyEditedSelectorSitemap()
     var selector = this.getCurrentlyEditedSelector()
@@ -1081,7 +1089,7 @@ SitemapController.prototype = {
     var deferredSelector = this.contentScript.selectSelector({
       parentCSSSelector: parentCSSSelector,
       allowedElements: selector.getItemCSSSelector()
-    }, {$})
+    }, {$, document, window})
 
     deferredSelector.done(function (result) {
       $(input).val(result.CSSSelector)
@@ -1095,12 +1103,12 @@ SitemapController.prototype = {
 			// inner html
       if (selector.type === 'SelectorTable') {
         this.getSelectorHTML().done(function (html) {
-          var tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html, {$})
-          var tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html, {$})
+          var tableHeaderRowSelector = SelectorTable.getTableHeaderRowSelectorFromTableHTML(html, {$, document, window})
+          var tableDataRowSelector = SelectorTable.getTableDataRowSelectorFromTableHTML(html, {$, document, window})
           $('input[name=tableHeaderRowSelector]').val(tableHeaderRowSelector)
           $('input[name=tableDataRowSelector]').val(tableDataRowSelector)
 
-          var headerColumns = SelectorTable.getTableHeaderColumnsFromHTML(tableHeaderRowSelector, html, {$})
+          var headerColumns = SelectorTable.getTableHeaderColumnsFromHTML(tableHeaderRowSelector, html, {$, document, window})
           this.renderTableHeaderColumns(headerColumns)
         }.bind(this))
       }
@@ -1117,6 +1125,8 @@ SitemapController.prototype = {
 
   selectTableHeaderRowSelector: function (button) {
     var $ = this.$
+var document = this.document
+var window = this.window
     var input = $(button).closest('.form-group').find('input.selector-value')
     var sitemap = this.getCurrentlyEditedSelectorSitemap()
     var selector = this.getCurrentlyEditedSelector()
@@ -1126,14 +1136,14 @@ SitemapController.prototype = {
     var deferredSelector = this.contentScript.selectSelector({
       parentCSSSelector: parentCSSSelector,
       allowedElements: 'tr'
-    }, {$})
+    }, {$, document, window})
 
     deferredSelector.done(function (result) {
       var tableHeaderRowSelector = result.CSSSelector
       $(input).val(tableHeaderRowSelector)
 
       this.getSelectorHTML().done(function (html) {
-        var headerColumns = SelectorTable.getTableHeaderColumnsFromHTML(tableHeaderRowSelector, html, {$})
+        var headerColumns = SelectorTable.getTableHeaderColumnsFromHTML(tableHeaderRowSelector, html, {$, document, window})
         this.renderTableHeaderColumns(headerColumns)
       }.bind(this))
 
@@ -1145,6 +1155,8 @@ SitemapController.prototype = {
 
   selectTableDataRowSelector: function (button) {
     var $ = this.$
+var document = this.document
+var window = this.window
     var input = this.$(button).closest('.form-group').find('input.selector-value')
     var sitemap = this.getCurrentlyEditedSelectorSitemap()
     var selector = this.getCurrentlyEditedSelector()
@@ -1154,7 +1166,7 @@ SitemapController.prototype = {
     var deferredSelector = this.contentScript.selectSelector({
       parentCSSSelector: parentCSSSelector,
       allowedElements: 'tr'
-    }, {$})
+    }, {$, document, window})
 
     var self = this
     deferredSelector.done(function (result) {
@@ -1184,16 +1196,20 @@ SitemapController.prototype = {
 	 */
   getSelectorHTML: function () {
     var $ = this.$
+var document = this.document
+var window = this.window
     var sitemap = this.getCurrentlyEditedSelectorSitemap()
     var selector = this.getCurrentlyEditedSelector()
     var currentStateParentSelectorIds = this.getCurrentStateParentSelectorIds()
     var CSSSelector = sitemap.selectors.getCSSSelectorWithinOnePage(selector.id, currentStateParentSelectorIds)
-    var deferredHTML = this.contentScript.getHTML({CSSSelector: CSSSelector}, {$})
+    var deferredHTML = this.contentScript.getHTML({CSSSelector: CSSSelector}, {$, document, window})
 
     return deferredHTML
   },
   previewSelector: function (button) {
     var $ = this.$
+var document = this.document
+var window = this.window
     if (!$(button).hasClass('preview')) {
       var sitemap = this.getCurrentlyEditedSelectorSitemap()
       var selector = this.getCurrentlyEditedSelector()
@@ -1202,7 +1218,7 @@ SitemapController.prototype = {
       var deferredSelectorPreview = this.contentScript.previewSelector({
         parentCSSSelector: parentCSSSelector,
         elementCSSSelector: selector.selector
-      }, {$})
+      }, {$, document, window})
 
       deferredSelectorPreview.done(function () {
         $(button).addClass('preview')
@@ -1214,6 +1230,8 @@ SitemapController.prototype = {
   },
   previewClickElementSelector: function (button) {
     var $ = this.$
+var document = this.document
+var window = this.window
     if (!$(button).hasClass('preview')) {
       var sitemap = this.state.currentSitemap
       var selector = this.getCurrentlyEditedSelector()
@@ -1223,7 +1241,7 @@ SitemapController.prototype = {
       var deferredSelectorPreview = this.contentScript.previewSelector({
         parentCSSSelector: parentCSSSelector,
         elementCSSSelector: selector.clickElementSelector
-      }, {$})
+      }, {$, document, window})
 
       deferredSelectorPreview.done(function () {
         $(button).addClass('preview')
@@ -1235,6 +1253,8 @@ SitemapController.prototype = {
   },
   previewTableRowSelector: function (button) {
     var $ = this.$
+var document = this.document
+var window = this.window
     if (!$(button).hasClass('preview')) {
       var sitemap = this.getCurrentlyEditedSelectorSitemap()
       var selector = this.getCurrentlyEditedSelector()
@@ -1245,7 +1265,7 @@ SitemapController.prototype = {
       var deferredSelectorPreview = this.contentScript.previewSelector({
         parentCSSSelector: parentCSSSelector,
         elementCSSSelector: rowSelector
-      }, {$})
+      }, {$, document, window})
 
       deferredSelectorPreview.done(function () {
         $(button).addClass('preview')
@@ -1257,6 +1277,8 @@ SitemapController.prototype = {
   },
   previewSelectorFromSelectorTree: function (button) {
     var $ = this.$
+var document = this.document
+var window = this.window
     if (!$(button).hasClass('preview')) {
       var sitemap = this.state.currentSitemap
       var selector = $(button).closest('tr').data('selector')
@@ -1265,7 +1287,7 @@ SitemapController.prototype = {
       var deferredSelectorPreview = this.contentScript.previewSelector({
         parentCSSSelector: parentCSSSelector,
         elementCSSSelector: selector.selector
-      }, {$})
+      }, {$, document, window})
 
       deferredSelectorPreview.done(function () {
         $(button).addClass('preview')

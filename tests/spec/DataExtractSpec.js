@@ -8,9 +8,11 @@ const globals = require('../globals')
 describe('DataExtractor', function () {
   let $
 let document
+let window
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
 
     document.body.innerHTML = utils.getTestHTML()
   })
@@ -27,16 +29,16 @@ document = globals.document
         multiple: false,
         parentSelectors: ['_root']
       }
-    ], {$})
+    ], {$, document, window})
 
     var sitemap = new Sitemap({
       selectors: selectors
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       sitemap: sitemap,
       parentSelectorId: '_root'
-    }, {$})
+    }, {$, document, window})
 
     assert.isTrue(extractor.selectorIsCommonToAllTrees(selectors[0]))
   })
@@ -49,16 +51,16 @@ document = globals.document
         multiple: true,
         parentSelectors: ['_root']
       }
-    ], {$})
+    ], {$, document, window})
 
     var sitemap = new Sitemap({
       selectors: selectors
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       sitemap: sitemap,
       parentSelectorId: '_root'
-    }, {$})
+    }, {$, document, window})
 
     assert.isFalse(extractor.selectorIsCommonToAllTrees(selectors[0]))
   })
@@ -77,16 +79,16 @@ document = globals.document
         multiple: false,
         parentSelectors: ['a']
       }
-    ], {$})
+    ], {$, document, window})
 
     var sitemap = new Sitemap({
       selectors: selectors
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       sitemap: sitemap,
       parentSelectorId: '_root'
-    }, {$})
+    }, {$, document, window})
 
     var isCommon = extractor.selectorIsCommonToAllTrees(selectors[0])
 
@@ -107,15 +109,15 @@ document = globals.document
         multiple: false,
         parentSelectors: ['a']
       }
-    ], {$})
+    ], {$, document, window})
 
     var sitemap = new Sitemap({
       selectors: selectors
-    }, {$})
+    }, {$, document, window})
     var extractor = new DataExtractor({
       sitemap: sitemap,
       parentSelectorId: '_root'
-    }, {$})
+    }, {$, document, window})
 
     assert.isTrue(extractor.selectorIsCommonToAllTrees(selectors[0]))
   })
@@ -134,15 +136,15 @@ document = globals.document
         multiple: true,
         parentSelectors: ['a']
       }
-    ], {$})
+    ], {$, document, window})
 
     var sitemap = new Sitemap({
       selectors: selectors
-    }, {$})
+    }, {$, document, window})
     var extractor = new DataExtractor({
       sitemap: sitemap,
       parentSelectorId: '_root'
-    }, {$})
+    }, {$, document, window})
 
     assert.isFalse(extractor.selectorIsCommonToAllTrees(selectors[0]))
   })
@@ -192,11 +194,11 @@ document = globals.document
 
     var sitemap = new Sitemap({
       selectors: selectors
-    }, {$})
+    }, {$, document, window})
     var extractor = new DataExtractor({
       sitemap: sitemap,
       parentSelectorId: '_root'
-    }, {$})
+    }, {$, document, window})
 
     await selectorMatchers.matchSelectorList(extractor.getSelectorsCommonToAllTrees('_root'), expectedSelectors)
   })
@@ -212,12 +214,12 @@ document = globals.document
     ]
     var sitemap = new Sitemap({
       selectors: selectors
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
     var expected = [
 			['a']
     ]
@@ -243,12 +245,12 @@ document = globals.document
 
     var sitemap = new Sitemap({
       selectors: selectors
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
 
     var expected = [
 			['simple-data']
@@ -275,12 +277,12 @@ document = globals.document
 
     var sitemap = new Sitemap({
       selectors: selectors
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
     var expected = [
 			['parent', 'child']
     ]
@@ -312,12 +314,12 @@ document = globals.document
 
     var sitemap = new Sitemap({
       selectors: selectors
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
     var expected = [
 			['parent', 'parent2', 'child']
     ]
@@ -373,12 +375,12 @@ document = globals.document
 
     var sitemap = new Sitemap({
       selectors: selectors
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
     var expected = [
 			['common', 'parent1', 'follow1'],
 			['common', 'parent1', 'follow11'],
@@ -443,12 +445,12 @@ document = globals.document
 
     var sitemap = new Sitemap({
       selectors: selectors
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
     var expected = [
 			['common', 'common1', 'parent1', 'multiple1'],
 			['common', 'common1', 'parent1', 'multiple11'],
@@ -493,12 +495,12 @@ document = globals.document
 
     var sitemap = new Sitemap({
       selectors: selectors
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
     var expected = [
 			['div', 'table', 'tr', 'td']
     ]
@@ -519,13 +521,13 @@ document = globals.document
           parentSelectors: ['_root']
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentElement: parentElement,
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
 
     var deferred = extractor.getData()
 
@@ -551,12 +553,12 @@ document = globals.document
           parentSelectors: ['_root']
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
 
     var deferred = extractor.getData()
 
@@ -591,13 +593,13 @@ document = globals.document
           parentSelectors: ['e']
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentElement: parentElement,
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
 
     var deferred = extractor.getData()
 
@@ -625,13 +627,13 @@ document = globals.document
           parentSelectors: ['_root']
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentElement: parentElement,
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
 
     var deferred = extractor.getData()
     deferred.then(function (data) {
@@ -644,7 +646,7 @@ document = globals.document
         }
       ]
       assert.deepEqual(expected, data)
-    }, {$})
+    }, {$, document, window})
   })
 
   it('should be able to extract multiple text results with common data', function () {
@@ -666,13 +668,13 @@ document = globals.document
           parentSelectors: ['_root']
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentElement: parentElement,
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
 
     var deferred = extractor.getData()
 
@@ -710,13 +712,13 @@ document = globals.document
           parentSelectors: ['div']
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentElement: parentElement,
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
 
     var deferred = extractor.getData()
 
@@ -752,13 +754,13 @@ document = globals.document
           parentSelectors: ['div']
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentElement: parentElement,
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
 
     var deferred = extractor.getData()
 
@@ -806,13 +808,13 @@ document = globals.document
           parentSelectors: ['tr']
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentElement: parentElement,
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
 
     var deferred = extractor.getData()
 
@@ -848,13 +850,13 @@ document = globals.document
           parentSelectors: ['_root']
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentElement: parentElement,
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
 
     var deferred = extractor.getData()
 
@@ -881,13 +883,13 @@ document = globals.document
           parentSelectors: ['_root']
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentElement: parentElement,
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
 
     var deferred = extractor.getData()
 
@@ -1004,12 +1006,12 @@ document = globals.document
       ],
       'startUrl': 'http://www.centos.org/modules/tinycontent/index.php?id=30',
       '_id': 'centos-mirrors2'
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
 
     var result = extractor.findSelectorTrees()
     assert.equal(result.length, 1)
@@ -1028,13 +1030,13 @@ document = globals.document
           parentSelectors: ['_root']
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentElement: parentElement,
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
 
     var deferred = extractor.getSelectorCommonData(sitemap.selectors, sitemap.selectors[0], parentElement)
 
@@ -1059,13 +1061,13 @@ document = globals.document
           parentSelectors: ['_root']
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentElement: parentElement,
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
 
     var deferred = extractor.getSelectorTreeCommonData(sitemap.selectors, '_root', parentElement)
 
@@ -1104,13 +1106,13 @@ document = globals.document
           parentSelectors: ['parent2']
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var extractor = new DataExtractor({
       parentElement: parentElement,
       parentSelectorId: '_root',
       sitemap: sitemap
-    }, {$})
+    }, {$, document, window})
 
     var deferred = extractor.getSelectorTreeCommonData(sitemap.selectors, '_root', parentElement)
 

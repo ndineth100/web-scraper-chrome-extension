@@ -1,5 +1,6 @@
 const $ = require('jquery')
 module.exports = {
   $,
-  document: window.document
+  document: window.document,
+  window: window
 }

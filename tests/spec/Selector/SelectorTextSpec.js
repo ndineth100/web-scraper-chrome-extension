@@ -6,9 +6,11 @@ const globals = require('../../globals')
 describe('Text Selector', function () {
   let $
 let document
+let window
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
     document.body.innerHTML = utils.getTestHTML()
 
   })
@@ -19,7 +21,7 @@ document = globals.document
       type: 'SelectorText',
       multiple: false,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-single-text')[0])
     dataDeferred.then(function (data) {
       var expected = [
@@ -38,7 +40,7 @@ document = globals.document
       type: 'SelectorText',
       multiple: true,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-multiple-text')[0])
     dataDeferred.then(function (data) {
@@ -61,7 +63,7 @@ document = globals.document
       type: 'SelectorText',
       multiple: false,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-single-not-exist')[0])
     dataDeferred.then(function (data) {
       var expected = [
@@ -81,7 +83,7 @@ document = globals.document
       multiple: false,
       selector: 'div',
       regex: 'wontmatch'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-single-regex')[0])
     dataDeferred.then(function (data) {
       var expected = [
@@ -101,7 +103,7 @@ document = globals.document
       multiple: false,
       selector: 'div',
       regex: '\\d+'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-single-regex')[0])
     dataDeferred.then(function (data) {
       var expected = [
@@ -120,7 +122,7 @@ document = globals.document
       type: 'SelectorText',
       multiple: true,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, ['id'])
@@ -132,7 +134,7 @@ document = globals.document
       type: 'SelectorText',
       multiple: false,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-ignore-script')[0])
     dataDeferred.then(function (data) {
       var expected = [
@@ -151,7 +153,7 @@ document = globals.document
       type: 'SelectorText',
       multiple: false,
       selector: 'p'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-text-newlines')[0])
     dataDeferred.then(function (data) {
       var expected = [

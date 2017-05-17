@@ -7,9 +7,11 @@ describe('Scroll Element Selector', function () {
   var $el
   let $
 let document
+let window
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
 
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>", document)
@@ -23,7 +25,7 @@ document = globals.document
       type: 'SelectorElementScroll',
       multiple: false,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -40,7 +42,7 @@ document = globals.document
       type: 'SelectorElementScroll',
       multiple: true,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -58,7 +60,7 @@ document = globals.document
       multiple: true,
       selector: 'a',
       delay: 100
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 1)
@@ -80,7 +82,7 @@ document = globals.document
       multiple: true,
       selector: 'a',
       delay: 200
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 2)
@@ -94,7 +96,7 @@ document = globals.document
       type: 'SelectorElementScroll',
       multiple: true,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, [])

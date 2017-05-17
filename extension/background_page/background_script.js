@@ -10,13 +10,13 @@ var config = new Config()
 var store
 config.loadConfiguration(function () {
   console.log('initial configuration', config)
-  store = new Store(config, {$})
+  store = new Store(config, {$, window, document})
 })
 
 chrome.storage.onChanged.addListener(function () {
   config.loadConfiguration(function () {
     console.log('configuration changed', config)
-    store = new Store(config, {$})
+    store = new Store(config, {$, window, document})
   })
 })
 
@@ -54,10 +54,10 @@ chrome.runtime.onMessage.addListener(
     store.sitemapExists(request.sitemapId, sendResponse)
     return true
   } else if (request.getSitemapData) {
-    store.getSitemapData(new Sitemap(request.sitemap, {$}), sendResponse)
+    store.getSitemapData(new Sitemap(request.sitemap, {$, window, document}), sendResponse)
     return true
   } else if (request.scrapeSitemap) {
-    var sitemap = new Sitemap(request.sitemap, {$})
+    var sitemap = new Sitemap(request.sitemap, {$, window, document})
     var queue = new Queue()
     var browser = new ChromePopupBrowser({
       pageLoadDelay: request.pageLoadDelay
@@ -69,7 +69,7 @@ chrome.runtime.onMessage.addListener(
       browser: browser,
       store: store,
       requestInterval: request.requestInterval
-    }, {$})
+    }, {$, window, document})
 
     try {
       scraper.run(function () {

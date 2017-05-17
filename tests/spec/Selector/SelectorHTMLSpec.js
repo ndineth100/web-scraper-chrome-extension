@@ -6,9 +6,11 @@ const globals = require('../../globals')
 describe('HTML Selector', function () {
   let $
 let document
+let window
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
 
     document.body.innerHTML = utils.getTestHTML()
   })
@@ -19,7 +21,7 @@ document = globals.document
       type: 'SelectorHTML',
       multiple: false,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-html-single-html')[0])
     dataDeferred.then(function (data) {
       assert.equal(data.length, 1)
@@ -39,7 +41,7 @@ document = globals.document
       type: 'SelectorHTML',
       multiple: true,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-html-multiple-html')[0])
     dataDeferred.then(function (data) {
       assert.equal(data.length, 2)
@@ -62,7 +64,7 @@ document = globals.document
       type: 'SelectorHTML',
       multiple: false,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
     console.log(document.querySelectorAll('#selector-html-single-not-exist'))
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-html-single-not-exist')[0])
     dataDeferred.then(function (data) {
@@ -84,7 +86,7 @@ document = globals.document
       multiple: false,
       selector: 'div',
       regex: 'wontmatch'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-html-single-html')[0])
     dataDeferred.then(function (data) {
       assert.equal(data.length, 1)
@@ -105,7 +107,7 @@ document = globals.document
       multiple: false,
       selector: 'div',
       regex: '<b>\\w+'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-html-single-html')[0])
     dataDeferred.then(function (data) {
       assert.equal(data.length, 1)
@@ -125,7 +127,7 @@ document = globals.document
       type: 'SelectorHTML',
       multiple: true,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, ['id'])

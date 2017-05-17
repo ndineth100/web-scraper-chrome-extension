@@ -8,10 +8,12 @@ describe('ContentSelector', function () {
   var $el
   let $
 let document
+let window
 
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
 
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>", document)
@@ -30,7 +32,7 @@ document = globals.document
     var contentSelector = new ContentSelector({
       parentCSSSelector: 'div#content-script-css-selector-test',
       allowedElements: 'a'
-    }, {$})
+    }, {$, document, window})
 
     var deferredCSSSelector = contentSelector.getCSSSelector()
 
@@ -51,7 +53,7 @@ document = globals.document
     var contentSelector = new ContentSelector({
       parentCSSSelector: 'div#content-script-css-selector-test',
       allowedElements: 'a'
-    }, {$})
+    }, {$, document, window})
 
     var currentCSSSelector = contentSelector.getCurrentCSSSelector()
     assert.equal(currentCSSSelector, '')
@@ -73,7 +75,7 @@ document = globals.document
     var contentSelector = new ContentSelector({
       parentCSSSelector: ' ',
       allowedElements: 'a'
-    }, {$})
+    }, {$, document, window})
 
 		// finish selection
     document.querySelector('#selector-toolbar .done-selecting-button').click()
@@ -86,7 +88,7 @@ document = globals.document
       parentCSSSelector: 'div#content-script-css-selector-test',
       allowedElements: 'a',
       alert: function () {}
-    }, {$})
+    }, {$, document, window})
 
     var deferredCSSSelector = contentSelector.getCSSSelector()
     await selectorMatchers.deferredToFail(deferredCSSSelector)
@@ -97,9 +99,9 @@ document = globals.document
 
     var contentSelector = new ContentSelector({
       parentCSSSelector: 'div#content-script-css-selector-test'
-    }, {$})
+    }, {$, document, window})
 
-    contentSelector.previewSelector('a', {$})
+    contentSelector.previewSelector('a', {$, document, window})
 
     assert.equal(document.querySelectorAll('.-sitemap-select-item-selected').length, 1)
     assert.isTrue(document.querySelector('#content-script-css-selector-test').classList.contains('-sitemap-parent'))
@@ -116,9 +118,9 @@ document = globals.document
     var contentSelector = new ContentSelector({
       parentCSSSelector: 'div#content-script-css-selector-test',
       alert: function () {}
-    }, {$})
+    }, {$, document, window})
 
-    var deferredSelectorPreview = contentSelector.previewSelector('a', {$})
+    var deferredSelectorPreview = contentSelector.previewSelector('a', {$, document, window})
     await selectorMatchers.deferredToFail(deferredSelectorPreview)
 
     assert.equal(document.querySelectorAll('.-sitemap-select-item-selected').length, 0)

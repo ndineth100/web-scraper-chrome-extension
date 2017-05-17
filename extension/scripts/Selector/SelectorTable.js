@@ -23,6 +23,8 @@ var SelectorTable = {
   getTableHeaderColumns: function ($table) {
     var columns = {}
     var $ = this.$
+var document = this.document
+var window = this.window
     var headerRowSelector = this.getTableHeaderRowSelector()
     var $headerRow = $($table).find(headerRowSelector)
     if ($headerRow.length > 0) {
@@ -38,6 +40,8 @@ var SelectorTable = {
   _getData: function (parentElement) {
     var dfd = jquery.Deferred()
     var $ = this.$
+var document = this.document
+var window = this.window
 
     var tables = this.getDataElements(parentElement)
 

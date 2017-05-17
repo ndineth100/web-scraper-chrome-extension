@@ -105,9 +105,11 @@ ContentSelector.prototype = {
 
   previewSelector: function (elementCSSSelector) {
     var $ = this.$
+var document = this.document
+var window = this.window
     if (this.deferredCSSSelectorResponse.state() !== 'rejected') {
       this.highlightParent()
-      $(ElementQuery(elementCSSSelector, this.parent, {$})).addClass('-sitemap-select-item-selected')
+      $(ElementQuery(elementCSSSelector, this.parent, {$, document, window})).addClass('-sitemap-select-item-selected')
       this.deferredCSSSelectorResponse.resolve()
     }
 
@@ -247,13 +249,15 @@ ContentSelector.prototype = {
 
   highlightSelectedElements: function () {
     var $ = this.$
+var document = this.document
+var window = this.window
     try {
       var resultCssSelector = this.getCurrentCSSSelector()
 
       $('body #-selector-toolbar .selector').text(resultCssSelector)
 			// highlight selected elements
       $('.-sitemap-select-item-selected').removeClass('-sitemap-select-item-selected')
-      $(ElementQuery(resultCssSelector, this.parent, {$})).addClass('-sitemap-select-item-selected')
+      $(ElementQuery(resultCssSelector, this.parent, {$, document, window})).addClass('-sitemap-select-item-selected')
     } catch (err) {
       if (err === 'found multiple element groups, but allowMultipleSelectors disabled') {
         console.log('multiple different element selection disabled')

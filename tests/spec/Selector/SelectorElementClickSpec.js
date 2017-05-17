@@ -9,6 +9,7 @@ describe('Click Element Selector', function () {
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
 
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>", document)
@@ -23,7 +24,7 @@ document = globals.document
       multiple: false,
       selector: 'div',
       clickType: 'clickOnce'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -40,7 +41,7 @@ document = globals.document
       multiple: true,
       selector: 'div',
       clickType: 'clickOnce'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -63,7 +64,7 @@ document = globals.document
       clickElementSelector: 'a',
       selector: 'div',
       clickType: 'clickOnce'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -91,7 +92,7 @@ document = globals.document
       selector: 'div',
       delay: 100,
       clickType: 'clickOnce'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 1)
@@ -117,7 +118,7 @@ document = globals.document
       selector: 'div',
       delay: 100,
       clickType: 'clickOnce'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 1)
@@ -132,7 +133,7 @@ document = globals.document
       type: 'SelectorElement',
       multiple: true,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, [])
@@ -154,7 +155,7 @@ document = globals.document
       selector: 'div',
       delay: 100,
       clickType: 'clickOnce'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -188,7 +189,7 @@ document = globals.document
       selector: 'div',
       delay: 100,
       clickType: 'clickOnce'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -224,7 +225,7 @@ document = globals.document
       delay: 100,
       clickType: 'clickOnce',
       discardInitialElements: true
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -259,7 +260,7 @@ document = globals.document
       selector: 'div',
       delay: 200,
       clickType: 'clickMore'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -296,7 +297,7 @@ document = globals.document
       selector: 'div',
       delay: 100,
       clickType: 'clickMore'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -331,7 +332,7 @@ document = globals.document
       delay: 100,
       clickType: 'clickMore',
       discardInitialElements: true
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
@@ -363,7 +364,7 @@ document = globals.document
       selector: 'div',
       delay: 100,
       clickType: 'clickMore'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {

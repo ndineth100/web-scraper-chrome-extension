@@ -29,7 +29,7 @@ Selector.prototype = {
 	 * @param data
 	 */
   updateData: function (data) {
-    var allowedKeys = ['id', 'type', 'selector', 'parentSelectors']
+    var allowedKeys = ['window', 'document', 'id', 'type', 'selector', 'parentSelectors']
     console.log('data type', data.type)
     allowedKeys = allowedKeys.concat(selectors[data.type].getFeatures())
     var key
@@ -95,7 +95,9 @@ Selector.prototype = {
 
   getDataElements: function (parentElement) {
     var $ = this.$
-    var elements = ElementQuery(this.selector, parentElement, {$})
+var document = this.document
+var window = this.window
+    var elements = ElementQuery(this.selector, parentElement, {$, document, window})
     if (this.multiple) {
       return elements
     } else if (elements.length > 0) {

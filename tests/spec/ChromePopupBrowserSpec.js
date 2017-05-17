@@ -6,9 +6,11 @@ const globals = require('../globals')
 describe('Chrome popup browser', function () {
   let $
 let document
+let window
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
 
     window.chromeAPI.reset()
     document.body.innerHTML = utils.getTestHTML()
@@ -45,7 +47,7 @@ document = globals.document
           parentSelectors: ['_root']
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var browser = new ChromePopupBrowser({
       pageLoadDelay: 500

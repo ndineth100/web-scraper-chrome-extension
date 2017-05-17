@@ -21,6 +21,8 @@ var SelectorText = {
   },
   _getData: function (parentElement) {
     var $ = this.$
+var document = this.document
+var window = this.window
     var dfd = jquery.Deferred()
 
     var elements = this.getDataElements(parentElement)

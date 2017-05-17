@@ -6,9 +6,11 @@ const globals = require('../../globals')
 describe('Element Selector', function () {
   let $
 let document
+let window
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
 
     document.body.innerHTML = utils.getTestHTML()
   })
@@ -19,7 +21,7 @@ document = globals.document
       type: 'SelectorElement',
       multiple: false,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
 
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-element-nodata')[0])
     dataDeferred.then(function (data) {
@@ -35,7 +37,7 @@ document = globals.document
       type: 'SelectorElement',
       multiple: true,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
     var dataDeferred = selector.getData(document.querySelectorAll('#selector-element-nodata')[0])
     dataDeferred.then(function (data) {
       assert.equal(data.length, 2)
@@ -50,7 +52,7 @@ document = globals.document
       type: 'SelectorElement',
       multiple: true,
       selector: 'div'
-    }, {$})
+    }, {$, document, window})
 
     var columns = selector.getDataColumns()
     assert.deepEqual(columns, [])

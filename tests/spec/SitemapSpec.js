@@ -7,9 +7,11 @@ const globals = require('../globals')
 describe('Sitemap', function () {
   let $
 let document
+let window
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
 
   })
   it('should be able to rename selector with a parent', function () {
@@ -32,7 +34,7 @@ document = globals.document
 
     var sitemap = new Sitemap({
       selectors: selectors
-    }, {$})
+    }, {$, document, window})
 
     var expected = new Selector({
       id: 'b',
@@ -40,7 +42,7 @@ document = globals.document
       parentSelectors: [
         'parent'
       ]
-    }, {$})
+    }, {$, document, window})
 
 		// no hard decidions here
     sitemap.updateSelector(sitemap.selectors[1], expected)
@@ -67,7 +69,7 @@ document = globals.document
 
     var sitemap = new Sitemap({
       selectors: selectors
-    }, {$})
+    }, {$, document, window})
 
     var expected = new Selector({
       id: 'b',
@@ -75,7 +77,7 @@ document = globals.document
       parentSelectors: [
         '_root'
       ]
-    }, {$})
+    }, {$, document, window})
 
     var expectedChild = new Selector({
       id: 'child',
@@ -83,7 +85,7 @@ document = globals.document
       parentSelectors: [
         'b'
       ]
-    }, {$})
+    }, {$, document, window})
 
 		// no hard decidions here
     sitemap.updateSelector(sitemap.selectors[1], expected)
@@ -104,7 +106,7 @@ document = globals.document
 
     var sitemap = new Sitemap({
       selectors: selectors
-    }, {$})
+    }, {$, document, window})
 
     var update = new Selector({
       id: 'b',
@@ -112,7 +114,7 @@ document = globals.document
       parentSelectors: [
         'a'
       ]
-    }, {$})
+    }, {$, document, window})
 
     var expected = new Selector({
       id: 'b',
@@ -120,7 +122,7 @@ document = globals.document
       parentSelectors: [
         'b'
       ]
-    }, {$})
+    }, {$, document, window})
 
 		// no hard decidions here
     sitemap.updateSelector(sitemap.selectors[0], update)
@@ -138,7 +140,7 @@ document = globals.document
           ]
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var update = new Selector({
       id: 'a',
@@ -146,7 +148,7 @@ document = globals.document
       parentSelectors: [
         'a'
       ]
-    }, {$})
+    }, {$, document, window})
 
     assert.isFalse(sitemap.selectors[0].canCreateNewJobs())
     sitemap.updateSelector(sitemap.selectors[0], update)
@@ -166,7 +168,7 @@ document = globals.document
           ]
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var sitemapJSON = sitemap.exportSitemap()
     var expectedJSON = '{"_id":"id","selectors":[{"id":"a","type":"SelectorElement","parentSelectors":["a"]}]}'
@@ -185,10 +187,10 @@ document = globals.document
           ]
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var sitemapJSON = '{"_id":"id","selectors":[{"id":"a","type":"SelectorElement","parentSelectors":["a"]}]}'
-    var sitemap = new Sitemap(null, {$})
+    var sitemap = new Sitemap(null, {$, document, window})
     sitemap.importSitemap(sitemapJSON)
     assert.deepEqual(sitemap, expectedSitemap)
   })
@@ -207,7 +209,7 @@ document = globals.document
           selector: 'b'
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var data = [
 			{a: 'a', b: 'b', c: 'c'}
@@ -231,7 +233,7 @@ document = globals.document
           selector: 'b'
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var columns = sitemap.getDataColumns()
     assert.deepEqual(columns, ['a', 'b', 'b-href'])
@@ -253,7 +255,7 @@ document = globals.document
           parentSelectors: ['_root']
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     sitemap.deleteSelector(sitemap.selectors[0])
 
@@ -276,7 +278,7 @@ document = globals.document
           parentSelectors: ['a']
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     sitemap.deleteSelector(sitemap.selectors[0])
     assert.equal(sitemap.selectors.length, 0)
@@ -304,22 +306,22 @@ document = globals.document
           parentSelectors: ['b', '_root']
         }
       ]
-    }, {$})
+    }, {$, document, window})
     var expectedSelector = new Selector({
       id: 'c',
       type: 'SelectorLink',
       selector: 'c',
       parentSelectors: ['_root']
-    }, {$})
+    }, {$, document, window})
 
     sitemap.deleteSelector(sitemap.selectors[0])
-    assert.deepEqual(sitemap.selectors, new SelectorList([expectedSelector], {$}))
+    assert.deepEqual(sitemap.selectors, new SelectorList([expectedSelector], {$, document, window}))
   })
 
   it('Should return one start url', function () {
     var sitemap = new Sitemap({
       startUrl: 'http://example.com/'
-    }, {$})
+    }, {$, document, window})
     var expectedURLS = ['http://example.com/']
     assert.deepEqual(sitemap.getStartUrls(), expectedURLS)
   })
@@ -327,7 +329,7 @@ document = globals.document
   it('Should return multiple start urls', function () {
     var sitemap = new Sitemap({
       startUrl: 'http://example.com/[1-3].html'
-    }, {$})
+    }, {$, document, window})
     var expectedURLS = [
       'http://example.com/1.html',
       'http://example.com/2.html',
@@ -339,7 +341,7 @@ document = globals.document
   it('Should return multiple start urls with id at the end', function () {
     var sitemap = new Sitemap({
       startUrl: 'http://example.com/?id=[1-3]'
-    }, {$})
+    }, {$, document, window})
     var expectedURLS = [
       'http://example.com/?id=1',
       'http://example.com/?id=2',
@@ -351,7 +353,7 @@ document = globals.document
   it('should return multiple start urls with specified incremental', function () {
     var sitemap = new Sitemap({
       startUrl: 'http://example.com/?id=[0-20:10]'
-    }, {$})
+    }, {$, document, window})
     var expectedURLS = [
       'http://example.com/?id=0',
       'http://example.com/?id=10',
@@ -363,7 +365,7 @@ document = globals.document
   it('Should return multiple start urls with padding', function () {
     var sitemap = new Sitemap({
       startUrl: 'http://example.com/[001-003].html'
-    }, {$})
+    }, {$, document, window})
     var expectedURLS = [
       'http://example.com/001.html',
       'http://example.com/002.html',
@@ -375,7 +377,7 @@ document = globals.document
   it('Should return multiple start urls when startUrl is an array', function () {
     var sitemap = new Sitemap({
       startUrl: ['http://example.com/1.html', 'http://example.com/2.html', 'http://example.com/3.html']
-    }, {$})
+    }, {$, document, window})
     var expectedURLS = [
       'http://example.com/1.html',
       'http://example.com/2.html',
@@ -412,7 +414,7 @@ document = globals.document
           type: 'SelectorText'
         }
       ]
-    }, {$})
+    }, {$, document, window})
 
     var expectedIds = ['_root', 'a', 'e']
     assert.deepEqual(sitemap.getPossibleParentSelectorIds(), expectedIds)

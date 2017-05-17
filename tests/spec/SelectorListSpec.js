@@ -6,9 +6,11 @@ const globals = require('./../globals')
 describe('SelectorList', function () {
   let $
 let document
+let window
   beforeEach(function () {
     $ = globals.$
 document = globals.document
+window = globals.window
 
   })
   it('should init selectors', function () {
@@ -21,7 +23,7 @@ document = globals.document
       }
     ]
 
-    var selectorList = new SelectorList(selectors, {$})
+    var selectorList = new SelectorList(selectors, {$, document, window})
 
     assert.isTrue(selectorList[0] instanceof Selector)
   })
@@ -36,9 +38,9 @@ document = globals.document
       }
     ]
 
-    var selectorList = new SelectorList(selectors, {$})
+    var selectorList = new SelectorList(selectors, {$, document, window})
 
-    assert.deepEqual(selectorList[0], new Selector(selectors[0], {$}))
+    assert.deepEqual(selectorList[0], new Selector(selectors[0], {$, document, window}))
   })
 
   it('should ignore repeating selectors', function () {
@@ -53,11 +55,11 @@ document = globals.document
       }
     ]
 
-    var selectorList = new SelectorList(selectors, {$})
+    var selectorList = new SelectorList(selectors, {$, document, window})
 
     assert.equal(selectorList.length, 1)
-    assert.deepEqual(selectorList[0], new Selector(selectors[0], {$}))
-    assert.deepEqual(selectorList[0], new Selector(selectors[1], {$}))
+    assert.deepEqual(selectorList[0], new Selector(selectors[0], {$, document, window}))
+    assert.deepEqual(selectorList[0], new Selector(selectors[1], {$, document, window}))
   })
 
   it('should be able to return all of its selectors', async function () {
@@ -72,7 +74,7 @@ document = globals.document
       }
     ]
 
-    var selectorList = new SelectorList(selectors, {$})
+    var selectorList = new SelectorList(selectors, {$, document, window})
 
     var foundSelectors = selectorList.getAllSelectors()
     await selectorMatchers.matchSelectorList(foundSelectors, selectors)
@@ -104,7 +106,7 @@ document = globals.document
       }
     ])
 
-    var selectorList = new SelectorList(selectors, {$})
+    var selectorList = new SelectorList(selectors, {$, document, window})
 
     var foundSelectors = selectorList.getAllSelectors('a')
     await selectorMatchers.matchSelectorList(foundSelectors, expectedSelectors)
@@ -136,7 +138,7 @@ document = globals.document
       }
     ])
 
-    var selectorList = new SelectorList(selectors, {$})
+    var selectorList = new SelectorList(selectors, {$, document, window})
 
     var foundSelectors = selectorList.getDirectChildSelectors('a')
     await selectorMatchers.matchSelectorList(foundSelectors, expectedSelectors)
@@ -148,7 +150,7 @@ document = globals.document
         id: 'a',
         type: 'SelectorText'
       }
-    ], {$})
+    ], {$, document, window})
     var resultList = selectorList.clone()
     selectorList.pop()
     assert.equal(selectorList.length, 0)
@@ -161,7 +163,7 @@ document = globals.document
         id: 'a',
         type: 'SelectorText'
       }
-    ], {$})
+    ], {$, document, window})
 
     var newList = selectorList.concat([
       {
@@ -193,7 +195,7 @@ document = globals.document
         multiple: true,
         parentSelectors: ['b']
       }
-    ], {$})
+    ], {$, document, window})
 
     assert.isTrue(selectorList.willReturnMultipleRecords('a'))
   })
@@ -218,7 +220,7 @@ document = globals.document
         multiple: false,
         parentSelectors: ['b']
       }
-    ], {$})
+    ], {$, document, window})
 
     assert.isFalse(selectorList.willReturnMultipleRecords('a'))
   })
@@ -231,7 +233,7 @@ document = globals.document
         multiple: false,
         parentSelectors: ['_root']
       }
-    ], {$})
+    ], {$, document, window})
     var selectorListJSON = JSON.stringify(selectorList)
 
     assert.equal(selectorListJSON, '[{"id":"a","type":"SelectorElement","multiple":false,"parentSelectors":["_root"]}]')
@@ -245,8 +247,8 @@ document = globals.document
         multiple: false,
         parentSelectors: ['_root']
       }
-    ], {$})
-    var selectorListNew = new SelectorList(JSON.parse(JSON.stringify(selectorList)), {$})
+    ], {$, document, window})
+    var selectorListNew = new SelectorList(JSON.parse(JSON.stringify(selectorList)), {$, document, window})
 
     assert.deepEqual(selectorListNew, selectorList)
   })
@@ -289,7 +291,7 @@ document = globals.document
         multiple: false,
         parentSelectors: ['parent2']
       }
-    ], {$})
+    ], {$, document, window})
 
     var selectorList = expectedSelectorList.concat([
       {
@@ -378,7 +380,7 @@ document = globals.document
         multiple: false,
         parentSelectors: ['parent2']
       }
-    ], {$})
+    ], {$, document, window})
 
     var selectorList = expectedSelectorList.concat([
       {
@@ -418,7 +420,7 @@ document = globals.document
         type: 'SelectorText',
         selector: 'div'
       }
-    ], {$})
+    ], {$, document, window})
 
     var CSSSelector = selectorList.getCSSSelectorWithinOnePage('div', ['_root'])
     assert.equal(CSSSelector, 'div')
@@ -436,7 +438,7 @@ document = globals.document
         type: 'SelectorText',
         selector: 'div'
       }
-    ], {$})
+    ], {$, document, window})
 
     var CSSSelector = selectorList.getCSSSelectorWithinOnePage('div', ['_root', 'parent1'])
     assert.equal(CSSSelector, 'div.parent div')
@@ -459,7 +461,7 @@ document = globals.document
         type: 'SelectorText',
         selector: 'div'
       }
-    ], {$})
+    ], {$, document, window})
 
     var CSSSelector = selectorList.getParentCSSSelectorWithinOnePage(['_root', 'parent2', 'parent1'])
     assert.equal(CSSSelector, 'div.parent2 div.parent ')
@@ -482,7 +484,7 @@ document = globals.document
         type: 'SelectorText',
         selector: 'div'
       }
-    ], {$})
+    ], {$, document, window})
 
     var CSSSelector = selectorList.getCSSSelectorWithinOnePage('div', ['_root', 'parent2', 'parent1'])
     assert.equal(CSSSelector, 'div.parent2 div.parent div')
@@ -505,7 +507,7 @@ document = globals.document
         type: 'SelectorText',
         selector: 'div'
       }
-    ], {$})
+    ], {$, document, window})
 
     var CSSSelector = selectorList.getCSSSelectorWithinOnePage('div', ['_root', 'parent2', 'parent1'])
     assert.equal(CSSSelector, 'div.parent div')
@@ -531,7 +533,7 @@ document = globals.document
         selector: 'div',
         parentSelectors: ['parent2']
       }
-    ], {$})
+    ], {$, document, window})
 
     var recursionFound = selectorList.hasRecursiveElementSelectors()
     assert.isFalse(recursionFound)
@@ -557,7 +559,7 @@ document = globals.document
         selector: 'div',
         parentSelectors: ['parent2']
       }
-    ], {$})
+    ], {$, document, window})
 
     var recursionFound = selectorList.hasRecursiveElementSelectors()
     assert.isTrue(recursionFound)
@@ -583,7 +585,7 @@ document = globals.document
         selector: 'div',
         parentSelectors: ['parent', 'link']
       }
-    ], {$})
+    ], {$, document, window})
 
     var recursionFound = selectorList.hasRecursiveElementSelectors()
     assert.isFalse(recursionFound)
