@@ -272,7 +272,9 @@ DataExtractor.prototype = {
     this.$ = options.$
 this.document = options.document
 this.window = options.window
-    if (!options.$) throw new Error('Missing jquery')
+    if (!this.$) throw new Error('Missing jquery')
+if (!this.document) throw new Error("Missing document")
+if(!this.window)throw new Error("Missing window")
 		// to fetch only single selectors data we will create a sitemap that only contains this selector, his
 		// parents and all child selectors
     var sitemap = this.sitemap

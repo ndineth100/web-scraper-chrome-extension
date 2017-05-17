@@ -10,6 +10,8 @@ var SitemapController = function (options, moreOptions) {
 this.document = moreOptions.document
 this.window = moreOptions.window
   if (!this.$) throw new Error('Missing jquery in Controller')
+if (!this.document) throw new Error("Missing document")
+if(!this.window)throw new Error("Missing window")
   for (var i in options) {
     this[i] = options[i]
   }

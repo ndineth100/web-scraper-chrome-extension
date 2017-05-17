@@ -18,6 +18,8 @@ var ContentSelector = function (options, moreOptions) {
 this.document = moreOptions.document
 this.window = moreOptions.window
   if (!this.$) throw new Error('Missing jquery in content selector')
+if (!this.document) throw new Error("Missing document")
+if(!this.window)throw new Error("Missing window")
   if (this.parentCSSSelector) {
     this.parent = this.$(this.parentCSSSelector)[0]
 

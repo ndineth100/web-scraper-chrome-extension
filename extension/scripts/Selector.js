@@ -6,7 +6,9 @@ var Selector = function (selector, options) {
   this.$ = options.$
 this.document = options.document
 this.window = options.window
-  if (!options.$) throw new Error('Missing jquery')
+  if (!this.$) throw new Error('Missing jquery')
+if (!this.document) throw new Error("Missing document")
+if(!this.window)throw new Error("Missing window")
 
   this.updateData(selector)
   this.initType()

@@ -17,7 +17,9 @@ var SelectorList = function (selectors, options) {
     get: function () {return document},
     enumerable: false
   })
-  if (!options.$) throw new Error('Missing jquery')
+  if (!this.$) throw new Error('Missing jquery')
+if (!this.document) throw new Error("Missing document")
+if(!this.window)throw new Error("Missing window")
 
   if (selectors === null || selectors === undefined) {
     return

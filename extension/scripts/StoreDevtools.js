@@ -10,6 +10,8 @@ var StoreDevtools = function (options) {
 this.document = options.document
 this.window = options.window
   if (!this.$) throw new Error('jquery required')
+if (!this.document) throw new Error("Missing document")
+if(!this.window)throw new Error("Missing window")
 }
 
 StoreDevtools.prototype = {

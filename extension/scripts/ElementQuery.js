@@ -10,6 +10,8 @@ var ElementQuery = function (CSSSelector, parentElement, options) {
 this.document = options.document
 this.window = options.window
   if (!this.$) throw new Error('Missing jquery for ElementQuery')
+if (!this.document) throw new Error("Missing document")
+if(!this.window)throw new Error("Missing window")
   var selectedElements = []
 
   var addElement = function (element) {

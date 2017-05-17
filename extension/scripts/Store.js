@@ -6,6 +6,8 @@ var Store = function (config, options) {
 this.document = options.document
 this.window = options.window
   if (!this.$) throw new Error('jquery required')
+if (!this.document) throw new Error("Missing document")
+if(!this.window)throw new Error("Missing window")
     // configure couchdb
   this.sitemapDb = new PouchDB(this.config.sitemapDb)
 }
