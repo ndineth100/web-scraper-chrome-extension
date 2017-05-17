@@ -35,7 +35,10 @@ SelectorList.prototype = []
 SelectorList.prototype.push = function (selector) {
   if (!this.hasSelector(selector.id)) {
     if (!(selector instanceof Selector)) {
-      selector = new Selector(selector, {$: this.$})
+var $ = this.$
+var document = this.document
+var window = this.window
+      selector = new Selector(selector, {$, window, document})
     }
     Array.prototype.push.call(this, selector)
   }
@@ -86,7 +89,10 @@ SelectorList.prototype.getAllSelectors = function (parentSelectorId) {
  * @returns {Array}
  */
 SelectorList.prototype.getDirectChildSelectors = function (parentSelectorId) {
-  var resultSelectors = new SelectorList(null, {$: this.$})
+var $ = this.$
+var document = this.document
+var window = this.window
+  var resultSelectors = new SelectorList(null, {$, window, document})
   this.forEach(function (selector) {
     if (selector.hasParentSelector(parentSelectorId)) {
       resultSelectors.push(selector)
@@ -96,7 +102,10 @@ SelectorList.prototype.getDirectChildSelectors = function (parentSelectorId) {
 }
 
 SelectorList.prototype.clone = function () {
-  var resultList = new SelectorList(null, {$: this.$})
+var $ = this.$
+var document = this.document
+var window = this.window
+  var resultList = new SelectorList(null, {$, window, document})
   this.forEach(function (selector) {
     resultList.push(selector)
   })
@@ -104,7 +113,10 @@ SelectorList.prototype.clone = function () {
 }
 
 SelectorList.prototype.fullClone = function () {
-  var resultList = new SelectorList(null, {$: this.$})
+var $ = this.$
+var document = this.document
+var window = this.window
+  var resultList = new SelectorList(null, {$, window, document})
   this.forEach(function (selector) {
     resultList.push(JSON.parse(JSON.stringify(selector)))
   })
@@ -137,7 +149,10 @@ SelectorList.prototype.getSelector = function (selectorId) {
  * @returns {*}
  */
 SelectorList.prototype.getOnePageSelectors = function (selectorId) {
-  var resultList = new SelectorList(null, {$: this.$})
+var $ = this.$
+var document = this.document
+var window = this.window
+  var resultList = new SelectorList(null, {$, window, document})
   var selector = this.getSelector(selectorId)
   resultList.push(this.getSelector(selectorId))
 
@@ -166,7 +181,10 @@ SelectorList.prototype.getOnePageSelectors = function (selectorId) {
  * @param parentSelectorId
  */
 SelectorList.prototype.getSinglePageAllChildSelectors = function (parentSelectorId) {
-  var resultList = new SelectorList(null, {$: this.$})
+var $ = this.$
+var document = this.document
+var window = this.window
+  var resultList = new SelectorList(null, {$, window, document})
   var addChildSelectors = function (parentSelector) {
     if (parentSelector.willReturnElements()) {
       var childSelectors = this.getDirectChildSelectors(parentSelector.id)

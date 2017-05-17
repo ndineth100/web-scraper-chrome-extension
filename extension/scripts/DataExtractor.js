@@ -8,12 +8,17 @@ var DataExtractor = function (options, moreOptions) {
 this.document = moreOptions.document
 this.window = moreOptions.window
   if (!moreOptions.$) {
-    console.error((new Error('a')).stack)
     throw new Error('Missing jquery in Data Extractor')
   }
+  if (!moreOptions.document) {
+    throw new Error('Missing document in Data Extractor')
+  }
+  if (!moreOptions.window) {
+    throw new Error('Missing window in Data Extractor')
+  }
   var $ = this.$
-var document = this.document
-var window = this.window
+  var document = this.document
+  var window = this.window
   if (options.sitemap instanceof Sitemap) {
     this.sitemap = options.sitemap
   } else {
@@ -31,7 +36,10 @@ DataExtractor.prototype = {
 	 * Two side by side type=multiple selectors split trees.
 	 */
   findSelectorTrees: function () {
-    return this._findSelectorTrees(this.parentSelectorId, new SelectorList(null, {$: this.$}))
+    var $ = this.$
+    var document = this.document
+    var window = this.window
+    return this._findSelectorTrees(this.parentSelectorId, new SelectorList(null, {$, window, document}))
   },
 
 	/**
@@ -271,12 +279,10 @@ DataExtractor.prototype = {
   },
 
   getSingleSelectorData: function (parentSelectorIds, selectorId, options) {
-    this.$ = options.$
-this.document = options.document
-this.window = options.window
-    if (!this.$) throw new Error('Missing jquery')
-if (!this.document) throw new Error("Missing document")
-if(!this.window)throw new Error("Missing window")
+    var $ = this.$ || options.$
+    var document = this.document || options.document
+    var window = this.window || options.window
+
 		// to fetch only single selectors data we will create a sitemap that only contains this selector, his
 		// parents and all child selectors
     var sitemap = this.sitemap
@@ -296,7 +302,7 @@ if(!this.window)throw new Error("Missing window")
 		// merge all needed selectors together
     var selectors = parentSelectors.concat(childSelectors)
     selectors.push(selector)
-    sitemap.selectors = new SelectorList(selectors, {$: this.$})
+    sitemap.selectors = new SelectorList(selectors, {$, window, document})
 
     var parentSelectorId
 		// find the parent that leaded to the page where required selector is being used

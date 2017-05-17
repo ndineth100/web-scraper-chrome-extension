@@ -1,11 +1,28 @@
 var Selector = require('./Selector')
 var SelectorList = require('./SelectorList')
 var Sitemap = function (sitemapObj, options) {
-  this.$ = options.$
-this.document = options.document
-this.window = options.window
+  var $ = options.$
+  var document = options.document
+  var window = options.window
+  // We don't want enumerable properties
+  Object.defineProperty(this, '$', {
+    get: function () {return $},
+    enumerable: false
+  })
+  Object.defineProperty(this, 'window', {
+    get: function () {return window},
+    enumerable: false
+  })
+  Object.defineProperty(this, 'document', {
+    get: function () {return document},
+    enumerable: false
+  })
   if (!this.$) throw new Error('Missing jquery')
-if (!this.document) throw new Error("Missing document")
+if (!this.document) {
+  console.error((new Error()).stack)
+
+  throw new Error("Missing document")
+}
 if(!this.window)throw new Error("Missing window")
   this.initData(sitemapObj)
 }
@@ -117,7 +134,10 @@ Sitemap.prototype = {
   updateSelector: function (selector, selectorData) {
 		// selector is undefined when creating a new one
     if (selector === undefined) {
-      selector = new Selector(selectorData, {$: this.$})
+var $ = this.$
+var document = this.document
+var window = this.window
+      selector = new Selector(selectorData, {$, window, document})
     }
 
 		// update child selectors

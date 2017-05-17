@@ -922,11 +922,14 @@ var window = this.window
     var parentSelectorId = this.state.currentParentSelectorId
     var sitemap = this.state.currentSitemap
 
+    var $ = this.$
+    var document = this.document
+    var window = this.window
     var selector = new Selector({
       parentSelectors: [parentSelectorId],
       type: 'SelectorText',
       multiple: false
-    }, {$: this.$})
+    }, {$, window, document})
 
     this._editSelector(selector, sitemap)
   },

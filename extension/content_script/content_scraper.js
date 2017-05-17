@@ -9,7 +9,7 @@ function extensionListener (request, sender, sendResponse, options) {
 
   if (request.extractData) {
     console.log('received data extraction request', request)
-    var extractor = new DataExtractor(request, {$})
+    var extractor = new DataExtractor(request, {$, window, document})
     var deferredData = extractor.getData()
     deferredData.done(function (data) {
       console.log('dataextractor data', data)

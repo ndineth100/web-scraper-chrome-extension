@@ -3,9 +3,22 @@ var ElementQuery = require('./ElementQuery')
 var jquery = require('jquery-deferred')
 
 var Selector = function (selector, options) {
-  this.$ = options.$
-this.document = options.document
-this.window = options.window
+  var $ = options.$
+  var document = options.document
+  var window = options.window
+  // We don't want enumerable properties
+  Object.defineProperty(this, '$', {
+    get: function () {return $},
+    enumerable: false
+  })
+  Object.defineProperty(this, 'window', {
+    get: function () {return window},
+    enumerable: false
+  })
+  Object.defineProperty(this, 'document', {
+    get: function () {return document},
+    enumerable: false
+  })
   if (!this.$) throw new Error('Missing jquery')
 if (!this.document) throw new Error("Missing document")
 if(!this.window)throw new Error("Missing window")
