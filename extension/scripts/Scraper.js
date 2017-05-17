@@ -12,6 +12,8 @@ var Scraper = function (options, moreOptions) {
   this.requestInterval = parseInt(options.requestInterval)
   this.pageLoadDelay = parseInt(options.pageLoadDelay)
   this.$ = moreOptions.$
+this.document = moreOptions.document
+this.window = moreOptions.window
   if (!moreOptions.$) throw new Error('Missing jquery')
 }
 

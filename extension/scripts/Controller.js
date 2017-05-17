@@ -7,6 +7,8 @@ var getBackgroundScript = require('./getBackgroundScript')
 var getContentScript = require('./getContentScript')
 var SitemapController = function (options, moreOptions) {
   this.$ = moreOptions.$
+this.document = moreOptions.document
+this.window = moreOptions.window
   if (!this.$) throw new Error('Missing jquery in Controller')
   for (var i in options) {
     this[i] = options[i]

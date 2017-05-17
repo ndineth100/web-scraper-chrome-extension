@@ -5,11 +5,14 @@ const globals = require('../globals')
 describe('Selector', function () {
   var $el
   let $
+let document
 
   beforeEach(function () {
     $ = globals.$
+document = globals.document
+
     document.body.innerHTML = utils.getTestHTML()
-    $el = utils.createElementFromHTML("<div id='tests' style='display:none'>aaaaaaaaaaaa</div>")
+    $el = utils.createElementFromHTML("<div id='tests' style='display:none'>aaaaaaaaaaaa</div>", document)
     document.body.appendChild($el)
   })
 

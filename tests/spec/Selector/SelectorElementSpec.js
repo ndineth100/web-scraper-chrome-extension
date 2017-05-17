@@ -5,8 +5,11 @@ const globals = require('../../globals')
 
 describe('Element Selector', function () {
   let $
+let document
   beforeEach(function () {
     $ = globals.$
+document = globals.document
+
     document.body.innerHTML = utils.getTestHTML()
   })
 

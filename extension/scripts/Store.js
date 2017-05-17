@@ -3,11 +3,12 @@ var Sitemap = require('./Sitemap')
 var Store = function (config, options) {
   this.config = config
   this.$ = options.$
+this.document = options.document
+this.window = options.window
   if (!this.$) throw new Error('jquery required')
     // configure couchdb
   this.sitemapDb = new PouchDB(this.config.sitemapDb)
 }
-
 var StoreScrapeResultWriter = function (db) {
   this.db = db
 }
@@ -69,7 +70,7 @@ Store.prototype = {
       sitemap._rev = response.rev
       callback(sitemap)
     }.bind(this, sitemap))
-  },
+  }, 
   saveSitemap: function (sitemap, callback) {
         // @TODO remove
     this.createSitemap(sitemap, callback)

@@ -5,8 +5,11 @@ const assert = require('chai').assert
 const globals = require('./../globals')
 describe('SelectorList', function () {
   let $
+let document
   beforeEach(function () {
     $ = globals.$
+document = globals.document
+
   })
   it('should init selectors', function () {
     var selectors = [

@@ -6,8 +6,11 @@ const globals = require('../globals')
 
 describe('Sitemap', function () {
   let $
+let document
   beforeEach(function () {
     $ = globals.$
+document = globals.document
+
   })
   it('should be able to rename selector with a parent', function () {
     var selectors = [

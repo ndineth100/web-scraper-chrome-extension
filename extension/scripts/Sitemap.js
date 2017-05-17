@@ -2,6 +2,8 @@ var Selector = require('./Selector')
 var SelectorList = require('./SelectorList')
 var Sitemap = function (sitemapObj, options) {
   this.$ = options.$
+this.document = options.document
+this.window = options.window
   if (!options.$) throw new Error('Missing jquery')
   this.initData(sitemapObj)
 }

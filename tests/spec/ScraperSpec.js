@@ -16,6 +16,8 @@ describe('Scraper', function () {
 
   beforeEach(function () {
     $ = globals.$
+document = globals.document
+
     q = new Queue()
     store = new FakeStore()
     document.body.innerHTML = utils.getTestHTML()

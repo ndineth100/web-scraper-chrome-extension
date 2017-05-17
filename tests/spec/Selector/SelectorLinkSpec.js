@@ -6,10 +6,13 @@ const globals = require('../../globals')
 describe('Link Selector', function () {
   var $el
   let $
+let document
   beforeEach(function () {
     $ = globals.$
+document = globals.document
+
     document.body.innerHTML = utils.getTestHTML()
-    $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
+    $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>", document)
     document.body.appendChild($el)
   })
 

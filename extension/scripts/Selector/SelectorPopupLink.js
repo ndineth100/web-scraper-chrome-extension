@@ -73,6 +73,7 @@ var SelectorPopupLink = {
 	 */
   getPopupURL: function (element) {
     var $ = this.$
+    var document = this.document
     // override window.open function. we need to execute this in page scope.
 		// we need to know how to find this element from page scope.
     var cs = new CssSelector({

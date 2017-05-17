@@ -20,6 +20,7 @@ var SelectorElementScroll = {
     return true
   },
   scrollToBottom: function () {
+    var document = this.document
     window.scrollTo(0, document.body.scrollHeight)
   },
   _getData: function (parentElement) {

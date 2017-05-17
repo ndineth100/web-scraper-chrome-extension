@@ -5,6 +5,8 @@ var jquery = require('jquery-deferred')
 
 var DataExtractor = function (options, moreOptions) {
   this.$ = moreOptions.$
+this.document = moreOptions.document
+this.window = moreOptions.window
   if (!moreOptions.$) {
     console.error((new Error('a')).stack)
     throw new Error('Missing jquery in Data Extractor')
@@ -268,6 +270,8 @@ DataExtractor.prototype = {
 
   getSingleSelectorData: function (parentSelectorIds, selectorId, options) {
     this.$ = options.$
+this.document = options.document
+this.window = options.window
     if (!options.$) throw new Error('Missing jquery')
 		// to fetch only single selectors data we will create a sitemap that only contains this selector, his
 		// parents and all child selectors

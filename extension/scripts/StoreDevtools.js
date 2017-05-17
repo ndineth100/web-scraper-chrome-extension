@@ -7,6 +7,8 @@ var Sitemap = require('./Sitemap')
  */
 var StoreDevtools = function (options) {
   this.$ = options.$
+this.document = options.document
+this.window = options.window
   if (!this.$) throw new Error('jquery required')
 }
 

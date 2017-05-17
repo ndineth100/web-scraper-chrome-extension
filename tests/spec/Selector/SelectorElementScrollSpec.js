@@ -6,10 +6,13 @@ const globals = require('../../globals')
 describe('Scroll Element Selector', function () {
   var $el
   let $
+let document
   beforeEach(function () {
     $ = globals.$
+document = globals.document
+
     document.body.innerHTML = utils.getTestHTML()
-    $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
+    $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>", document)
     document.body.appendChild($el)
   })
 
@@ -68,7 +71,7 @@ describe('Scroll Element Selector', function () {
     $el.innerHTML = '<a>a</a>'
     // add extra element after a little delay
     setTimeout(function () {
-      utils.appendHTML($el, '<a>a</a>')
+      utils.appendHTML($el, '<a>a</a>', document)
     }, 100)
 
     var selector = new Selector({

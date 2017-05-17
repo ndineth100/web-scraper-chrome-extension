@@ -6,11 +6,14 @@ const globals = require('../../globals')
 describe('Element Attribute Selector', function () {
   var $el
   let $
+let document
 
   beforeEach(function () {
     $ = globals.$
+document = globals.document
+
     document.body.innerHTML = utils.getTestHTML()
-    $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
+    $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>", document)
     document.body.appendChild($el)
   })
 
@@ -89,7 +92,7 @@ describe('Element Attribute Selector', function () {
 
   it('should be able to select data- attributes', function (done) {
     var html = '<ul><li data-type="dog"></li></ul>'
-    utils.appendHTML($el, html)
+    utils.appendHTML($el, html, document)
 
     var selector = new Selector({
       id: 'type',

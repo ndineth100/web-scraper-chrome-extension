@@ -1,7 +1,22 @@
 var Selector = require('./Selector')
 
 var SelectorList = function (selectors, options) {
-  this.$ = options.$
+  var $ = options.$
+  var document = options.document
+  var window = options.window
+  // We don't want enumerable properties
+  Object.defineProperty(this, '$', {
+    get: function () {return $},
+    enumerable: false
+  })
+  Object.defineProperty(this, 'window', {
+    get: function () {return window},
+    enumerable: false
+  })
+  Object.defineProperty(this, 'document', {
+    get: function () {return document},
+    enumerable: false
+  })
   if (!options.$) throw new Error('Missing jquery')
 
   if (selectors === null || selectors === undefined) {

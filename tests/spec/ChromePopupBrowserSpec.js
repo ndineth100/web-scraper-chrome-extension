@@ -5,8 +5,11 @@ const utils = require('./../utils')
 const globals = require('../globals')
 describe('Chrome popup browser', function () {
   let $
+let document
   beforeEach(function () {
     $ = globals.$
+document = globals.document
+
     window.chromeAPI.reset()
     document.body.innerHTML = utils.getTestHTML()
   })

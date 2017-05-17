@@ -38,6 +38,7 @@ var SelectorElementClick = {
   },
 
   triggerButtonClick: function (clickElement) {
+    var document = this.document
     var cs = new CssSelector({
       enableSmartTableSelector: false,
       parent: this.$('body')[0],

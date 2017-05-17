@@ -8,8 +8,10 @@ describe('Click Element Selector', function () {
   var $
   beforeEach(function () {
     $ = globals.$
+document = globals.document
+
     document.body.innerHTML = utils.getTestHTML()
-    $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
+    $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>", document)
     document.body.appendChild($el)
   })
 
@@ -51,7 +53,7 @@ describe('Click Element Selector', function () {
   it('should get elements that are available immediately after clicking', function (done) {
     $el.innerHTML = '<a>a</a>'
     $el.querySelectorAll('a').forEach(el => el.addEventListener('click', function () {
-      utils.appendHTML($el, '<div>test</div>')
+      utils.appendHTML($el, '<div>test</div>', document)
     }))
 
     var selector = new Selector({
@@ -75,7 +77,7 @@ describe('Click Element Selector', function () {
     $el.innerHTML = "<a>a</a><a class='remove'>b</a>"
     $el.querySelector('a').addEventListener('click', function () {
       console.log($el.innerHTML)
-      utils.appendHTML($el, '<div>test</div>')
+      utils.appendHTML($el, '<div>test</div>', document)
       console.log($el.innerHTML)
       var elementToRemove = $el.querySelector('.remove')
       if (elementToRemove) elementToRemove.remove()
@@ -103,7 +105,7 @@ describe('Click Element Selector', function () {
     $el.innerHTML = '<a>a</a>'
     $el.querySelector('a').addEventListener('click', function () {
       setTimeout(function () {
-        utils.appendHTML($el, '<div>test</div>')
+        utils.appendHTML($el, '<div>test</div>', document)
       }, 50)
     })
 
@@ -169,7 +171,7 @@ describe('Click Element Selector', function () {
       setTimeout(function () {
         $el.querySelectorAll('div').forEach(function (el) { el.innerText = 'b' })
         $el.querySelectorAll('a').forEach(el => el.remove())
-        utils.appendHTML($el, '<a>2</a>')
+        utils.appendHTML($el, '<a>2</a>', document)
         $el.querySelectorAll('a').forEach(el => el.addEventListener('click', function () {
           setTimeout(function () {
             $el.querySelectorAll('div').forEach(function (el) { el.innerText = 'c' })
@@ -204,7 +206,7 @@ describe('Click Element Selector', function () {
       setTimeout(function () {
         $el.querySelectorAll('div').forEach(el => el.innerText = 'b')
         $el.querySelectorAll('a').forEach(el => el.remove())
-        utils.appendHTML($el, '<a>2</a>')
+        utils.appendHTML($el, '<a>2</a>', document)
         $el.querySelectorAll('a').forEach(el => el.addEventListener('click', function () {
           setTimeout(function () {
             $el.querySelectorAll('div').forEach(el => el.innerText = 'c')
@@ -240,7 +242,7 @@ describe('Click Element Selector', function () {
       var next = moreElements.shift()
       if (next) {
         setTimeout(function () {
-          utils.appendHTML($el, '<div>' + next + '</div>')
+          utils.appendHTML($el, '<div>' + next + '</div>', document)
         }, 50)
       }
 			// remove if there won't be new elements
@@ -276,9 +278,9 @@ describe('Click Element Selector', function () {
       setTimeout(function () {
         var next = moreElements.shift()
         if (next) {
-          utils.appendHTML($el, '<div>' + next + '</div>')
+          utils.appendHTML($el, '<div>' + next + '</div>', document)
           $el.querySelectorAll('a').forEach(el => el.remove())
-          utils.appendHTML($el, '<a>1</a>')
+          utils.appendHTML($el, '<a>1</a>', document)
           $el.querySelectorAll('a').forEach(el => el.addEventListener('click', clickHandler))
         }
       }, 50)
@@ -315,7 +317,7 @@ describe('Click Element Selector', function () {
         $el.querySelectorAll("div:contains('a')").forEach(el => el.remove())
         var next = moreElements.shift()
         if (next) {
-          utils.appendHTML($el, '<div>' + next + '</div>')
+          utils.appendHTML($el, '<div>' + next + '</div>', document)
         }
       }, 50)
     }))

@@ -220,12 +220,12 @@ function getTestHTML () {
 }
 
 // Take care, this only generates a node, not several nodes like <a></a><span></span>
-function createElementFromHTML (html) {
+function createElementFromHTML (html, document) {
   var template = document.createElement('template')
   template.innerHTML = html
   return template.content.firstChild
 }
 
-function appendHTML (element, html) {
-  return element.appendChild(createElementFromHTML(html))
+function appendHTML (element, html, document) {
+  return element.appendChild(createElementFromHTML(html, document))
 }

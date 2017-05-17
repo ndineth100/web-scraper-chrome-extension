@@ -5,9 +5,12 @@ const globals = require('../../globals')
 
 describe('Text Selector', function () {
   let $
+let document
   beforeEach(function () {
-    document.body.innerHTML = utils.getTestHTML()
     $ = globals.$
+document = globals.document
+    document.body.innerHTML = utils.getTestHTML()
+
   })
 
   it('should extract single text record', function (done) {

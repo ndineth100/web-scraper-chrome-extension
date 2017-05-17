@@ -7,8 +7,11 @@ const utils = require('./../utils')
 const globals = require('../globals')
 describe('DataExtractor', function () {
   let $
+let document
   beforeEach(function () {
     $ = globals.$
+document = globals.document
+
     document.body.innerHTML = utils.getTestHTML()
   })
 

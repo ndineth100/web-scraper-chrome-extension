@@ -7,6 +7,8 @@
 var ElementQuery = function (CSSSelector, parentElement, options) {
   CSSSelector = CSSSelector || ''
   this.$ = options.$
+this.document = options.document
+this.window = options.window
   if (!this.$) throw new Error('Missing jquery for ElementQuery')
   var selectedElements = []
 

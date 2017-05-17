@@ -4,6 +4,8 @@ var jquery = require('jquery-deferred')
 
 var Selector = function (selector, options) {
   this.$ = options.$
+this.document = options.document
+this.window = options.window
   if (!options.$) throw new Error('Missing jquery')
 
   this.updateData(selector)

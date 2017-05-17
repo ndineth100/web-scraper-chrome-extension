@@ -15,6 +15,8 @@ var ContentSelector = function (options, moreOptions) {
   this.alert = options.alert || function (txt) { alert(txt) }
 
   this.$ = moreOptions.$
+this.document = moreOptions.document
+this.window = moreOptions.window
   if (!this.$) throw new Error('Missing jquery in content selector')
   if (this.parentCSSSelector) {
     this.parent = this.$(this.parentCSSSelector)[0]
@@ -111,6 +113,7 @@ ContentSelector.prototype = {
   },
 
   initGUI: function () {
+    var document = this.document
     this.highlightParent()
 
 		// all elements except toolbar
@@ -195,6 +198,7 @@ ContentSelector.prototype = {
 
 	// User with keyboard arrows can select child or paret elements of selected elements.
   bindKeyboardSelectionManipulations: function () {
+    var document = this.document
 		// check for focus
     var lastFocusStatus
     this.keyPressFocusInterval = setInterval(function () {

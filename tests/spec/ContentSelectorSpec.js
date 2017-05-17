@@ -7,11 +7,14 @@ const globals = require('../globals')
 describe('ContentSelector', function () {
   var $el
   let $
+let document
 
   beforeEach(function () {
     $ = globals.$
+document = globals.document
+
     document.body.innerHTML = utils.getTestHTML()
-    $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>")
+    $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>", document)
     document.body.appendChild($el)
   })
 
@@ -22,7 +25,7 @@ describe('ContentSelector', function () {
   }
 
   it('should be able to get css selector from user', async function () {
-    utils.appendHTML($el, '<div id="content-script-css-selector-test"><a class="needed"></a><a></a></div>')
+    utils.appendHTML($el, '<div id="content-script-css-selector-test"><a class="needed"></a><a></a></div>', document)
 
     var contentSelector = new ContentSelector({
       parentCSSSelector: 'div#content-script-css-selector-test',
@@ -43,7 +46,7 @@ describe('ContentSelector', function () {
   })
 
   it('should be return empty css selector when no element selected', async function () {
-    utils.appendHTML($el, '<div id="content-script-css-selector-test"></div>')
+    utils.appendHTML($el, '<div id="content-script-css-selector-test"></div>', document)
 
     var contentSelector = new ContentSelector({
       parentCSSSelector: 'div#content-script-css-selector-test',
@@ -90,7 +93,7 @@ describe('ContentSelector', function () {
   })
 
   it('should be able to preview selected elements', function () {
-    utils.appendHTML($el, '<div id="content-script-css-selector-test"><a></a></div>')
+    utils.appendHTML($el, '<div id="content-script-css-selector-test"><a></a></div>', document)
 
     var contentSelector = new ContentSelector({
       parentCSSSelector: 'div#content-script-css-selector-test'
