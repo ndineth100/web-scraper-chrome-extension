@@ -206,8 +206,9 @@ Sitemap.prototype = {
 	 * @returns {Sitemap}
 	 */
   clone: function () {
+    var $ = this.$
     var clonedJSON = JSON.parse(JSON.stringify(this))
-    var sitemap = new Sitemap(clonedJSON)
+    var sitemap = new Sitemap(clonedJSON, {$})
     return sitemap
   }
 }

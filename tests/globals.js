@@ -1,3 +1,4 @@
+const $ = require('jquery')
 module.exports = {
-  $: window.$
+  $
 }

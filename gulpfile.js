@@ -38,7 +38,7 @@ function generateBuilder (isWatch) {
   const bundlerScraper = wrapper(browserify({
     standalone: 'contentScraper',
     entries: [
-      'extension/content_script/content_scraper.js'
+      'extension/content_script/content_scraper_browser.js'
     ],
     debug: true
   }))

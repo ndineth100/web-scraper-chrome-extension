@@ -5,8 +5,8 @@ var Sitemap = require('./Sitemap')
 // var SelectorGraphv2 = require('./SelectorGraphv2')
 var getBackgroundScript = require('./getBackgroundScript')
 var getContentScript = require('./getContentScript')
-var SitemapController = function (options) {
-  this.$ = options.$
+var SitemapController = function (options, moreOptions) {
+  this.$ = moreOptions.$
   if (!this.$) throw new Error('Missing jquery in Controller')
   for (var i in options) {
     this[i] = options[i]
@@ -410,9 +410,9 @@ SitemapController.prototype = {
     this.setActiveNavigationButton('sitemaps')
 
     this.store.getAllSitemaps(function (sitemaps) {
-      $sitemapListPanel = ich.SitemapList()
+      var $sitemapListPanel = ich.SitemapList()
       sitemaps.forEach(function (sitemap) {
-        $sitemap = ich.SitemapListItem(sitemap)
+        var $sitemap = ich.SitemapListItem(sitemap)
         $sitemap.data('sitemap', sitemap)
         $sitemapListPanel.find('tbody').append($sitemap)
       })
@@ -572,7 +572,7 @@ SitemapController.prototype = {
     })
     var selectors = sitemap.getDirectChildSelectors(parentSelectorId)
     selectors.forEach(function (selector) {
-      $selector = ich.SelectorListItem(selector)
+      var $selector = ich.SelectorListItem(selector)
       $selector.data('selector', selector)
       $selectorListPanel.find('tbody').append($selector)
     })

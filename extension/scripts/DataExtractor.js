@@ -6,6 +6,7 @@ var jquery = require('jquery-deferred')
 var DataExtractor = function (options, moreOptions) {
   this.$ = moreOptions.$
   if (!moreOptions.$) {
+    console.error((new Error('a')).stack)
     throw new Error('Missing jquery in Data Extractor')
   }
   var $ = this.$

@@ -5,7 +5,7 @@ var Queue = require('../scripts/Queue')
 var Scraper = require('../scripts/Scraper')
 var ChromePopupBrowser = require('../scripts/ChromePopupBrowser')
 var getBackgroundScript = require('../scripts/getBackgroundScript')
-
+var $ = require('jquery')
 var config = new Config()
 var store
 config.loadConfiguration(function () {
@@ -54,7 +54,7 @@ chrome.runtime.onMessage.addListener(
     store.sitemapExists(request.sitemapId, sendResponse)
     return true
   } else if (request.getSitemapData) {
-    store.getSitemapData(new Sitemap(request.sitemap), sendResponse)
+    store.getSitemapData(new Sitemap(request.sitemap, {$}), sendResponse)
     return true
   } else if (request.scrapeSitemap) {
     var sitemap = new Sitemap(request.sitemap, {$})

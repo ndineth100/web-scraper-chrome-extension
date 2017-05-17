@@ -17,7 +17,10 @@
     }
   },
   "standard": {
-    "ignore": ["extension/generated", "extension/assets"],
+    "ignore": [
+      "extension/generated",
+      "extension/assets"
+    ],
     "globals": [
       "d3",
       "chrome",
@@ -63,9 +66,10 @@
     "watchify": "^3.9.0"
   },
   "dependencies": {
-    "css-selector": "git://github.com/furstenheim/css-selector.git#b50eb6befc4129ac56e91efba3dd1e233bb67202",
     "browserify": "^14.1.0",
     "chrome-remote-interface": "^0.18.0",
+    "css-selector": "git://github.com/furstenheim/css-selector.git#b50eb6befc4129ac56e91efba3dd1e233bb67202",
+    "jquery": "^3.2.1",
     "jquery-deferred": "^0.3.1"
   }
 }

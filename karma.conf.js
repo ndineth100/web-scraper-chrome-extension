@@ -15,7 +15,6 @@ module.exports = function (config) {
     },
     // list of files / patterns to load in the browser
     files: [
-      'extension/assets/jquery-2.0.3.js',
       'extension/assets/sugar-1.4.1.js',
       'extension/assets/pouchdb-nightly.min.js',
       'tests/ChromeAPI.js',
