@@ -75,8 +75,8 @@ var window = this.window
 	 */
   getPopupURL: function (element) {
     var $ = this.$
-var document = this.document
-var window = this.window
+    var document = this.document
+    var window = this.window
     // override window.open function. we need to execute this in page scope.
 		// we need to know how to find this element from page scope.
     var cs = new CssSelector({
@@ -92,19 +92,15 @@ var window = this.window
     script.type = 'text/javascript'
     console.log(cssSelector)
     console.log(document.querySelectorAll(cssSelector))
-    script.text = `
-			(function(){
-        var open = window.open;
-        var el = document.querySelectorAll('${cssSelector}')[0];
-        var openNew = function() { 
-          var url = arguments[0]; 
-          el.dataset.webScraperExtractUrl = url; 
-          window.open = open; 
-        };
-        window.open = openNew; 
-        el.click(); 
-			})()`
-    document.body.appendChild(script)
+    var el = document.querySelectorAll(cssSelector)[0]
+
+    const open = window.open
+    window.open = function () {
+      var url = arguments[0]
+      el.dataset.webScraperExtractUrl = url
+      window.open = open
+    }
+    el.click()
 
 		// wait for url to be available
     var deferredURL = jquery.Deferred()

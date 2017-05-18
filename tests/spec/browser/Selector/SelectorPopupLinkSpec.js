@@ -1,18 +1,18 @@
-var Selector = require('../../../extension/scripts/Selector')
-const utils = require('./../../utils')
+var Selector = require('../../../../extension/scripts/Selector')
+const utils = require('../../../utils')
 const assert = require('chai').assert
-const globals = require('../../globals')
+const globals = require('../../../globals')
 
 describe('Popup link Selector', function () {
   var $el
   let $
-let document
-let window
+  let document
+  let window
 
   beforeEach(function () {
     $ = globals.$
-document = globals.document
-window = globals.window
+    document = globals.document
+    window = globals.window
 
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>", document)
