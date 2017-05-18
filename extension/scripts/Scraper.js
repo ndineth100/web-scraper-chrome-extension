@@ -1,6 +1,4 @@
-var jquery = require('jquery-deferred')
 var whenCallSequentially = require('../assets/jquery.whencallsequentially')
-var Base64 = require('../assets/base64')
 var Job = require('./Job')
 
 var Scraper = function (options, moreOptions) {
@@ -11,9 +9,11 @@ var Scraper = function (options, moreOptions) {
   this.resultWriter = null // db instance for scraped data writing
   this.requestInterval = parseInt(options.requestInterval)
   this.pageLoadDelay = parseInt(options.pageLoadDelay)
+
+  // It isn't actually much needed, only to get teh
   this.$ = moreOptions.$
-this.document = moreOptions.document
-this.window = moreOptions.window
+  this.document = moreOptions.document
+  this.window = moreOptions.window
   if (!moreOptions.$) throw new Error('Missing jquery')
   if (!moreOptions.window) throw new Error('Missing window')
   if (!moreOptions.document) throw new Error('Missing document')
@@ -79,60 +79,10 @@ Scraper.prototype = {
 	 * @param record
 	 */
   saveImages: function (record) {
-    var deferredResponse = jquery.Deferred()
-    var deferredImageStoreCalls = []
-    var prefixLength = '_imageBase64-'.length
+    var browser = this.browser
+    return browser.saveImages(record, namingFunction.bind(this))
 
-    for (var attr in record) {
-      if (attr.substr(0, prefixLength) === '_imageBase64-') {
-        var selectorId = attr.substring(prefixLength, attr.length)
-        deferredImageStoreCalls.push(function (selectorId) {
-          var imageBase64 = record['_imageBase64-' + selectorId]
-          var deferredDownloadDone = jquery.Deferred()
-
-          var deferredBlob = Base64.base64ToBlob(imageBase64, record['_imageMimeType-' + selectorId])
-
-          delete record['_imageMimeType-' + selectorId]
-          delete record['_imageBase64-' + selectorId]
-
-          deferredBlob.done(function (blob) {
-            var downloadUrl = window.URL.createObjectURL(blob)
-            var fileSavePath = this.sitemap._id + '/' + selectorId + '/' + this.getFileFilename(record[selectorId + '-src'])
-
-						// download image using chrome api
-            var downloadRequest = {
-              url: downloadUrl,
-              filename: fileSavePath
-            }
-
-						// wait for the download to finish
-            chrome.downloads.download(downloadRequest, function (downloadId) {
-              var cbDownloaded = function (downloadItem) {
-                if (downloadItem.id === downloadId && downloadItem.state) {
-                  if (downloadItem.state.current === 'complete') {
-                    deferredDownloadDone.resolve()
-                    chrome.downloads.onChanged.removeListener(cbDownloaded)
-                  } else if (downloadItem.state.current === 'interrupted') {
-                    deferredDownloadDone.reject('download failed')
-                    chrome.downloads.onChanged.removeListener(cbDownloaded)
-                  }
-                }
-              }
-
-              chrome.downloads.onChanged.addListener(cbDownloaded)
-            })
-          }.bind(this))
-
-          return deferredDownloadDone.promise()
-        }.bind(this, selectorId))
-      }
-    }
-
-    whenCallSequentially(deferredImageStoreCalls).done(function () {
-      deferredResponse.resolve()
-    })
-
-    return deferredResponse.promise()
+    function namingFunction (selectorId) { return this.sitemap._id + '/' + selectorId + '/' + this.getFileFilename(record[selectorId + '-src']) }
   },
 
 	// @TODO remove recursion and add an iterative way to run these jobs.
