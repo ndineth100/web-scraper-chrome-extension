@@ -6,7 +6,6 @@ const notify = require('gulp-notify')
 const Server = require('karma').Server
 const path = require('path')
 const mocha = require('gulp-spawn-mocha')
-const babel = require('gulp-babel')
 // We do karma in gulp instead of npm because we need to recompute all the generated bundles that are loaded to the browser
 const runTests = (function () {
   let timeout

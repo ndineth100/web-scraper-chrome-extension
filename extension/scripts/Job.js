@@ -53,7 +53,10 @@ Job.prototype = {
     var sitemap = this.scraper.sitemap
     var job = this
     console.log('starting fetching')
-    browser.fetchData(this.url, sitemap, this.parentSelector, function (results) {
+    browser.fetchData(this.url, sitemap, this.parentSelector, function (err, results) {
+      if (err) {
+        return callback(err)
+      }
       console.log('finished fetching')
 			// merge data with data from initialization
       for (var i in results) {
@@ -65,7 +68,7 @@ Job.prototype = {
         }
         this.dataItems.push(result)
       }
-      callback(job)
+      callback(null, job)
     }.bind(this), this)
   },
   getResults: function () {

@@ -61,7 +61,7 @@ chrome.runtime.onMessage.addListener(
     var queue = new Queue()
     var browser = new ChromePopupBrowser({
       pageLoadDelay: request.pageLoadDelay
-    })
+    }, {$, window, document})
 
     var scraper = new Scraper({
       queue: queue,

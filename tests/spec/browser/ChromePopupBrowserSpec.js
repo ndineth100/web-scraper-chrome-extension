@@ -5,12 +5,12 @@ const utils = require('../../utils')
 const globals = require('../../globals')
 describe('Chrome popup browser', function () {
   let $
-let document
-let window
+  let document
+  let window
   beforeEach(function () {
     $ = globals.$
-document = globals.document
-window = globals.window
+    document = globals.document
+    window = globals.window
 
     window.chromeAPI.reset()
     document.body.innerHTML = utils.getTestHTML()
@@ -19,7 +19,7 @@ window = globals.window
   it('should init a popup window', function () {
     var browser = new ChromePopupBrowser({
       pageLoadDelay: 500
-    })
+    }, {$, document, window})
     browser._initPopupWindow(function () {
     })
     assert.deepEqual(browser.tab, {id: 0})
@@ -28,7 +28,7 @@ window = globals.window
   it('should load a page', function (done) {
     var browser = new ChromePopupBrowser({
       pageLoadDelay: 500
-    })
+    }, {$, document, window})
     browser._initPopupWindow(function () {
     })
     browser.loadUrl('http://example,com/', function () {
@@ -51,10 +51,11 @@ window = globals.window
 
     var browser = new ChromePopupBrowser({
       pageLoadDelay: 500
-    })
+    }, {$, document, window})
     browser._initPopupWindow(function () {
     })
-    browser.fetchData('http://example,com/', sitemap, '_root', function (data) {
+    browser.fetchData('http://example,com/', sitemap, '_root', function (err, data) {
+      assert.isNull(err)
       assert.deepEqual(data, [
         {
           'a': 'a'

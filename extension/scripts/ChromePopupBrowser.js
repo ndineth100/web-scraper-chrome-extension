@@ -65,26 +65,6 @@ ChromePopupBrowser.prototype = {
     var deferredResponse = jquery.Deferred()
     var deferredImageStoreCalls = []
     var prefixLength = '_imageBase64-'.length
-    const b64toBlob = (b64Data, contentType = '', sliceSize = 512) => {
-      const byteCharacters = window.atob(b64Data)
-      const byteArrays = []
-
-      for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-        const slice = byteCharacters.slice(offset, offset + sliceSize)
-
-        const byteNumbers = new Array(slice.length)
-        for (let i = 0; i < slice.length; i++) {
-          byteNumbers[i] = slice.charCodeAt(i)
-        }
-
-        const byteArray = new Uint8Array(byteNumbers)
-
-        byteArrays.push(byteArray)
-      }
-
-      const blob = new window.Blob(byteArrays, {type: contentType})
-      return blob
-    }
 
     for (var attr in record) {
       if (attr.substr(0, prefixLength) === '_imageBase64-') {
@@ -151,7 +131,7 @@ ChromePopupBrowser.prototype = {
 
         chrome.tabs.sendMessage(tab.id, message, function (data) {
           console.log('extracted data from web page', data)
-          callback.call(scope, data)
+          callback.call(scope, null, data)
         })
       })
     }, this)
@@ -159,3 +139,24 @@ ChromePopupBrowser.prototype = {
 }
 
 module.exports = ChromePopupBrowser
+
+function b64toBlob (b64Data, contentType = '', sliceSize = 512) {
+  const byteCharacters = window.atob(b64Data)
+  const byteArrays = []
+
+  for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+    const slice = byteCharacters.slice(offset, offset + sliceSize)
+
+    const byteNumbers = new Array(slice.length)
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i)
+    }
+
+    const byteArray = new Uint8Array(byteNumbers)
+
+    byteArrays.push(byteArray)
+  }
+
+  const blob = new window.Blob(byteArrays, {type: contentType})
+  return blob
+}

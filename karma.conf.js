@@ -1,4 +1,4 @@
-const files = ['tests/spec/*.js', 'tests/spec/**/*.js']
+const files = ['tests/browserSpec.js', 'tests/spec/*.js', 'tests/spec/**/*.js']
 module.exports = function (config) {
   config.set({
 
@@ -11,7 +11,8 @@ module.exports = function (config) {
 
     preprocessors: {
       [files[0]]: ['browserify'],
-      [files[1]]: ['browserify']
+      [files[1]]: ['browserify'],
+      [files[2]]: ['browserify']
     },
     // list of files / patterns to load in the browser
     files: [
@@ -23,7 +24,6 @@ module.exports = function (config) {
       'extension/content_script/content_script.js',
       'docs/images/chrome-store-logo.png',
       '/docs/images/chrome-store-logo.png',
-      'tests/browserSpec.js',
       ...files
     ],
     customLaunchers: {

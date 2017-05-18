@@ -95,7 +95,11 @@ Scraper.prototype = {
       return
     }
     console.log('starting execute')
-    job.execute(this.browser, function (job) {
+    job.execute(this.browser, function (err, job) {
+      if (err) {
+        // jobs don't seem to return anything
+        return console.error('Error in job', err)
+      }
       console.log('finished executing')
       var scrapedRecords = []
       var deferredDatamanipulations = []

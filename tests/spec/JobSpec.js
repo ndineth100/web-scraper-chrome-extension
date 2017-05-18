@@ -52,7 +52,7 @@ describe('Job', function () {
   it('should not override data with base data if it already exists', function () {
     var browser = {
       fetchData: function (url, sitemap, parentSelector, callback) {
-        callback([{a: 1, b: 2}])
+        callback(null, [{a: 1, b: 2}])
       }
     }
 
