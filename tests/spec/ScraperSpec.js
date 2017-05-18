@@ -7,22 +7,21 @@ const FakeStore = require('./../FakeStore')
 const Scraper = require('./../../extension/scripts/Scraper')
 const utils = require('./../utils')
 const globals = require('../globals')
-process.on('unhandledRejection', function (err) {
-  console.error(err)
-})
 
 describe('Scraper', function () {
-  var q, store, $el, $
+  var q, store, $el
+  let $
+  let document
+  let window
 
   beforeEach(function () {
     $ = globals.$
-document = globals.document
-window = globals.window
+    document = globals.document
+    window = globals.window
 
     q = new Queue()
     store = new FakeStore()
     document.body.innerHTML = utils.getTestHTML()
-    window.chromeAPI.reset()
   })
   afterEach(function () {
     while (document.body.firstChild) document.body.removeChild(document.body.firstChild)

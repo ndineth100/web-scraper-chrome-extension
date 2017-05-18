@@ -6,15 +6,15 @@ var Sitemap = function (sitemapObj, options) {
   var window = options.window
   // We don't want enumerable properties
   Object.defineProperty(this, '$', {
-    get: function () {return $},
+    value: $,
     enumerable: false
   })
   Object.defineProperty(this, 'window', {
-    get: function () {return window},
+    value: window,
     enumerable: false
   })
   Object.defineProperty(this, 'document', {
-    get: function () {return document},
+    value: document,
     enumerable: false
   })
   if (!this.$) throw new Error('Missing jquery')
@@ -198,6 +198,7 @@ var window = this.window
     return columns
   },
   getDataExportCsvBlob: function (data) {
+    var window = this.window
     var columns = this.getDataColumns(),
       delimiter = ',',
       newline = '\n',
@@ -222,7 +223,7 @@ var window = this.window
       csvData.push(rowData.join(delimiter) + newline)
     })
 
-    return new Blob(csvData, {type: 'text/csv'})
+    return new window.Blob(csvData, {type: 'text/csv'})
   },
   getSelectorById: function (selectorId) {
     return this.selectors.getSelectorById(selectorId)

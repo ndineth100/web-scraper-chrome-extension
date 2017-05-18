@@ -1,4 +1,4 @@
-const files = ['tests/spec/*.js', 'tests/spec/*/*.js']
+const files = ['tests/spec/*.js', 'tests/spec/**/*.js']
 module.exports = function (config) {
   config.set({
 
@@ -23,8 +23,7 @@ module.exports = function (config) {
       'extension/content_script/content_script.js',
       'docs/images/chrome-store-logo.png',
       '/docs/images/chrome-store-logo.png',
-      'tests/spec/*.js',
-      'tests/spec/*/*.js',
+      'tests/browserSpec.js',
       ...files
     ],
     customLaunchers: {
@@ -36,7 +35,7 @@ module.exports = function (config) {
     browserify: {
       debug: true,
       transform: [
-        ['babelify', {ignore: /\/node_modules\//, plugins: 'babel-plugin-meaningful-logs'}]
+        ['babelify', {ignore: /\/node_modules\//}]
       ]
     },
 

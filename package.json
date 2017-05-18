@@ -49,10 +49,13 @@
   "homepage": "https://github.com/martinsbalodis/web-scraper-chrome-extension#readme",
   "devDependencies": {
     "babel-plugin-meaningful-logs": "^1.0.2",
+    "babel-register": "^6.24.1",
     "babelify": "^7.3.0",
     "chai": "^3.5.0",
     "gulp": "^3.9.1",
     "gulp-notify": "^3.0.0",
+    "gulp-spawn-mocha": "^3.3.0",
+    "istanbul": "^0.4.5",
     "jasmine-node": "^1.14.5",
     "karma": "^1.6.0",
     "karma-browserify": "^5.1.1",
@@ -70,6 +73,7 @@
     "chrome-remote-interface": "^0.18.0",
     "css-selector": "git://github.com/furstenheim/css-selector.git#b50eb6befc4129ac56e91efba3dd1e233bb67202",
     "jquery": "^3.2.1",
-    "jquery-deferred": "^0.3.1"
+    "jquery-deferred": "^0.3.1",
+    "jsdom": "^10.1.0"
   }
 }

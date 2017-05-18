@@ -25,8 +25,8 @@ var SelectorElementClick = {
 
   getClickElements: function (parentElement) {
     var $ = this.$
-var document = this.document
-var window = this.window
+    var document = this.document
+    var window = this.window
     var clickElements = ElementQuery(this.clickElementSelector, parentElement, {$, document, window})
     return clickElements
   },
@@ -48,7 +48,8 @@ var window = this.window
     })
     var cssSelector = cs.getCssSelector([clickElement])
 
-		// this function will catch window.open call and place the requested url as the elements data attribute
+    document.querySelectorAll(cssSelector)[0].click()
+/*    // this function will catch window.open call and place the requested url as the elements data attribute
     var script = document.createElement('script')
     script.type = 'text/javascript'
     script.text = '' +
@@ -56,7 +57,7 @@ var window = this.window
 			"var el = document.querySelectorAll('" + cssSelector + "')[0]; " +
 			'el.click(); ' +
 			'})();'
-    document.body.appendChild(script)
+    document.body.appendChild(script)*/
   },
 
   getClickElementUniquenessType: function () {
@@ -69,8 +70,8 @@ var window = this.window
 
   _getData: function (parentElement) {
     var $ = this.$
-var document = this.document
-var window = this.window
+    var document = this.document
+    var window = this.window
     var delay = parseInt(this.delay) || 0
     var deferredResponse = jquery.Deferred()
     var foundElements = new UniqueElementList('uniqueText', {$, document, window})

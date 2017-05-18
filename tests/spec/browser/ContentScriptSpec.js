@@ -1,8 +1,8 @@
-const getContentScript = require('../../extension/scripts/getContentScript')
-const selectorMatchers = require('../Matchers')
-const utils = require('./../utils')
+const getContentScript = require('../../../extension/scripts/getContentScript')
+const selectorMatchers = require('../../Matchers')
+const utils = require('../../utils')
 const assert = require('chai').assert
-const globals = require('../globals')
+const globals = require('../../globals')
 describe('ContentScript', function () {
   var contentScript = getContentScript('ContentScript')
   var $el

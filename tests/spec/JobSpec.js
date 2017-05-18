@@ -2,10 +2,6 @@ const Job = require('./../../extension/scripts/Job')
 const assert = require('chai').assert
 
 describe('Job', function () {
-  beforeEach(function () {
-    window.chromeAPI.reset()
-  })
-
   it('should be able to create correct url from parent job', function () {
     var parent = new Job('http://example.com/')
     var child = new Job('/test/', null, null, parent)

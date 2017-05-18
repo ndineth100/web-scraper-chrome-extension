@@ -8,20 +8,20 @@ var Selector = function (selector, options) {
   var window = options.window
   // We don't want enumerable properties
   Object.defineProperty(this, '$', {
-    get: function () {return $},
+    value: $,
     enumerable: false
   })
   Object.defineProperty(this, 'window', {
-    get: function () {return window},
+    value: window,
     enumerable: false
   })
   Object.defineProperty(this, 'document', {
-    get: function () {return document},
+    value: document,
     enumerable: false
   })
   if (!this.$) throw new Error('Missing jquery')
-if (!this.document) throw new Error("Missing document")
-if(!this.window)throw new Error("Missing window")
+  if (!this.document) throw new Error("Missing document")
+  if(!this.window)throw new Error("Missing window")
 
   this.updateData(selector)
   this.initType()
@@ -108,8 +108,8 @@ Selector.prototype = {
 
   getDataElements: function (parentElement) {
     var $ = this.$
-var document = this.document
-var window = this.window
+    var document = this.document
+    var window = this.window
     var elements = ElementQuery(this.selector, parentElement, {$, document, window})
     if (this.multiple) {
       return elements
@@ -130,7 +130,7 @@ var window = this.window
       deferredData.done(function (data) {
         d.resolve(data)
       })
-    }		else {
+    }	else {
       setTimeout(function () {
         var deferredData = this._getData(parentElement)
         deferredData.done(function (data) {

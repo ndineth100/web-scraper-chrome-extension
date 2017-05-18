@@ -69,8 +69,9 @@ var SelectorImage = {
   },
 
   downloadFileAsBlob: function (url) {
+    var window = this.window
     var deferredResponse = jquery.Deferred()
-    var xhr = new XMLHttpRequest()
+    var xhr = new window.XMLHttpRequest()
     xhr.onreadystatechange = function () {
       if (this.readyState == 4) {
         if (this.status == 200) {

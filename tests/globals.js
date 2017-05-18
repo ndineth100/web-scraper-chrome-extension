@@ -1,6 +1,6 @@
 const $ = require('jquery')
 module.exports = {
   $,
-  document: window.document,
-  window: window
+  document: typeof window !== 'undefined' ? window.document : null,
+  window: typeof window !== 'undefined' ? window : null
 }

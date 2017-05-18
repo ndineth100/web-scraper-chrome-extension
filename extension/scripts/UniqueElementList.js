@@ -6,17 +6,30 @@ var CssSelector = require('css-selector').CssSelector
  * @constructor
  */
 function UniqueElementList (clickElementUniquenessType, options) {
-  this.$ = options.$
-this.document = options.document
-this.window = options.window
+  var $ = options.$
+  var window = options.window
+  var document = options.document
+
+  Object.defineProperty(this, '$', {
+    value: $,
+    enumerable: false
+  })
+  Object.defineProperty(this, 'window', {
+    value: window,
+    enumerable: false
+  })
+  Object.defineProperty(this, 'document', {
+    value: document,
+    enumerable: false
+  })
   if (!this.$) throw new Error('jquery required')
-if (!this.document) {
-  throw new Error("Missing document")
-}
-if(!this.window)throw new Error("Missing window")
-  this.clickElementUniquenessType = clickElementUniquenessType
-  this.addedElements = {}
-}
+  if (!this.document) {
+    throw new Error("Missing document")
+  }
+  if(!this.window) throw new Error("Missing window")
+    this.clickElementUniquenessType = clickElementUniquenessType
+    this.addedElements = {}
+  }
 
 UniqueElementList.prototype = []
 

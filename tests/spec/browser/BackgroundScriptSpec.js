@@ -1,7 +1,7 @@
-const getBackgroundScript = require('../../extension/scripts/getBackgroundScript')
-const getContentScript = require('../../extension/scripts/getContentScript')
-const selectorMatchers = require('./../Matchers')
-const utils = require('./../utils')
+const getBackgroundScript = require('../../../extension/scripts/getBackgroundScript')
+const getContentScript = require('../../../extension/scripts/getContentScript')
+const selectorMatchers = require('../../Matchers')
+const utils = require('../../utils')
 
 describe('BackgroundScript', function () {
   var backgroundScript = getBackgroundScript('BackgroundScript')

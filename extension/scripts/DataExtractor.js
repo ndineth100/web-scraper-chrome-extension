@@ -137,7 +137,7 @@ DataExtractor.prototype = {
     whenCallSequentially(deferredDataCalls).done(function (responses) {
       var commonData = {}
       responses.forEach(function (data) {
-        commonData = Object.merge(commonData, data)
+        commonData = Object.assign(commonData, data)
       })
       deferredResponse.resolve(commonData)
     })
@@ -173,11 +173,11 @@ DataExtractor.prototype = {
     if (!selector.willReturnElements()) {
       deferredData = selector.getData(parentElement)
       deferredData.done(function (selectorData) {
-        var newCommonData = Object.clone(commonData, true)
+        var newCommonData = JSON.parse(JSON.stringify(commonData))
         var resultData = []
 
         selectorData.forEach(function (record) {
-          Object.merge(record, newCommonData, true)
+          Object.assign(record, newCommonData)
           resultData.push(record)
         })
 
@@ -191,7 +191,7 @@ DataExtractor.prototype = {
       var deferredDataCalls = []
 
       selectorData.forEach(function (element) {
-        var newCommonData = Object.clone(commonData, true)
+        var newCommonData = JSON.parse(JSON.stringify(commonData))
         var childRecordDeferredCall = this.getSelectorTreeData.bind(this, selectors, selector.id, element, newCommonData)
         deferredDataCalls.push(childRecordDeferredCall)
       }.bind(this))
@@ -201,7 +201,7 @@ DataExtractor.prototype = {
         responses.forEach(function (childRecordList) {
           childRecordList.forEach(function (childRecord) {
             var rec = {}
-            Object.merge(rec, childRecord, true)
+            Object.assign(rec, childRecord)
             resultData.push(rec)
           })
         })
@@ -218,13 +218,13 @@ DataExtractor.prototype = {
     var deferredResponse = jquery.Deferred()
 
     childCommonDataDeferred.done(function (childCommonData) {
-      commonData = Object.merge(commonData, childCommonData)
+      commonData = Object.assign(commonData, childCommonData)
 
       var dataDeferredCalls = []
 
       childSelectors.forEach(function (selector) {
         if (selectors.willReturnMultipleRecords(selector.id)) {
-          var newCommonData = Object.clone(commonData, true)
+          var newCommonData = JSON.parse(JSON.stringify(commonData))
           var dataDeferredCall = this.getMultiSelectorData.bind(this, selectors, selector, parentElement, newCommonData)
           dataDeferredCalls.push(dataDeferredCall)
         }
@@ -236,7 +236,7 @@ DataExtractor.prototype = {
         responses.forEach(function (childRecords) {
           childRecords.forEach(function (childRecord) {
             var rec = {}
-            Object.merge(rec, childRecord, true)
+            Object.assign(rec, childRecord)
             resultData.push(rec)
           })
         })

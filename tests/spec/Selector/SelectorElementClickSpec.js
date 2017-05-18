@@ -5,11 +5,13 @@ const globals = require('../../globals')
 
 describe('Click Element Selector', function () {
   var $el
-  var $
+  let $
+  let document
+  let window
   beforeEach(function () {
     $ = globals.$
-document = globals.document
-window = globals.window
+    document = globals.document
+    window = globals.window
 
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>", document)
@@ -28,7 +30,7 @@ window = globals.window
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
-      assert.equal(data[0].innerText, 'a')
+      assert.equal(data[0].textContent, 'a')
       done()
     })
   })
@@ -45,8 +47,8 @@ window = globals.window
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
-      assert.equal(data[0].innerText, 'a')
-      assert.equal(data[1].innerText, 'b')
+      assert.equal(data[0].textContent, 'a')
+      assert.equal(data[1].textContent, 'b')
       done()
     })
   })
@@ -69,7 +71,7 @@ window = globals.window
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 1)
-      assert.equal(data[0].innerText, 'test')
+      assert.equal(data[0].textContent, 'test')
       done()
     })
   })
@@ -96,7 +98,7 @@ window = globals.window
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 1)
-      assert.equal(data[0].innerText, 'test')
+      assert.equal(data[0].textContent, 'test')
       console.log('done')
       done()
     })
@@ -122,7 +124,7 @@ window = globals.window
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 1)
-      assert.equal(data[0].innerText, 'test')
+      assert.equal(data[0].textContent, 'test')
       done()
     })
   })
@@ -143,7 +145,7 @@ window = globals.window
     $el.innerHTML = '<a>a</a><div>a</div>'
     $el.querySelector('a').addEventListener('click', function () {
       setTimeout(function () {
-        $el.querySelector('div').innerText = 'b'
+        $el.querySelector('div').textContent = 'b'
       }, 50)
     })
 
@@ -160,8 +162,8 @@ window = globals.window
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 2)
-      assert.equal(data[0].innerText, 'a')
-      assert.equal(data[1].innerText, 'b')
+      assert.equal(data[0].textContent, 'a')
+      assert.equal(data[1].textContent, 'b')
       done()
     })
   })
@@ -170,12 +172,12 @@ window = globals.window
     $el.innerHTML = '<a>1</a><div>a</div>'
     $el.querySelectorAll('a').forEach(el => el.addEventListener('click', function () {
       setTimeout(function () {
-        $el.querySelectorAll('div').forEach(function (el) { el.innerText = 'b' })
+        $el.querySelectorAll('div').forEach(function (el) { el.textContent = 'b' })
         $el.querySelectorAll('a').forEach(el => el.remove())
         utils.appendHTML($el, '<a>2</a>', document)
         $el.querySelectorAll('a').forEach(el => el.addEventListener('click', function () {
           setTimeout(function () {
-            $el.querySelectorAll('div').forEach(function (el) { el.innerText = 'c' })
+            $el.querySelectorAll('div').forEach(function (el) { el.textContent = 'c' })
           }, 50)
         }))
       }, 50)
@@ -194,9 +196,9 @@ window = globals.window
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 3)
-      assert.equal(data[0].innerText, 'a')
-      assert.equal(data[1].innerText, 'b')
-      assert.equal(data[2].innerText, 'c')
+      assert.equal(data[0].textContent, 'a')
+      assert.equal(data[1].textContent, 'b')
+      assert.equal(data[2].textContent, 'c')
       done()
     })
   })
@@ -205,12 +207,12 @@ window = globals.window
     $el.innerHTML = '<a>1</a><div>a</div>'
     $el.querySelectorAll('a').forEach(el => el.addEventListener('click', function () {
       setTimeout(function () {
-        $el.querySelectorAll('div').forEach(el => el.innerText = 'b')
+        $el.querySelectorAll('div').forEach(el => el.textContent = 'b')
         $el.querySelectorAll('a').forEach(el => el.remove())
         utils.appendHTML($el, '<a>2</a>', document)
         $el.querySelectorAll('a').forEach(el => el.addEventListener('click', function () {
           setTimeout(function () {
-            $el.querySelectorAll('div').forEach(el => el.innerText = 'c')
+            $el.querySelectorAll('div').forEach(el => el.textContent = 'c')
           }, 50)
         }))
       }, 50)
@@ -230,8 +232,8 @@ window = globals.window
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 2)
-      assert.equal(data[0].innerText, 'b')
-      assert.equal(data[1].innerText, 'c')
+      assert.equal(data[0].textContent, 'b')
+      assert.equal(data[1].textContent, 'c')
       done()
     })
   })
@@ -265,9 +267,9 @@ window = globals.window
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 3)
-      assert.equal(data[0].innerText, 'a')
-      assert.equal(data[1].innerText, 'b')
-      assert.equal(data[2].innerText, 'c')
+      assert.equal(data[0].textContent, 'a')
+      assert.equal(data[1].textContent, 'b')
+      assert.equal(data[2].textContent, 'c')
       done()
     })
   })
@@ -302,9 +304,9 @@ window = globals.window
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 3)
-      assert.equal(data[0].innerText, 'a')
-      assert.equal(data[1].innerText, 'b')
-      assert.equal(data[2].innerText, 'c')
+      assert.equal(data[0].textContent, 'a')
+      assert.equal(data[1].textContent, 'b')
+      assert.equal(data[2].textContent, 'c')
       done()
     })
   })
@@ -337,8 +339,8 @@ window = globals.window
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 2)
-      assert.equal(data[0].innerText, 'a')
-      assert.equal(data[1].innerText, 'b')
+      assert.equal(data[0].textContent, 'a')
+      assert.equal(data[1].textContent, 'b')
       done()
     })
   })
@@ -351,7 +353,7 @@ window = globals.window
         var next = moreElements.shift()
 
         if (next) {
-          $el.querySelectorAll('div').forEach(el => el.innerText = next)
+          $el.querySelectorAll('div').forEach(el => el.textContent = next)
         }
       }, 50)
     }))
@@ -369,9 +371,9 @@ window = globals.window
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
       assert.equal(data.length, 3)
-      assert.equal(data[0].innerText, 'a')
-      assert.equal(data[1].innerText, 'b')
-      assert.equal(data[2].innerText, 'c')
+      assert.equal(data[0].textContent, 'a')
+      assert.equal(data[1].textContent, 'b')
+      assert.equal(data[2].textContent, 'c')
       done()
     })
   })

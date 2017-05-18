@@ -6,15 +6,15 @@ var SelectorList = function (selectors, options) {
   var window = options.window
   // We don't want enumerable properties
   Object.defineProperty(this, '$', {
-    get: function () {return $},
+    value: $,
     enumerable: false
   })
   Object.defineProperty(this, 'window', {
-    get: function () {return window},
+    value: window,
     enumerable: false
   })
   Object.defineProperty(this, 'document', {
-    get: function () {return document},
+    value: document,
     enumerable: false
   })
   if (!this.$) throw new Error('Missing jquery')

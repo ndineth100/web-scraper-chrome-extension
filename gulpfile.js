@@ -5,21 +5,38 @@ const source = require('vinyl-source-stream')
 const notify = require('gulp-notify')
 const Server = require('karma').Server
 const path = require('path')
-
+const mocha = require('gulp-spawn-mocha')
+const babel = require('gulp-babel')
 // We do karma in gulp instead of npm because we need to recompute all the generated bundles that are loaded to the browser
-const runKarma = (function () {
+const runTests = (function () {
   let timeout
   return function (done = function () {}) {
     if (timeout) clearTimeout(timeout)
     timeout = setTimeout(function () {
-      const server = new Server({
-        configFile: path.join(__dirname, 'karma.conf.js'),
-        singleRun: true
-      }, done)
-      server.start()
+      runKarma(done)
+      runJSDOMTests()
     }, 100)
   }
 })()
+
+function runKarma (done) {
+  const server = new Server({
+    configFile: path.join(__dirname, 'karma.conf.js'),
+    singleRun: true
+  }, done)
+  server.start()
+}
+
+function runJSDOMTests () {
+  return gulp.src([
+    'tests/jsdomSpec.js',
+    'tests/spec/*Spec.js',
+    'tests/spec/Selector/*Spec.js'
+  ])
+    .pipe(mocha({
+      compilers: 'js:babel-register'
+    }).on('error', console.error))
+}
 
 gulp.task('build:watch', () => generateBuilder(true))
 gulp.task('build', () => generateBuilder(false))
@@ -64,7 +81,7 @@ function generateBuilder (isWatch) {
         console.error(e)
       })
       .on('end', function () {
-        runKarma()
+        runTests()
         console.log('finished bundling')
         // TODO launch tests
       })

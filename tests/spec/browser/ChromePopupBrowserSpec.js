@@ -1,8 +1,8 @@
-const ChromePopupBrowser = require('../../extension/scripts/ChromePopupBrowser')
-const Sitemap = require('../../extension/scripts/Sitemap')
+const ChromePopupBrowser = require('../../../extension/scripts/ChromePopupBrowser')
+const Sitemap = require('../../../extension/scripts/Sitemap')
 const assert = require('chai').assert
-const utils = require('./../utils')
-const globals = require('../globals')
+const utils = require('../../utils')
+const globals = require('../../globals')
 describe('Chrome popup browser', function () {
   let $
 let document

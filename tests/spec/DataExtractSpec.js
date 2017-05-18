@@ -11,16 +11,13 @@ let document
 let window
   beforeEach(function () {
     $ = globals.$
-document = globals.document
-window = globals.window
+    document = globals.document
+    window = globals.window
 
     document.body.innerHTML = utils.getTestHTML()
   })
 
   it('should be able to tell whether a selector will be common to all selector tree groups (one selector single)', function () {
-    beforeEach(function () {
-      document.body.innerHTML = utils.getTestHTML()
-    })
 
     var selectors = new SelectorList([
       {
@@ -629,6 +626,7 @@ window = globals.window
       ]
     }, {$, document, window})
 
+    console.log(parentElement)
     var extractor = new DataExtractor({
       parentElement: parentElement,
       parentSelectorId: '_root',
