@@ -14,7 +14,7 @@ const runTests = (function () {
     if (timeout) clearTimeout(timeout)
     timeout = setTimeout(function () {
       runKarma(done)
-      //runJSDOMTests()
+      runJSDOMTests()
     }, 100)
   }
 })()
