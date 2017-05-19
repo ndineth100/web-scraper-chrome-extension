@@ -7,26 +7,6 @@ var whenCallSequentially = require('../assets/jquery.whencallsequentially')
 
 var JSDOMBrowser = function (options, moreOptions) {
   this.pageLoadDelay = options.pageLoadDelay
-  // Probably unneeded as we will create a new window each time
-  var $ = moreOptions.$
-  var document = moreOptions.document
-  var window = moreOptions.window
-  // We don't want enumerable properties
-  Object.defineProperty(this, '$', {
-    value: $,
-    enumerable: false
-  })
-  Object.defineProperty(this, 'window', {
-    value: window,
-    enumerable: false
-  })
-  Object.defineProperty(this, 'document', {
-    value: document,
-    enumerable: false
-  })
-  if (!moreOptions.$) throw new Error('Missing jquery')
-  if (!moreOptions.window) throw new Error('Missing window')
-  if (!moreOptions.document) throw new Error('Missing document')
 }
 
 JSDOMBrowser.prototype = {

@@ -53,6 +53,7 @@ SitemapController.prototype = {
       'SitemapImport',
       'SitemapExport',
       'SitemapBrowseData',
+      'SitemapHeadlessScrapeConfig',
       'SitemapScrapeConfig',
       'SitemapExportDataCSV',
       'SitemapEditMetadata',
@@ -137,12 +138,20 @@ SitemapController.prototype = {
         },
         '#sitemap-scrape-nav-button': {
           click: this.showScrapeSitemapConfigPanel
+
+
+        },
+        '#sitemap-headless-scrape-nav-button': {
+          click: this.showHeadlessScrapeSitemapConfigPanel
         },
         '#submit-scrape-sitemap-form': {
           submit: function () { return false }
         },
         '#submit-scrape-sitemap': {
           click: this.scrapeSitemap
+        },
+        '#submit-headless-scrape-sitemap': {
+          click: this.headlessScrapeSitemap
         },
         '#sitemaps button[action=browse-sitemap-data]': {
           click: this.sitemapListBrowseSitemapData
@@ -989,11 +998,56 @@ var window = this.window
       }
     })
   },
+  initHeadlessScrapeSitemapConfigValidation: function () {
+    this.$('#viewport form').bootstrapValidator({
+      fields: {
+        'requestInterval': {
+          validators: {
+            notEmpty: {
+              message: 'The request interval is required and cannot be empty'
+            },
+            numeric: {
+              message: 'The request interval must be numeric'
+            },
+            callback: {
+              message: 'The request interval must be atleast 2000 milliseconds',
+              callback: function (value, validator) {
+                return value >= 2000
+              }
+            }
+          }
+        },
+        'pageLoadDelay': {
+          validators: {
+            notEmpty: {
+              message: 'The page load delay is required and cannot be empty'
+            },
+            numeric: {
+              message: 'The page laod delay must be numeric'
+            },
+            callback: {
+              message: 'The page load delay must be atleast 500 milliseconds',
+              callback: function (value, validator) {
+                return value >= 500
+              }
+            }
+          }
+        }
+      }
+    })
+  },
   showScrapeSitemapConfigPanel: function () {
     this.setActiveNavigationButton('sitemap-scrape')
     var scrapeConfigPanel = ich.SitemapScrapeConfig()
     this.$('#viewport').html(scrapeConfigPanel)
     this.initScrapeSitemapConfigValidation()
+    return true
+  },
+  showHeadlessScrapeSitemapConfigPanel: function () {
+    this.setActiveNavigationButton('sitemap-headless-scrape')
+    var scrapeConfigPanel = ich.SitemapHeadlessScrapeConfig()
+    this.$('#viewport').html(scrapeConfigPanel)
+    this.initHeadlessScrapeSitemapConfigValidation()
     return true
   },
   scrapeSitemap: function () {
@@ -1013,6 +1067,33 @@ var window = this.window
     }
 
 		// show sitemap scraping panel
+    this.getFormValidator().destroy()
+    this.$('.scraping-in-progress').removeClass('hide')
+    this.$('#submit-scrape-sitemap').closest('.form-group').hide()
+    this.$('#scrape-sitemap-config input').prop('disabled', true)
+
+    chrome.runtime.sendMessage(request, function (response) {
+      this.browseSitemapData()
+    }.bind(this))
+    return false
+  },
+  headlessScrapeSitemap: function () {
+    if (!this.isValidForm()) {
+      return false
+    }
+
+    var requestInterval = this.$('input[name=requestInterval]').val()
+    var pageLoadDelay = this.$('input[name=pageLoadDelay]').val()
+
+    var sitemap = this.state.currentSitemap
+    var request = {
+      headlessScrapeSitemap: true,
+      sitemap: JSON.parse(JSON.stringify(sitemap)),
+      requestInterval: requestInterval,
+      pageLoadDelay: pageLoadDelay
+    }
+
+    // show sitemap scraping panel
     this.getFormValidator().destroy()
     this.$('.scraping-in-progress').removeClass('hide')
     this.$('#submit-scrape-sitemap').closest('.form-group').hide()

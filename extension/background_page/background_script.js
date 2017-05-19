@@ -4,6 +4,7 @@ var Sitemap = require('../scripts/Sitemap')
 var Queue = require('../scripts/Queue')
 var Scraper = require('../scripts/Scraper')
 var ChromePopupBrowser = require('../scripts/ChromePopupBrowser')
+const WebJSDOMBrowser = require('../scripts/WebJSDOMBrowser')
 var getBackgroundScript = require('../scripts/getBackgroundScript')
 var $ = require('jquery')
 var config = new Config()
@@ -88,6 +89,38 @@ chrome.runtime.onMessage.addListener(
       console.log('Scraper execution cancelled'.e)
     }
 
+    return true
+  } else if (request.headlessScrapeSitemap) {
+    const sitemap = new Sitemap(request.sitemap, {$, window, document})
+    const queue = new Queue()
+    const browser = new WebJSDOMBrowser({
+      pageLoadDelay: request.pageLoadDelay
+    }, {$, window, document})
+
+    const scraper = new Scraper({
+      queue: queue,
+      sitemap: sitemap,
+      browser: browser,
+      store: store,
+      requestInterval: request.requestInterval
+    }, {$, window, document})
+
+    try {
+      scraper.run(function () {
+        browser.close()
+        var notification = chrome.notifications.create('scraping-finished', {
+          type: 'basic',
+          iconUrl: 'assets/images/icon128.png',
+          title: 'Scraping finished!',
+          message: 'Finished scraping ' + sitemap._id
+        }, function (id) {
+          // notification showed
+        })
+        sendResponse()
+      })
+    }			catch (e) {
+      console.log('Scraper execution cancelled'.e)
+    }
     return true
   } else if (request.previewSelectorData) {
     chrome.tabs.query({
