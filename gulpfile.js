@@ -38,33 +38,33 @@ function runJSDOMTests () {
     }).on('error', console.error))
 }
 
-gulp.task('build:watch', () => generateBuilder(true))
-gulp.task('build', () => generateBuilder(false))
+gulp.task('build:watch', () => generateBuilder(true, true))
+gulp.task('build', () => generateBuilder(false, false))
 
 gulp.task('default', ['build:watch'])
 
-function generateBuilder (isWatch) {
+function generateBuilder (isWatch, debug) {
   const wrapper = isWatch ? watchify : (x) => x
   const bundlerBackground = wrapper(browserify({
     standalone: 'backgroundScraper',
     entries: [
       'extension/background_page/background_script.js'
     ],
-    debug: true
+    debug
   }))
   const bundlerScraper = wrapper(browserify({
     standalone: 'contentScraper',
     entries: [
       'extension/content_script/content_scraper_browser.js'
     ],
-    debug: true
+    debug
   }))
   const bundlerDevtools = wrapper(browserify({
     standalone: 'contentScraper',
     entries: [
       'extension/scripts/App.js'
     ],
-    debug: true
+    debug
   }))
 
   setBundler(bundlerBackground, 'background-scraper.js')
