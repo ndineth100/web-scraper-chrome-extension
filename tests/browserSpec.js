@@ -7,4 +7,8 @@ beforeEach(function () {
   globals.$ = $
   globals.Browser = ChromePopupBrowser
   window.chromeAPI.reset()
+
+  window.addEventListener('unhandledrejection', function (err, promise) {
+    console.error('Unhandled error', err.reason)
+  })
 })

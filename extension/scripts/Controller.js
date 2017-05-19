@@ -7,11 +7,11 @@ var getBackgroundScript = require('./getBackgroundScript')
 var getContentScript = require('./getContentScript')
 var SitemapController = function (options, moreOptions) {
   this.$ = moreOptions.$
-this.document = moreOptions.document
-this.window = moreOptions.window
+  this.document = moreOptions.document
+  this.window = moreOptions.window
   if (!this.$) throw new Error('Missing jquery in Controller')
-if (!this.document) throw new Error("Missing document")
-if(!this.window)throw new Error("Missing window")
+  if (!this.document) throw new Error("Missing document")
+  if(!this.window)throw new Error("Missing window")
   for (var i in options) {
     this[i] = options[i]
   }
@@ -834,7 +834,7 @@ var window = this.window
     }
 
 		// cancel possible element selection
-    this.contentScript.removeCurrentContentSelector().done(function () {
+    this.contentScript.removeCurrentContentSelector().then(function () {
       sitemap.updateSelector(selector, newSelector)
 
       this.store.saveSitemap(sitemap, function () {
@@ -846,32 +846,34 @@ var window = this.window
 	 * Get selector from selector editing form
 	 */
   getCurrentlyEditedSelector: function () {
-    var id = this.$('#edit-selector [name=id]').val()
-    var selectorsSelector = this.$('#edit-selector [name=selector]').val()
-    var tableDataRowSelector = this.$('#edit-selector [name=tableDataRowSelector]').val()
-    var tableHeaderRowSelector = this.$('#edit-selector [name=tableHeaderRowSelector]').val()
-    var clickElementSelector = this.$('#edit-selector [name=clickElementSelector]').val()
-    var type = this.$('#edit-selector [name=type]').val()
-    var clickElementUniquenessType = this.$('#edit-selector [name=clickElementUniquenessType]').val()
-    var clickType = this.$('#edit-selector [name=clickType]').val()
-    var discardInitialElements = this.$('#edit-selector [name=discardInitialElements]').is(':checked')
-    var multiple = this.$('#edit-selector [name=multiple]').is(':checked')
-    var downloadImage = this.$('#edit-selector [name=downloadImage]').is(':checked')
-    var clickPopup = this.$('#edit-selector [name=clickPopup]').is(':checked')
-    var regex = this.$('#edit-selector [name=regex]').val()
-    var delay = this.$('#edit-selector [name=delay]').val()
-    var extractAttribute = this.$('#edit-selector [name=extractAttribute]').val()
-    var parentSelectors = this.$('#edit-selector [name=parentSelectors]').val()
+    var $ = this.$
+    var document = this.document
+    var window = this.window
+    var id = $('#edit-selector [name=id]').val()
+    var selectorsSelector = $('#edit-selector [name=selector]').val()
+    var tableDataRowSelector = $('#edit-selector [name=tableDataRowSelector]').val()
+    var tableHeaderRowSelector = $('#edit-selector [name=tableHeaderRowSelector]').val()
+    var clickElementSelector = $('#edit-selector [name=clickElementSelector]').val()
+    var type = $('#edit-selector [name=type]').val()
+    var clickElementUniquenessType = $('#edit-selector [name=clickElementUniquenessType]').val()
+    var clickType = $('#edit-selector [name=clickType]').val()
+    var discardInitialElements = $('#edit-selector [name=discardInitialElements]').is(':checked')
+    var multiple = $('#edit-selector [name=multiple]').is(':checked')
+    var downloadImage = $('#edit-selector [name=downloadImage]').is(':checked')
+    var clickPopup = $('#edit-selector [name=clickPopup]').is(':checked')
+    var regex = $('#edit-selector [name=regex]').val()
+    var delay = $('#edit-selector [name=delay]').val()
+    var extractAttribute = $('#edit-selector [name=extractAttribute]').val()
+    var parentSelectors = $('#edit-selector [name=parentSelectors]').val()
     var columns = []
-    var $columnHeaders = this.$('#edit-selector .column-header')
-    var $columnNames = this.$('#edit-selector .column-name')
-    var $columnExtracts = this.$('#edit-selector .column-extract')
+    var $columnHeaders = $('#edit-selector .column-header')
+    var $columnNames = $('#edit-selector .column-name')
+    var $columnExtracts = $('#edit-selector .column-extract')
 
-    var self = this
     $columnHeaders.each(function (i) {
-      var header = self.$($columnHeaders[i]).val()
-      var name = self.$($columnNames[i]).val()
-      var extract = self.$($columnExtracts[i]).is(':checked')
+      var header = $($columnHeaders[i]).val()
+      var name = $($columnNames[i]).val()
+      var extract = $($columnExtracts[i]).is(':checked')
       columns.push({
         header: header,
         name: name,
@@ -898,7 +900,7 @@ var window = this.window
       columns: columns,
       delay: delay
     }, {
-      $: this.$
+      $, document, window
     })
     return newSelector
   },
@@ -914,7 +916,7 @@ var window = this.window
   },
   cancelSelectorEditing: function (button) {
 		// cancel possible element selection
-    this.contentScript.removeCurrentContentSelector().done(function () {
+    this.contentScript.removeCurrentContentSelector().then(function () {
       this.showSitemapSelectorList()
     }.bind(this))
   },
@@ -1081,8 +1083,8 @@ var window = this.window
 
   selectSelector: function (button) {
     var $ = this.$
-var document = this.document
-var window = this.window
+    var document = this.document
+    var window = this.window
     var input = $(button).closest('.form-group').find('input.selector-value')
     var sitemap = this.getCurrentlyEditedSelectorSitemap()
     var selector = this.getCurrentlyEditedSelector()
@@ -1128,8 +1130,8 @@ var window = this.window
 
   selectTableHeaderRowSelector: function (button) {
     var $ = this.$
-var document = this.document
-var window = this.window
+    var document = this.document
+    var window = this.window
     var input = $(button).closest('.form-group').find('input.selector-value')
     var sitemap = this.getCurrentlyEditedSelectorSitemap()
     var selector = this.getCurrentlyEditedSelector()
@@ -1158,8 +1160,8 @@ var window = this.window
 
   selectTableDataRowSelector: function (button) {
     var $ = this.$
-var document = this.document
-var window = this.window
+    var document = this.document
+    var window = this.window
     var input = this.$(button).closest('.form-group').find('input.selector-value')
     var sitemap = this.getCurrentlyEditedSelectorSitemap()
     var selector = this.getCurrentlyEditedSelector()
@@ -1173,6 +1175,7 @@ var window = this.window
 
     var self = this
     deferredSelector.done(function (result) {
+      if (!result) return console.error(new Error('result should not be null'))
       self.$(input).val(result.CSSSelector)
 
 			// update validation for selector field

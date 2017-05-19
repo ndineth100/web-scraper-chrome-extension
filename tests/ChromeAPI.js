@@ -72,6 +72,7 @@ ChromeAPI.prototype = {
     }
   },
   tabQuery: function (query, callback) {
+    // TODO this should be async
     callback([
 			{'id': 666}
     ])

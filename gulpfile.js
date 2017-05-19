@@ -5,6 +5,7 @@ const source = require('vinyl-source-stream')
 const notify = require('gulp-notify')
 const Server = require('karma').Server
 const path = require('path')
+const babelify = require('babelify')
 const mocha = require('gulp-spawn-mocha')
 // We do karma in gulp instead of npm because we need to recompute all the generated bundles that are loaded to the browser
 const runTests = (function () {
@@ -13,7 +14,7 @@ const runTests = (function () {
     if (timeout) clearTimeout(timeout)
     timeout = setTimeout(function () {
       runKarma(done)
-      runJSDOMTests()
+      //runJSDOMTests()
     }, 100)
   }
 })()
@@ -88,6 +89,7 @@ function generateBuilder (isWatch) {
 
   function setBundler (bundler, file) {
     bundler
+      .transform(babelify, {})
       .on('update', function () {
         gulpBundle(bundler, file)
       })

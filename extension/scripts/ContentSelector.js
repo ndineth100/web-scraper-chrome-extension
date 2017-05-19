@@ -15,11 +15,11 @@ var ContentSelector = function (options, moreOptions) {
   this.alert = options.alert || function (txt) { alert(txt) }
 
   this.$ = moreOptions.$
-this.document = moreOptions.document
-this.window = moreOptions.window
+  this.document = moreOptions.document
+  this.window = moreOptions.window
   if (!this.$) throw new Error('Missing jquery in content selector')
-if (!this.document) throw new Error("Missing document")
-if(!this.window)throw new Error("Missing window")
+  if (!this.document) throw new Error("Missing document")
+  if(!this.window) throw new Error("Missing window")
   if (this.parentCSSSelector) {
     this.parent = this.$(this.parentCSSSelector)[0]
 
@@ -105,8 +105,8 @@ ContentSelector.prototype = {
 
   previewSelector: function (elementCSSSelector) {
     var $ = this.$
-var document = this.document
-var window = this.window
+    var document = this.document
+    var window = this.window
     if (this.deferredCSSSelectorResponse.state() !== 'rejected') {
       this.highlightParent()
       $(ElementQuery(elementCSSSelector, this.parent, {$, document, window})).addClass('-sitemap-select-item-selected')
@@ -161,26 +161,28 @@ var window = this.window
   },
 
   bindElementHighlight: function () {
-    this.$(this.$allElements).bind('mouseover.elementSelector', function (e) {
+    var $ = this.$
+    $(this.$allElements).bind('mouseover.elementSelector', function (e) {
       var element = e.currentTarget
       this.mouseOverElement = element
-      this.$(element).addClass('-sitemap-select-item-hover')
+      $(element).addClass('-sitemap-select-item-hover')
       return false
     }.bind(this)).bind('mouseout.elementSelector', function (e) {
       var element = e.currentTarget
       this.mouseOverElement = null
-      this.$(element).removeClass('-sitemap-select-item-hover')
+      $(element).removeClass('-sitemap-select-item-hover')
       return false
     }.bind(this))
   },
 
   bindMoveImagesToTop: function () {
-    this.$('body').addClass('-web-scraper-selection-active')
+    var $ = this.$
+    $('body').addClass('-web-scraper-selection-active')
 
 		// do this only when selecting images
     if (this.allowedElements === 'img') {
-      this.$('img').filter(function (i, element) {
-        return this.$(element).css('position') === 'static'
+      $('img').filter(function (i, element) {
+        return $(element).css('position') === 'static'
       }).addClass('-web-scraper-img-on-top')
     }
   },
@@ -202,6 +204,7 @@ var window = this.window
 
 	// User with keyboard arrows can select child or paret elements of selected elements.
   bindKeyboardSelectionManipulations: function () {
+    var $ = this.$
     var document = this.document
 		// check for focus
     var lastFocusStatus
@@ -210,26 +213,26 @@ var window = this.window
       if (focus === lastFocusStatus) return
       lastFocusStatus = focus
 
-      this.$('#-selector-toolbar .key-button').toggleClass('hide', !focus)
-      this.$('#-selector-toolbar .key-events').toggleClass('hide', focus)
+      $('#-selector-toolbar .key-button').toggleClass('hide', !focus)
+      $('#-selector-toolbar .key-events').toggleClass('hide', focus)
     }, 200)
 
 		// Using up/down arrows user can select elements from top of the
 		// selected element
-    this.$(document).bind('keydown.selectionManipulation', function (event) {
+    $(document).bind('keydown.selectionManipulation', function (event) {
 			// select child C
       if (event.keyCode === 67) {
-        this.animateClickedKey(this.$('#-selector-toolbar .key-button-child'))
+        this.animateClickedKey($('#-selector-toolbar .key-button-child'))
         this.selectChild()
       }
 			// select parent P
       else if (event.keyCode === 80) {
-        this.animateClickedKey(this.$('#-selector-toolbar .key-button-parent'))
+        this.animateClickedKey($('#-selector-toolbar .key-button-parent'))
         this.selectParent()
       }
 			// select element
       else if (event.keyCode === 83) {
-        this.animateClickedKey(this.$('#-selector-toolbar .key-button-select'))
+        this.animateClickedKey($('#-selector-toolbar .key-button-select'))
         this.selectMouseOverElement()
       }
 
@@ -238,19 +241,20 @@ var window = this.window
   },
 
   animateClickedKey: function (element) {
-    this.$(element).removeClass('clicked').removeClass('clicked-animation')
+    var $ = this.$
+    $(element).removeClass('clicked').removeClass('clicked-animation')
     setTimeout(function () {
-      this.$(element).addClass('clicked')
+      $(element).addClass('clicked')
       setTimeout(function () {
-        this.$(element).addClass('clicked-animation')
+        $(element).addClass('clicked-animation')
       }, 100)
     }, 1)
   },
 
   highlightSelectedElements: function () {
     var $ = this.$
-var document = this.document
-var window = this.window
+    var document = this.document
+    var window = this.window
     try {
       var resultCssSelector = this.getCurrentCSSSelector()
 
@@ -287,8 +291,9 @@ var window = this.window
   },
 
   bindMultipleGroupCheckbox: function () {
-    this.$('#-selector-toolbar [name=diferentElementSelection]').change(function (e) {
-      if (this.$(e.currentTarget).is(':checked')) {
+    var $ = this.$
+    $('#-selector-toolbar [name=diferentElementSelection]').change(function (e) {
+      if ($(e.currentTarget).is(':checked')) {
         this.initCssSelector(true)
       } else {
         this.initCssSelector(false)
@@ -300,6 +305,7 @@ var window = this.window
   },
 
   attachToolbar: function () {
+    var $ = this.$
     var $toolbar = '<div id="-selector-toolbar">' +
 			'<div class="list-item"><div class="selector-container"><div class="selector"></div></div></div>' +
 			'<div class="input-group-addon list-item">' +
@@ -322,21 +328,23 @@ var window = this.window
 			'<div class="list-item key-button key-button-child hide" title="Use C key to select child">C</div>' +
 			'<div class="list-item done-selecting-button">Done selecting!</div>' +
 			'</div>'
-    this.$('body').append($toolbar)
+    $('body').append($toolbar)
 
-    this.$('body #-selector-toolbar .done-selecting-button').click(function () {
+    $('body #-selector-toolbar .done-selecting-button').click(function () {
       this.selectionFinished()
     }.bind(this))
   },
   highlightParent: function () {
+    var $ = this.$
 		// do not highlight parent if its the body
-    if (!this.$(this.parent).is('body') && !this.$(this.parent).is('#webpage')) {
-      this.$(this.parent).addClass('-sitemap-parent')
+    if (!$(this.parent).is('body') && !$(this.parent).is('#webpage')) {
+      $(this.parent).addClass('-sitemap-parent')
     }
   },
 
   unbindElementSelection: function () {
-    this.$(this.$allElements).unbind('click.elementSelector')
+    var $ = this.$
+    $(this.$allElements).unbind('click.elementSelector')
 		// remove highlighted element classes
     this.unbindElementSelectionHighlight()
   },
