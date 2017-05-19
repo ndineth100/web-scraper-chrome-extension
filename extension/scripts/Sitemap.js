@@ -200,7 +200,7 @@ var window = this.window
   getDataExportCsvBlob: function (data) {
     var window = this.window
     var columns = this.getDataColumns(),
-      delimiter = ',',
+      delimiter = ';',
       newline = '\n',
       csvData = ['\ufeff'] // utf-8 bom char
 
@@ -234,8 +234,8 @@ var window = this.window
 	 */
   clone: function () {
     var $ = this.$
-var document = this.document
-var window = this.window
+    var document = this.document
+    var window = this.window
     var clonedJSON = JSON.parse(JSON.stringify(this))
     var sitemap = new Sitemap(clonedJSON, {$, document, window})
     return sitemap
