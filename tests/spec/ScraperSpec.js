@@ -49,7 +49,7 @@ describe('Scraper', function () {
 
     var browser = new Browser({
       pageLoadDelay: 100
-    }, {$, document, window})
+    })
 
     var s = new Scraper({
       queue: q,
@@ -86,7 +86,7 @@ describe('Scraper', function () {
 
     var browser = new Browser({
       pageLoadDelay: 500
-    }, {$, document, window})
+    })
 
     var s = new Scraper({
       queue: q,
@@ -217,7 +217,7 @@ describe('Scraper', function () {
 
     var browser = new Browser({
       pageLoadDelay: 500
-    }, {$, document, window})
+    })
 
     var sitemap = new Sitemap({
       id: 'test'
@@ -268,7 +268,7 @@ describe('Scraper', function () {
 
     var browser = new Browser({
       pageLoadDelay: 500
-    }, {$, document, window})
+    })
 
     var s = new Scraper({
       queue: q,

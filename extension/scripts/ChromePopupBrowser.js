@@ -1,7 +1,7 @@
 var jquery = require('jquery-deferred')
 var whenCallSequentially = require('../assets/jquery.whencallsequentially')
 
-var ChromePopupBrowser = function (options, moreOptions) {
+var ChromePopupBrowser = function (options) {
   this.pageLoadDelay = options.pageLoadDelay
 
   // Not setting window here as it conflicts with this.window. In any case window must be defined in this case

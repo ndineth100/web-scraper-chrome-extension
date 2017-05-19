@@ -5,7 +5,7 @@ var jqueryDeferred = require('jquery-deferred')
 const contentScraper = require('../content_script/content_scraper')
 var whenCallSequentially = require('../assets/jquery.whencallsequentially')
 
-var JSDOMBrowser = function (options, moreOptions) {
+var JSDOMBrowser = function (options) {
   this.pageLoadDelay = options.pageLoadDelay
 }
 

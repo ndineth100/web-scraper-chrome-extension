@@ -38,7 +38,7 @@ describe('Scraper', function () {
 
     var browser = new Browser({
       pageLoadDelay: 500
-    }, {$, document, window})
+    })
 
     var sitemap = new Sitemap({
       id: 'test'

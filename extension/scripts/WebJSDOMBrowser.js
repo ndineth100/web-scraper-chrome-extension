@@ -4,7 +4,7 @@ const jsdomBrowserLoader = require('./JSDOMBrowserLoader')
 var jqueryDeferred = require('jquery-deferred')
 var whenCallSequentially = require('../assets/jquery.whencallsequentially')
 
-const WebJSDOMBrowser = function (options, moreOptions) {
+const WebJSDOMBrowser = function (options) {
   this.pageLoadDelay = options.pageLoadDelay
   const promises = {}
   this.promises = promises

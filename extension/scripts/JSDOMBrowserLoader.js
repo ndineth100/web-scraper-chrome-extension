@@ -12,7 +12,7 @@ module.exports = function (self) {
     const data = ev.data
     const UUID = data.UUID
     if (data.topic === 'init') {
-      browser = new JSDOMBrowser(data.options, {})
+      browser = new JSDOMBrowser(data.options)
       return self.postMessage({
         UUID
       })

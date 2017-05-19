@@ -19,7 +19,7 @@ describe('Chrome popup browser', function () {
   it('should init a popup window', function () {
     var browser = new ChromePopupBrowser({
       pageLoadDelay: 500
-    }, {$, document, window})
+    })
     browser._initPopupWindow(function () {
     })
     assert.deepEqual(browser.tab, {id: 0})
@@ -28,7 +28,7 @@ describe('Chrome popup browser', function () {
   it('should load a page', function (done) {
     var browser = new ChromePopupBrowser({
       pageLoadDelay: 500
-    }, {$, document, window})
+    })
     browser._initPopupWindow(function () {
     })
     browser.loadUrl('http://example,com/', function () {
@@ -51,7 +51,7 @@ describe('Chrome popup browser', function () {
 
     var browser = new ChromePopupBrowser({
       pageLoadDelay: 500
-    }, {$, document, window})
+    })
     browser._initPopupWindow(function () {
     })
     browser.fetchData('http://example,com/', sitemap, '_root', function (err, data) {

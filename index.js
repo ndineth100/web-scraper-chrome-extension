@@ -1,6 +1,6 @@
 const Queue = require('./extension/scripts/Queue')
 const Sitemap = require('./extension/scripts/Sitemap')
-const FakeStore = require('./tests/FakeStore')
+const InMemoryStore = require('./extension/scripts/InMemoryStore')
 const Scraper = require('./extension/scripts/Scraper')
 const jsdom = require('jsdom')
 const jQuery = require('jquery')
@@ -20,7 +20,7 @@ function scrapeJSDOM (sitemapInfo, options = {}) {
     const document = window.document
     const $ = jQuery(window)
     const q = new Queue()
-    const store = new FakeStore()
+    const store = new InMemoryStore()
     const sitemap = new Sitemap(sitemapInfo, {$, document, window})
     const browser = new Browser({
       pageLoadDelay: options.pageLoadDelay || 2000

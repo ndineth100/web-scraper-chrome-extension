@@ -68,7 +68,7 @@ module.exports = function (config) {
     // Concurrency level
     // how many browser should be started simultaneous
     concurrency: Infinity,
-    // browserNoActivityTimeout: 50000000,
+    browserNoActivityTimeout: 50000000,
     plugins: [
       'karma-mocha',
       'karma-browserify',
