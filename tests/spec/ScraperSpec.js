@@ -1,7 +1,6 @@
 const Queue = require('./../../extension/scripts/Queue')
 const assert = require('chai').assert
 
-const ChromePopupBrowser = require('./../../extension/scripts/ChromePopupBrowser')
 const Sitemap = require('./../../extension/scripts/Sitemap')
 const FakeStore = require('./../FakeStore')
 const Scraper = require('./../../extension/scripts/Scraper')

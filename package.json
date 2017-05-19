@@ -1,8 +1,8 @@
 {
-  "name": "web-scraper-chrome-extension",
+  "name": "web-scraper-headless",
   "version": "1.0.0",
   "description": "Web Scraper is a chrome browser extension built for data extraction from web  pages. Using this extension you can create a plan (sitemap) how a web site  should be traversed and what should be extracted. Using these sitemaps the  Web Scraper will navigate the site accordingly and extract all data. Scraped  data later can be exported as CSV.",
-  "main": "config.js",
+  "main": "index.js",
   "directories": {
     "doc": "docs",
     "test": "tests"
