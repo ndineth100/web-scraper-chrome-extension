@@ -12,7 +12,7 @@ module.exports = function (sitemap, options) {
   return scrapeJSDOM(sitemap, options)
 }
 
-function scrapeJSDOM (sitemapInfo, options) {
+function scrapeJSDOM (sitemapInfo, options = {}) {
   return new Promise(function (resolve, reject) {
     const {JSDOM} = jsdom
     const dom = new JSDOM()

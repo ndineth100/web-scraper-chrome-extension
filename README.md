@@ -1,11 +1,13 @@
 # Web Scraper
-Web Scraper is a chrome browser extension built for data extraction from web 
+Web Scraper is a chrome browser extension and a library built for data extraction from web 
 pages. Using this extension you can create a plan (sitemap) how a web site 
 should be traversed and what should be extracted. Using these sitemaps the 
 Web Scraper will navigate the site accordingly and extract all data. Scraped 
 data later can be exported as CSV.
 
-Install the extension from [Chrome store] [chrome-store]
+To use it as an extension install it from [Chrome store] [chrome-store]
+
+To use it as a library do `npm i webscraper-headless`
 
 ### Features
 
@@ -26,6 +28,31 @@ Install the extension from [Chrome store] [chrome-store]
  
  Submit bugs and suggest features on [bug tracker] [github-issues]
  
+#### Headless mode
+To use it as a library you need a sitemap, for example exported from the app.
+
+    const webscraper = require('webscraper-headless')
+    const sitemap = {
+      id: 'test',
+      startUrl: 'http://test.lv/',
+      selectors: [
+        {
+          'id': 'a',
+          'selector': '#scraper-test-one-page a',
+          'multiple': false,
+          type: 'SelectorText',
+          'parentSelectors': [
+            '_root'
+          ]
+        }
+      ]
+    }
+    const options = {} // optional delay and pageLoadDelay
+    webscraper(sitemap, options)
+        .then(function (scraped) {
+            // This is your scraped info
+        })
+
 #### Bugs
 When submitting a bug please attach an exported sitemap if possible.
 
