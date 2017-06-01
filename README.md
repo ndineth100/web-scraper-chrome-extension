@@ -7,7 +7,7 @@ data later can be exported as CSV.
 
 To use it as an extension install it from [Chrome store] [chrome-store]
 
-To use it as a library do `npm i webscraper-headless`
+To use it as a library do `npm i web-scraper-headless`
 
 ### Features
 

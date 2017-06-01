@@ -1,7 +1,7 @@
 {
   "name": "web-scraper-headless",
   "version": "1.0.0",
-  "description": "Web Scraper is a chrome browser extension built for data extraction from web  pages. Using this extension you can create a plan (sitemap) how a web site  should be traversed and what should be extracted. Using these sitemaps the  Web Scraper will navigate the site accordingly and extract all data. Scraped  data later can be exported as CSV.",
+  "description": "Web Scraper Headless allows to extract data from web pages using plans (sitemaps) created with the Web Scraper browser extension. Using these sitemaps the  Web Scraper will navigate the site accordingly and extract all data. Scraped  data later can be exported as CSV.",
   "main": "index.js",
   "directories": {
     "doc": "docs",
@@ -33,7 +33,6 @@
     ]
   },
   "scripts": {
-    "test-jasmine": "jasmine-node tests/spec/ScraperSpec.js",
     "build": "gulp build",
     "test-watch": "gulp"
   },
@@ -42,11 +41,11 @@
     "url": "git+https://github.com/martinsbalodis/web-scraper-chrome-extension.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "LGPL-3.0",
   "bugs": {
-    "url": "https://github.com/martinsbalodis/web-scraper-chrome-extension/issues"
+    "url": "https://github.com/geoblink/web-scraper-chrome-extension/issues"
   },
-  "homepage": "https://github.com/martinsbalodis/web-scraper-chrome-extension#readme",
+  "homepage": "https://github.com/geoblink/web-scraper-chrome-extension#readme",
   "devDependencies": {
     "babel-plugin-meaningful-logs": "^1.0.2",
     "babel-register": "^6.24.1",
