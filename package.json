@@ -66,12 +66,13 @@
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.9.0",
-    "webworkify": "^1.4.0"
+    "webworkify": "^1.4.0",
+    "chrome-remote-interface": "^0.18.0",
+    "browserify": "^14.1.0"
   },
   "dependencies": {
-    "browserify": "^14.1.0",
-    "chrome-remote-interface": "^0.18.0",
     "css-selector": "git://github.com/furstenheim/css-selector.git#b50eb6befc4129ac56e91efba3dd1e233bb67202",
+    "debug": "^3.1.0",
     "jquery": "^3.2.1",
     "jquery-deferred": "^0.3.1",
     "jsdom": "^10.1.0"

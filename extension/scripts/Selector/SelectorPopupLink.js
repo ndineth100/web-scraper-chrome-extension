@@ -1,6 +1,7 @@
 var whenCallSequentially = require('../../assets/jquery.whencallsequentially')
 var jquery = require('jquery-deferred')
 var CssSelector = require('css-selector').CssSelector
+const debug = require('debug')('web-scraper-headless:selector:selector-popup-link')
 var SelectorPopupLink = {
   canReturnMultipleRecords: function () {
     return true
@@ -85,13 +86,13 @@ var window = this.window
       enableResultStripping: false
     })
     var cssSelector = cs.getCssSelector([element])
-    console.log(cssSelector)
-    console.log(document.body.querySelectorAll(cssSelector))
+    debug(cssSelector)
+    debug(document.body.querySelectorAll(cssSelector))
 		// this function will catch window.open call and place the requested url as the elements data attribute
     var script = document.createElement('script')
     script.type = 'text/javascript'
-    console.log(cssSelector)
-    console.log(document.querySelectorAll(cssSelector))
+    debug(cssSelector)
+    debug(document.querySelectorAll(cssSelector))
     var el = document.querySelectorAll(cssSelector)[0]
 
     const open = window.open

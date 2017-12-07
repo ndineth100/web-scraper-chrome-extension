@@ -1,4 +1,4 @@
-
+const debug = require('debug')('web-scraper-headless:job')
 var Job = function (url, parentSelector, scraper, parentJob, baseData) {
   if (parentJob !== undefined) {
     this.url = this.combineUrls(parentJob.url, url)
@@ -52,12 +52,12 @@ Job.prototype = {
   execute: function (browser, callback, scope) {
     var sitemap = this.scraper.sitemap
     var job = this
-    console.log('starting fetching')
+    debug('starting fetching')
     browser.fetchData(this.url, sitemap, this.parentSelector, function (err, results) {
       if (err) {
         return callback(err)
       }
-      console.log('finished fetching')
+      debug('finished fetching')
 			// merge data with data from initialization
       for (var i in results) {
         var result = results[i]

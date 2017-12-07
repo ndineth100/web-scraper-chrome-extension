@@ -1,6 +1,6 @@
 var jquery = require('jquery-deferred')
 var whenCallSequentially = require('../assets/jquery.whencallsequentially')
-
+const debug = require('debug')('web-scraper-headless:chrome-popup-browser')
 var ChromePopupBrowser = function (options) {
   this.pageLoadDelay = options.pageLoadDelay
 
@@ -121,7 +121,7 @@ ChromePopupBrowser.prototype = {
 
     this._initPopupWindow(function () {
       var tab = browser.tab
-      console.log('Init browser app')
+      debug('Init browser app')
       browser.loadUrl(url, function () {
         var message = {
           extractData: true,
@@ -130,7 +130,7 @@ ChromePopupBrowser.prototype = {
         }
 
         chrome.tabs.sendMessage(tab.id, message, function (data) {
-          console.log('extracted data from web page', data)
+          debug('extracted data from web page', data)
           callback.call(scope, null, data)
         })
       })

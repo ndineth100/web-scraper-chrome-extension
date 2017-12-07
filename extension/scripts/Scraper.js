@@ -1,6 +1,6 @@
 var whenCallSequentially = require('../assets/jquery.whencallsequentially')
 var Job = require('./Job')
-
+const debug = require('debug')('web-scraper-headless:scraper')
 var Scraper = function (options, moreOptions) {
   this.queue = options.queue
   this.sitemap = options.sitemap
@@ -89,18 +89,18 @@ Scraper.prototype = {
   _run: function () {
     var job = this.queue.getNextJob()
     if (job === false) {
-      console.log('Scraper execution is finished')
+      debug('Scraper execution is finished')
       this.browser.close()
       this.executionCallback()
       return
     }
-    console.log('starting execute')
+    debug('starting execute')
     job.execute(this.browser, function (err, job) {
       if (err) {
         // jobs don't seem to return anything
         return console.error('Error in job', err)
       }
-      console.log('finished executing')
+      debug('finished executing')
       var scrapedRecords = []
       var deferredDatamanipulations = []
 
@@ -121,8 +121,8 @@ Scraper.prototype = {
             this.queue.add(newJob)
           } else {
             // store already scraped links
-            console.log('Ignoring next')
-            console.log(record)
+            debug('Ignoring next')
+            debug(record)
 //						scrapedRecords.push(record);
           }
         } else {

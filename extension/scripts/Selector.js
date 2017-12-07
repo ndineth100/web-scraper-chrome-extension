@@ -1,6 +1,7 @@
 var selectors = require('./Selectors')
 var ElementQuery = require('./ElementQuery')
 var jquery = require('jquery-deferred')
+const debug = require('debug')('web-scraper-headless:selector')
 
 var Selector = function (selector, options) {
   var $ = options.$
@@ -43,7 +44,7 @@ Selector.prototype = {
 	 */
   updateData: function (data) {
     var allowedKeys = ['window', 'document', 'id', 'type', 'selector', 'parentSelectors']
-    console.log('data type', data.type)
+    debug('data type', data.type)
     allowedKeys = allowedKeys.concat(selectors[data.type].getFeatures())
     var key
 		// update data

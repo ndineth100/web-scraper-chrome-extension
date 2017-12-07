@@ -1,6 +1,7 @@
 var ElementQuery = require('./ElementQuery')
 var jquery = require('jquery-deferred')
 var CssSelector = require('css-selector').CssSelector
+const debug = require('debug')('web-scraper-headless:content-selector')
 /**
  * @param options.parentCSSSelector	Elements can be only selected within this element
  * @param options.allowedElements	Elements that can only be selected
@@ -264,7 +265,7 @@ ContentSelector.prototype = {
       $(ElementQuery(resultCssSelector, this.parent, {$, document, window})).addClass('-sitemap-select-item-selected')
     } catch (err) {
       if (err === 'found multiple element groups, but allowMultipleSelectors disabled') {
-        console.log('multiple different element selection disabled')
+        debug('multiple different element selection disabled')
 
         this.showMultipleGroupPopup()
 				// remove last added element

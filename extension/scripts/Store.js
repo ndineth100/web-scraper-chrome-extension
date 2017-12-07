@@ -1,5 +1,5 @@
 var Sitemap = require('./Sitemap')
-
+const debug = require('debug')('web-scraper-headless:store')
 var Store = function (config, options) {
   this.config = config
   this.$ = options.$
@@ -22,7 +22,7 @@ StoreScrapeResultWriter.prototype = {
     } else {
       this.db.bulkDocs({docs: docs}, function (err, response) {
         if (err !== null) {
-          console.log('Error while persisting scraped data to db', err)
+          debug('Error while persisting scraped data to db', err)
         }
         callback()
       })
@@ -64,7 +64,7 @@ Store.prototype = {
     var sitemapJson = JSON.parse(JSON.stringify(sitemap))
 
     if (!sitemap._id) {
-      console.log('cannot save sitemap without an id', sitemap)
+      debug('cannot save sitemap without an id', sitemap)
     }
 
     this.sitemapDb.put(sitemapJson, function (sitemap, err, response) {

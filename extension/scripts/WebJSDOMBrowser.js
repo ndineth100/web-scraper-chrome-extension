@@ -3,7 +3,7 @@ const work = require('webworkify')
 const jsdomBrowserLoader = require('./JSDOMBrowserLoader')
 var jqueryDeferred = require('jquery-deferred')
 var whenCallSequentially = require('../assets/jquery.whencallsequentially')
-
+const debug = require('debug')('web-scraper-headless:web-jsdom-browser')
 const WebJSDOMBrowser = function (options) {
   this.pageLoadDelay = options.pageLoadDelay
   const promises = {}
@@ -35,7 +35,7 @@ const WebJSDOMBrowser = function (options) {
   })
   promises.init = {
     resolve: function () {
-      console.log('successfully created')
+      debug('successfully created')
     },
     reject: function (err) {
       console.error(err)
@@ -98,7 +98,7 @@ WebJSDOMBrowser.prototype = {
     })
   },
   close: function () {
-    console.log('closing webjsdom browser')
+    debug('closing webjsdom browser')
     if (this.worker) this.worker.terminate()
     this.worker = null
   }

@@ -5,6 +5,7 @@ var Sitemap = require('./Sitemap')
 // var SelectorGraphv2 = require('./SelectorGraphv2')
 var getBackgroundScript = require('./getBackgroundScript')
 var getContentScript = require('./getContentScript')
+const debug = require('debug')('web-scraper-headless:controller')
 var SitemapController = function (options, moreOptions) {
   this.$ = moreOptions.$
   this.document = moreOptions.document
@@ -1426,7 +1427,7 @@ var window = this.window
       }
       var dataColumns = Object.keys(response[0])
 
-      console.log(dataColumns)
+      debug(dataColumns)
 
       var $dataPreviewPanel = ich.DataPreview({
         columns: dataColumns

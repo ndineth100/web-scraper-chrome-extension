@@ -112,7 +112,7 @@ var SelectorElementClick = {
       var now = (new Date()).getTime()
 			// sleep. wait when to extract next elements
       if (now < nextElementSelection) {
-				// console.log("wait");
+				// debug("wait");
         return
       }
 
@@ -125,7 +125,7 @@ var SelectorElementClick = {
           addedAnElement = true
         }
       })
-			// console.log("added", addedAnElement);
+			// debug("added", addedAnElement);
 
 			// no new elements found. Stop clicking this button
       if (!addedAnElement) {
@@ -134,12 +134,12 @@ var SelectorElementClick = {
 
 			// continue clicking and add delay, but if there is nothing
 			// more to click the finish
-			// console.log("total buttons", clickElements.length)
+			// debug("total buttons", clickElements.length)
       if (clickElements.length === 0) {
         clearInterval(interval)
         deferredResponse.resolve(foundElements)
       } else {
-				// console.log("click");
+				// debug("click");
         currentClickElement = clickElements[0]
 				// click on elements only once if the type is clickonce
         if (this.clickType === 'clickOnce') {

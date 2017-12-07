@@ -4,7 +4,7 @@ var jqueryDeferred = require('jquery-deferred')
 
 const contentScraper = require('../content_script/content_scraper')
 var whenCallSequentially = require('../assets/jquery.whencallsequentially')
-
+const debug = require('debug')('web-scraper-headless:jsdom-browser')
 var JSDOMBrowser = function (options) {
   this.pageLoadDelay = options.pageLoadDelay
 }
@@ -43,7 +43,7 @@ JSDOMBrowser.prototype = {
   },
   fetchData: function (url, sitemap, parentSelectorId, callback, scope) {
     const browser = this
-    console.log('Init jsdom browser app')
+    debug('Init jsdom browser app')
     browser.loadUrl(url, function (err, {$, document, window}) {
       if (err) {
         return callback(err)

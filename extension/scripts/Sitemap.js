@@ -1,5 +1,6 @@
 var Selector = require('./Selector')
 var SelectorList = require('./SelectorList')
+const debug = require('debug')('web-scraper-headless:sitemap')
 var Sitemap = function (sitemapObj, options) {
   var $ = options.$
   var document = options.document
@@ -30,12 +31,12 @@ if(!this.window)throw new Error("Missing window")
 Sitemap.prototype = {
 
   initData: function (sitemapObj) {
-    console.log(this)
+    debug(this)
     for (var key in sitemapObj) {
-      console.log(key)
+      debug(key)
       this[key] = sitemapObj[key]
     }
-    console.log(this)
+    debug(this)
     var $ = this.$
     var window = this.window
     var document = this.document
@@ -110,7 +111,7 @@ Sitemap.prototype = {
         var start = parseInt(startStr)
         var end = parseInt(endStr)
         var incremental = 1
-        console.log(matches[5])
+        debug(matches[5])
         if (matches[5] !== undefined) {
           incremental = parseInt(matches[5])
         }
