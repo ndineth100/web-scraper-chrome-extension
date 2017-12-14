@@ -29,23 +29,30 @@ To use it as a library do `npm i web-scraper-headless`
  Submit bugs and suggest features on [bug tracker] [github-issues]
  
 #### Headless mode
-To use it as a library you need a sitemap, for example exported from the app.
+To use it as a library you need a sitemap, you can write it by hand, but the easiest way is to use the [original extension][extension] to scrape and then click on "export sitemap".
 
-    const webscraper = require('webscraper-headless')
+    const webscraper = require('web-scraper-headless')
+    // visit github and retrieve last commit of all trending repo. 
+    // The sitemap depends on the actual DOM of github, so it might get outdated
     const sitemap = {
-      id: 'test',
-      startUrl: 'http://test.lv/',
-      selectors: [
-        {
-          'id': 'a',
-          'selector': '#scraper-test-one-page a',
-          'multiple': false,
-          type: 'SelectorText',
-          'parentSelectors': [
-            '_root'
-          ]
-        }
-      ]
+	     "startUrl": "https://github.com/trending",
+	     "selectors": [{
+		      "parentSelectors": ["_root"],
+		      "type": "SelectorLink",
+		      "multiple": true,
+		      "id": "link_to_repo",
+		      "selector": "h3 a",
+		      "delay": ""
+	     }, {
+		      "parentSelectors": ["link_to_repo"],
+		      "type": "SelectorText",
+		      "multiple": false,
+		      "id": "latest_commit",
+		      "selector": "a.commit-tease-sha",
+		      "regex": "",
+		      "delay": ""
+	    }],
+	    "_id": "github_trending"
     }
     const options = {} // optional delay and pageLoadDelay
     webscraper(sitemap, options)
@@ -86,3 +93,4 @@ LGPLv3
  [webscraper.io]: http://webscraper.io/
  [google-groups]: https://groups.google.com/forum/#!forum/web-scraper
  [github-issues]: https://github.com/martinsbalodis/web-scraper-chrome-extension/issues
+ [extension]: https://chrome.google.com/webstore/detail/web-scraper/jnhgnonknehpejjnehehllkliplmbmhn
