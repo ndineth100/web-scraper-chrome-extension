@@ -70,7 +70,7 @@ var SelectorGoogMapID = {
 
   getItemCSSSelector: function () {
     // We get the container
-    return '*'
+    return '*:not(div.overlay)'
   },
 
   getMapsSelectorFromDivHTML: function (html, options = {}) {

@@ -1186,6 +1186,9 @@ var window = this.window
     }, {$, document, window})
 
     deferredSelector.done(function (result) {
+      if (result === null) {
+        console.error('Result was returned null. Maybe there was a communication loss with content script. Try to close and open the dev tools')
+      }
       $(input).val(result.CSSSelector)
 
 			// update validation for selector field
@@ -1332,8 +1335,8 @@ var window = this.window
   },
   previewClickElementSelector: function (button) {
     var $ = this.$
-var document = this.document
-var window = this.window
+    var document = this.document
+    var window = this.window
     if (!$(button).hasClass('preview')) {
       var sitemap = this.state.currentSitemap
       var selector = this.getCurrentlyEditedSelector()
