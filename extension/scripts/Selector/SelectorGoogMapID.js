@@ -53,7 +53,7 @@ var SelectorGoogMapID = {
     var selector = this
     $(containers).each(function (k, container) {
       const mapId = selector.getMapID($(container))
-      result.push({FTID: mapId})
+      result.push({[selector.id + '_FTID']: mapId})
     })
 
     dfd.resolve(result)
@@ -61,11 +61,11 @@ var SelectorGoogMapID = {
   },
 
   getDataColumns: function () {
-    return ['FTID'] // TODO CID
+    return [this.id + '_FTID', this.id + '_PID', this.id + '_CID']
   },
 
   getFeatures: function () {
-    return ['googType', 'mapsSelectorFromDiv']
+    return ['mapsSelectorFromDiv']
   },
 
   getItemCSSSelector: function () {

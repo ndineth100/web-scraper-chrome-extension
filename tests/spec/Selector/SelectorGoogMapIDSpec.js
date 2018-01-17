@@ -17,7 +17,7 @@ describe('Goog Map ID Selector', function () {
     document.body.appendChild($el)
   })
 
-  it.only('FTID selector', function (done) {
+  it('FTID selector', function (done) {
     $el.innerHTML = `
         <iframe src='//20768463p.rfihub.com/ca.html?rb=303415&ca=202438463&_o=30656&_t=207878463&ra=REPLACE_ME_WITH_YOUR_CACHE_BUSTING' style='display:none;padding:0;margin:0' width='0' height='0'>
         </iframe>
@@ -32,14 +32,13 @@ describe('Goog Map ID Selector', function () {
     var selector = new Selector({
       id: 'a',
       type: 'SelectorGoogMapID',
-      googType: 'FTID',
       selector: 'section',
       mapsSelectorFromDiv: 'iframe[src*="google.com/maps/embed"]'
     }, {$, document, window})
 
     var dataDeferred = selector.getData($el)
     dataDeferred.then(function (data) {
-      assert.equal(data[0].FTID, '0x12a4a2674531e3bd:0xf12f53af6888194e')
+      assert.equal(data[0].a_FTID, '0x12a4a2674531e3bd:0xf12f53af6888194e')
       done()
     })
   })
