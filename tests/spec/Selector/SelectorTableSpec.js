@@ -7,12 +7,12 @@ const globals = require('../../globals')
 describe('Table Selector', function () {
   var $el
   let $
-let document
-let window
+  let document
+  let window
   beforeEach(function () {
     $ = globals.$
-document = globals.document
-window = globals.window
+    document = globals.document
+    window = globals.window
 
     document.body.innerHTML = utils.getTestHTML()
     $el = utils.createElementFromHTML("<div id='tests' style='display:none'></div>", document)
