@@ -1,6 +1,7 @@
 var selectors = require('./Selectors')
 var Selector = require('./Selector')
 var SelectorTable = selectors.SelectorTable
+var SelectorGoogMapID = selectors.SelectorGoogMapID
 var Sitemap = require('./Sitemap')
 // var SelectorGraphv2 = require('./SelectorGraphv2')
 var getBackgroundScript = require('./getBackgroundScript')
@@ -758,6 +759,10 @@ var window = this.window
           title: 'Table'
         },
         {
+          type: 'SelectorGoogMapID',
+          title: 'GoogMaps'
+        },
+        {
           type: 'SelectorElementAttribute',
           title: 'Element attribute'
         },
@@ -862,6 +867,7 @@ var window = this.window
     var id = $('#edit-selector [name=id]').val()
     var selectorsSelector = $('#edit-selector [name=selector]').val()
     var tableDataRowSelector = $('#edit-selector [name=tableDataRowSelector]').val()
+    var mapsSelectorFromDiv = $('#edit-selector [name=mapsSelectorFromDiv]').val()
     var tableHeaderRowSelector = $('#edit-selector [name=tableHeaderRowSelector]').val()
     var clickElementSelector = $('#edit-selector [name=clickElementSelector]').val()
     var type = $('#edit-selector [name=type]').val()
@@ -896,6 +902,7 @@ var window = this.window
       selector: selectorsSelector,
       tableHeaderRowSelector: tableHeaderRowSelector,
       tableDataRowSelector: tableDataRowSelector,
+      mapsSelectorFromDiv: mapsSelectorFromDiv,
       clickElementSelector: clickElementSelector,
       clickElementUniquenessType: clickElementUniquenessType,
       clickType: clickType,
@@ -1198,6 +1205,13 @@ var window = this.window
           var headerColumns = SelectorTable.getTableHeaderColumnsFromHTML(tableHeaderRowSelector, html, {$, document, window})
           this.renderTableHeaderColumns(headerColumns)
         }.bind(this))
+      }
+
+      if (selector.type === 'SelectorGoogMapIDS') {
+        this.getSelectorHTML().done(function (html) {
+          var mapSelectorFromDiv = SelectorGoogMapID.getMapsSelectorFromDivHTML(html, {$, document, window})
+          $('input[name=mapsSelectorFromDiv]').val(mapSelectorFromDiv)
+        })
       }
     }.bind(this))
   },
