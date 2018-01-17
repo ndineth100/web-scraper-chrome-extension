@@ -70,7 +70,7 @@ var SelectorGoogMapID = {
 
   getItemCSSSelector: function () {
     // We get the container
-    return 'div'
+    return '*'
   },
 
   getMapsSelectorFromDivHTML: function (html, options = {}) {

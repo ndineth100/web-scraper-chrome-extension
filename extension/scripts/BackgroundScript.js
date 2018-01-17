@@ -1,4 +1,6 @@
 var jquery = require('jquery-deferred')
+const debug = require('debug')('web-scraper-headless:background-script')
+
 /**
  * ContentScript that can be called from anywhere within the extension
  */
@@ -20,8 +22,20 @@ var BackgroundScript = {
       currentWindow: true
     }, function (tabs) {
       if (tabs.length < 1) {
+        debug('There seems to be no active tab in the current window. Let us try only active')
+        chrome.tabs.query({
+          active: true,
+          windowType: 'normal'
+        }, function (tabs) {
+          if (tabs.length < 1) {
+            debug('Could not find tab')
+            deferredResponse.reject("couldn't find the active tab")
+          } else {
+            const tabId = tabs[0].id
+            deferredResponse.resolve(tabId)
+          }
+        })
 				// @TODO must be running within popup. maybe find another active window?
-        deferredResponse.reject("couldn't find the active tab")
       } else {
         var tabId = tabs[0].id
         deferredResponse.resolve(tabId)

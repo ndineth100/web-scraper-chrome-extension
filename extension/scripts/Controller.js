@@ -1207,7 +1207,7 @@ var window = this.window
         }.bind(this))
       }
 
-      if (selector.type === 'SelectorGoogMapIDS') {
+      if (selector.type === 'SelectorGoogMapID') {
         this.getSelectorHTML().done(function (html) {
           var mapSelectorFromDiv = SelectorGoogMapID.getMapsSelectorFromDivHTML(html, {$, document, window})
           $('input[name=mapsSelectorFromDiv]').val(mapSelectorFromDiv)
@@ -1298,8 +1298,8 @@ var window = this.window
 	 */
   getSelectorHTML: function () {
     var $ = this.$
-var document = this.document
-var window = this.window
+    var document = this.document
+    var window = this.window
     var sitemap = this.getCurrentlyEditedSelectorSitemap()
     var selector = this.getCurrentlyEditedSelector()
     var currentStateParentSelectorIds = this.getCurrentStateParentSelectorIds()
@@ -1310,8 +1310,8 @@ var window = this.window
   },
   previewSelector: function (button) {
     var $ = this.$
-var document = this.document
-var window = this.window
+    var document = this.document
+    var window = this.window
     if (!$(button).hasClass('preview')) {
       var sitemap = this.getCurrentlyEditedSelectorSitemap()
       var selector = this.getCurrentlyEditedSelector()
