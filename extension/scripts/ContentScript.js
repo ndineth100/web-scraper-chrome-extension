@@ -1,5 +1,7 @@
 var ContentSelector = require('./ContentSelector')
 var jquery = require('jquery-deferred')
+const debug = require('debug')('web-scraper-headless:content-script')
+
 /**
  * ContentScript that can be called from anywhere within the extension
  */
@@ -15,6 +17,7 @@ var ContentScript = {
     var deferredHTML = jquery.Deferred()
     var html = $(request.CSSSelector).clone().wrap('<p>').parent().html()
     deferredHTML.resolve(html)
+    debug('Send html', html)
     return deferredHTML.promise()
   },
 

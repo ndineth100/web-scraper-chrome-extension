@@ -9,13 +9,14 @@ const babelify = require('babelify')
 const mocha = require('gulp-spawn-mocha')
 // We do karma in gulp instead of npm because we need to recompute all the generated bundles that are loaded to the browser
 const runTests = (function () {
-  let timeout
+  let builds = 0
   return function (done = function () {}) {
-    if (timeout) clearTimeout(timeout)
-    timeout = setTimeout(function () {
+    builds++
+    // One build per bundle
+    if (builds % 3 === 0) {
       runKarma(done)
       runJSDOMTests()
-    }, 100)
+    }
   }
 })()
 

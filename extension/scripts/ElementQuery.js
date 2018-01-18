@@ -7,11 +7,11 @@
 var ElementQuery = function (CSSSelector, parentElement, options) {
   CSSSelector = CSSSelector || ''
   this.$ = options.$
-this.document = options.document
-this.window = options.window
+  this.document = options.document
+  this.window = options.window
   if (!this.$) throw new Error('Missing jquery for ElementQuery')
-if (!this.document) throw new Error("Missing document")
-if(!this.window)throw new Error("Missing window")
+  if (!this.document) throw new Error("Missing document")
+  if(!this.window)throw new Error("Missing window")
   var selectedElements = []
 
   var addElement = function (element) {
@@ -23,12 +23,12 @@ if(!this.window)throw new Error("Missing window")
   var selectorParts = ElementQuery.getSelectorParts(CSSSelector)
   var self = this
   selectorParts.forEach(function (selector) {
-		// handle special case when parent is selected
+    // handle special case when parent is selected
     if (selector === '_parent_') {
       self.$(parentElement).each(function (i, element) {
         addElement(element)
       })
-    }		else {
+    } else {
       var elements = self.$(selector, self.$(parentElement))
       elements.each(function (i, element) {
         addElement(element)

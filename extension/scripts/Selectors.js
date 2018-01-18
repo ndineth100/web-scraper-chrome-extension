@@ -9,7 +9,7 @@ var SelectorLink = require('./Selector/SelectorLink')
 var SelectorPopupLink = require('./Selector/SelectorPopupLink')
 var SelectorTable = require('./Selector/SelectorTable')
 var SelectorText = require('./Selector/SelectorText')
-
+var SelectorGoogMapID = require('./Selector/SelectorGoogMapID')
 module.exports = {
   SelectorElement,
   SelectorElementAttribute,
@@ -21,5 +21,6 @@ module.exports = {
   SelectorLink,
   SelectorPopupLink,
   SelectorTable,
-  SelectorText
+  SelectorText,
+  SelectorGoogMapID
 }

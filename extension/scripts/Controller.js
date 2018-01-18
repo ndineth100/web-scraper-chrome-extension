@@ -1,6 +1,7 @@
 var selectors = require('./Selectors')
 var Selector = require('./Selector')
 var SelectorTable = selectors.SelectorTable
+var SelectorGoogMapID = selectors.SelectorGoogMapID
 var Sitemap = require('./Sitemap')
 // var SelectorGraphv2 = require('./SelectorGraphv2')
 var getBackgroundScript = require('./getBackgroundScript')
@@ -758,6 +759,10 @@ var window = this.window
           title: 'Table'
         },
         {
+          type: 'SelectorGoogMapID',
+          title: 'GoogMaps'
+        },
+        {
           type: 'SelectorElementAttribute',
           title: 'Element attribute'
         },
@@ -862,6 +867,7 @@ var window = this.window
     var id = $('#edit-selector [name=id]').val()
     var selectorsSelector = $('#edit-selector [name=selector]').val()
     var tableDataRowSelector = $('#edit-selector [name=tableDataRowSelector]').val()
+    var mapsSelectorFromDiv = $('#edit-selector [name=mapsSelectorFromDiv]').val()
     var tableHeaderRowSelector = $('#edit-selector [name=tableHeaderRowSelector]').val()
     var clickElementSelector = $('#edit-selector [name=clickElementSelector]').val()
     var type = $('#edit-selector [name=type]').val()
@@ -896,6 +902,7 @@ var window = this.window
       selector: selectorsSelector,
       tableHeaderRowSelector: tableHeaderRowSelector,
       tableDataRowSelector: tableDataRowSelector,
+      mapsSelectorFromDiv: mapsSelectorFromDiv,
       clickElementSelector: clickElementSelector,
       clickElementUniquenessType: clickElementUniquenessType,
       clickType: clickType,
@@ -1179,6 +1186,9 @@ var window = this.window
     }, {$, document, window})
 
     deferredSelector.done(function (result) {
+      if (result === null) {
+        console.error('Result was returned null. Maybe there was a communication loss with content script. Try to close and open the dev tools')
+      }
       $(input).val(result.CSSSelector)
 
 			// update validation for selector field
@@ -1198,6 +1208,13 @@ var window = this.window
           var headerColumns = SelectorTable.getTableHeaderColumnsFromHTML(tableHeaderRowSelector, html, {$, document, window})
           this.renderTableHeaderColumns(headerColumns)
         }.bind(this))
+      }
+
+      if (selector.type === 'SelectorGoogMapID') {
+        this.getSelectorHTML().done(function (html) {
+          var mapSelectorFromDiv = SelectorGoogMapID.getMapsSelectorFromDivHTML(html, {$, document, window})
+          $('input[name=mapsSelectorFromDiv]').val(mapSelectorFromDiv)
+        })
       }
     }.bind(this))
   },
@@ -1284,8 +1301,8 @@ var window = this.window
 	 */
   getSelectorHTML: function () {
     var $ = this.$
-var document = this.document
-var window = this.window
+    var document = this.document
+    var window = this.window
     var sitemap = this.getCurrentlyEditedSelectorSitemap()
     var selector = this.getCurrentlyEditedSelector()
     var currentStateParentSelectorIds = this.getCurrentStateParentSelectorIds()
@@ -1296,8 +1313,8 @@ var window = this.window
   },
   previewSelector: function (button) {
     var $ = this.$
-var document = this.document
-var window = this.window
+    var document = this.document
+    var window = this.window
     if (!$(button).hasClass('preview')) {
       var sitemap = this.getCurrentlyEditedSelectorSitemap()
       var selector = this.getCurrentlyEditedSelector()
@@ -1318,8 +1335,8 @@ var window = this.window
   },
   previewClickElementSelector: function (button) {
     var $ = this.$
-var document = this.document
-var window = this.window
+    var document = this.document
+    var window = this.window
     if (!$(button).hasClass('preview')) {
       var sitemap = this.state.currentSitemap
       var selector = this.getCurrentlyEditedSelector()
