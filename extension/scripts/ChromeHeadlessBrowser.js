@@ -1,11 +1,10 @@
 const puppeteer = require('puppeteer')
-const jQuery = require('jquery')
-const url = require('url')
-const contentScraper = require('../content_script/content_scraper')
 const debug = require('debug')('web-scraper-headless:chrome-headless-browser')
 const {ExecutionContext} = require('puppeteer/lib/ExecutionContext')
-const {FrameManager} = require('puppeteer/lib/FrameManager')
 const contentSraperBundler = require('../content_script/contentScraperHeadlessBundler')
+const jqueryDeferred = require('jquery-deferred')
+const whenCallSequentially = require('../assets/jquery.whencallsequentially')
+
 class ChromeHeadlessBrowser {
   constructor (options) {
     this.pageLoadDelay = options.pageLoadDelay
@@ -31,7 +30,19 @@ class ChromeHeadlessBrowser {
     }
   }
   saveImages (record, namingFunction) {
+    var deferredResponse = jqueryDeferred.Deferred()
+    var deferredImageStoreCalls = []
+    var prefixLength = '_imageBase64-'.length
+    for (var attr in record) {
+      if (attr.substr(0, prefixLength) === '_imageBase64-') {
+        throw new Error('Downloading images is not yet supported')
+      }
+    }
+    whenCallSequentially(deferredImageStoreCalls).done(function () {
+      deferredResponse.resolve()
+    })
 
+    return deferredResponse.promise()
   }
   async fetchData (url, sitemap, parentSelectorId, callback, scope) {
     try {
@@ -62,7 +73,6 @@ class ChromeHeadlessBrowser {
           })
         })
       }, message)
-      console.log(data)
       callback.call(scope, null, data)
     } catch (e) {
       return callback(e)
