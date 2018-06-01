@@ -5,6 +5,7 @@ const Scraper = require('./extension/scripts/Scraper')
 const jsdom = require('jsdom')
 const jQuery = require('jquery')
 const Browser = require('./extension/scripts/JSDOMBrowser')
+const ChromeHeadlessBrowser = require('./extension/scripts/ChromeHeadlessBrowser')
 
 module.exports = function (sitemap, options) {
   const type = options.type || 'jsdom'
@@ -31,7 +32,7 @@ function scrapeJSDOM (sitemapInfo, options = {}) {
       browser,
       store,
       delay: options.delay || 500
-    }, {$, document, window})
+    }, {})
     s.run(function () {
       // TODO there should be some error handling here
       resolve(store.data)

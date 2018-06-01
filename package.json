@@ -50,7 +50,7 @@
     "babel-plugin-meaningful-logs": "^1.0.2",
     "babel-register": "^6.24.1",
     "babelify": "^7.3.0",
-    "browserify": "^14.1.0",
+    "browserify": "^16.1.0",
     "chai": "^3.5.0",
     "chrome-remote-interface": "^0.18.0",
     "gulp": "^3.9.1",
