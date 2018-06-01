@@ -4,26 +4,46 @@ const InMemoryStore = require('./extension/scripts/InMemoryStore')
 const Scraper = require('./extension/scripts/Scraper')
 const jsdom = require('jsdom')
 const jQuery = require('jquery')
-const Browser = require('./extension/scripts/JSDOMBrowser')
+const JSDOMBrowser = require('./extension/scripts/JSDOMBrowser')
 const ChromeHeadlessBrowser = require('./extension/scripts/ChromeHeadlessBrowser')
-
+/**
+ *
+ * @param sitemap
+ * @param options
+ * @param options.type jsdom|headless
+ * @param options.pageLoadDelay
+ * @param options.delay
+ * @return {*}
+ */
 module.exports = function (sitemap, options) {
-  const type = options.type || 'jsdom'
-  if (type !== 'jsdom') throw new Error('Not implemented')
-  return scrapeJSDOM(sitemap, options)
+  return scrape(sitemap, options)
 }
 
-function scrapeJSDOM (sitemapInfo, options = {}) {
+function scrape (sitemapInfo, options = {}) {
   return new Promise(function (resolve, reject) {
     const {JSDOM} = jsdom
     const dom = new JSDOM()
-    const window = dom.window
-    const document = window.document
-    const $ = jQuery(window)
+    // sitemap is created twice, once in node another in the browser context.
+    // In node we don't actually need these variables. We should probably not provide them
+    const fakeWindow = dom.window
+    const fakeDocument = window.document
+    const fake$ = jQuery(window)
     const q = new Queue()
     const store = new InMemoryStore()
-    const sitemap = new Sitemap(sitemapInfo, {$, document, window})
-    const browser = new Browser({
+    const sitemap = new Sitemap(sitemapInfo, {$: fake$, document: fakeDocument, window: fakeWindow})
+
+    let BrowserConstructor
+    switch (options.type) {
+      case 'jsdom':
+        BrowserConstructor = JSDOMBrowser
+        break
+      case 'headless':
+        BrowserConstructor = ChromeHeadlessBrowser
+        break
+      default:
+        BrowserConstructor = JSDOMBrowser
+    }
+    const browser = new BrowserConstructor({
       pageLoadDelay: options.pageLoadDelay || 2000
     })
     const s = new Scraper({

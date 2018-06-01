@@ -50,7 +50,6 @@
     "babel-plugin-meaningful-logs": "^1.0.2",
     "babel-register": "^6.24.1",
     "babelify": "^7.3.0",
-    "browserify": "^16.1.0",
     "chai": "^3.5.0",
     "chrome-remote-interface": "^0.18.0",
     "gulp": "^3.9.1",
@@ -71,6 +70,7 @@
     "webworkify": "^1.4.0"
   },
   "dependencies": {
+    "browserify": "^16.1.0",
     "css-selector": "git://github.com/furstenheim/css-selector.git#b50eb6befc4129ac56e91efba3dd1e233bb67202",
     "debug": "^3.1.0",
     "jquery": "^3.2.1",
