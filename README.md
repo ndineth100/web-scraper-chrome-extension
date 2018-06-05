@@ -55,7 +55,7 @@ To use it as a library you need a sitemap, you can write it by hand, but the eas
 	    }],
 	    "_id": "github_trending"
     }
-    const options = {} // optional delay, pageLoadDelay and browser
+    const options = {delay: 10, pageLoadDelay: 10, browser: 'headless'} // optional delay, pageLoadDelay and browser
     webscraper(sitemap, options)
         .then(function (scraped) {
             // This is your scraped info
