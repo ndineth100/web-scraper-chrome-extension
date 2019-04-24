@@ -20,7 +20,7 @@ Queue.prototype = {
 	 */
   add: function (job) {
     if (this.canBeAdded(job)) {
-        client.rpush(['queue', job], function(err, reply){
+        client.rpush(['queue', JSON.stringify(job)], function(err, reply){
           if(err){
               console.log(`Job : ${job} did not add properly! error: ${err}`)
               return false
@@ -89,7 +89,7 @@ Queue.prototype = {
                 console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
                 return false
             }
-            return reply
+            return JSON.parse(reply)
         });
     } else {
       return false
