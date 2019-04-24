@@ -51,9 +51,11 @@ Queue.prototype = {
   },
 
   getQueueSize: function () {
-      llenAsync('queue').then(function(res) {
+      return llenAsync('queue').then(function(res) {
           console.log(res)
-          return res
+          return new Promise(function(resolve, reject) {
+              resolve(res)
+          }
       });
       //client.llen('queue', (err, reply) =>
       //{
@@ -101,21 +103,22 @@ Queue.prototype = {
 		// @TODO test this
 
     console.log(`getNextJob started! queue size: ${this.getQueueSize()}`);
-    if (this.getQueueSize() > 0) {
-        console.log('getNextJob queue size ok!');
-        client.lpop('scrapedUrl', function(err, reply){
-            console.log('getNextJob inside lpop!');
-            if(err){
-                console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
-                return false
-            }
-            console.log('getNextJob function returned ' + reply)
-            return JSON.parse(reply)
-        });
-    } else {
-      console.log('getNextJob queue size is zero!');
-      return false
-    }
+      this.getQueueSize.then(function(result) {
+          console.log('getNextJob queue size ok!');
+          client.lpop('scrapedUrl', function(err, reply){
+              console.log('getNextJob inside lpop!')
+              if(err){
+                  console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
+                  return false
+              }
+              console.log('getNextJob function returned ' + reply)
+              return JSON.parse(reply)
+          })
+      })
+      //else {
+      //    console.log('getNextJob queue size is zero!');
+      //    return false
+      //}
   }
 }
 
