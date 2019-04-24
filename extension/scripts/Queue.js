@@ -1,4 +1,4 @@
-const redis = require('redis');
+const redis = require("async-redis")
 
 // Create Redis Client
 let client = redis.createClient();
@@ -46,7 +46,7 @@ Queue.prototype = {
   },
 
   getQueueSize: function () {
-      await client.llen('queue', function(err, reply){
+      client.llen('queue', function(err, reply){
           if(err){
               console.log(`Getting queue size - error: ${err}`)
               return 0
