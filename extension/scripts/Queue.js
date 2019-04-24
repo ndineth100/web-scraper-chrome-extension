@@ -55,7 +55,7 @@ Queue.prototype = {
           console.log(res)
           return new Promise(function(resolve, reject) {
               resolve(res)
-          }
+          })
       });
       //client.llen('queue', (err, reply) =>
       //{
