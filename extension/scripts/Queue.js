@@ -61,6 +61,7 @@ Queue.prototype = {
               return parseInt(reply)
           }
       });
+      console.log('getQueueSize function returned ' + reply);
   },
 
   isScraped: function (url) {
