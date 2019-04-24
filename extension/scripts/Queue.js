@@ -21,13 +21,13 @@ Queue.prototype = {
   add: function (job) {
     console.log('add function started!');
     if (this.canBeAdded(job)) {
-        console.log('add function canBeAdded true!');
+        console.log('add function canBeAdded true!')
+        console.log('job: '+JSON.stringify(job))
         client.rpush('queue', JSON.stringify(job))
         this._setUrlScraped(job.url)
         console.log('add function returned true')
         return true
       }
-    }
     console.log('add function return false!');
     return false
   },
