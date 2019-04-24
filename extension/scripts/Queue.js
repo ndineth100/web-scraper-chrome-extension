@@ -19,7 +19,9 @@ Queue.prototype = {
 	 * @returns {boolean}
 	 */
   add: function (job) {
+    console.log('add function started!');
     if (this.canBeAdded(job)) {
+        console.log('add function canBeAdded true!');
         let status = client.rpush(['queue', JSON.stringify(job)], function(err, reply){
           if(err){
               console.log(`Job : ${job} did not add properly! error: ${err}`)
@@ -36,6 +38,7 @@ Queue.prototype = {
           return true
       }
     }
+    console.log('add function return false!');
     return false
   },
 
