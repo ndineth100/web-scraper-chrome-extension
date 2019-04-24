@@ -1,7 +1,13 @@
 const redis = require("async-redis")
+const {promisify} = require('util')
 
 // Create Redis Client
 let client = redis.createClient();
+
+const sismemberAsync = promisify(client.sismember).bind(client);
+const llenAsync = promisify(client.llen).bind(client);
+const saddAsync = promisify(client.sadd).bind(client);
+const lpopAsync = promisify(client.lpop).bind(client);
 
 client.on('connect', function(){
     console.log('Package Queue Initiated a Connection to Redis...');
@@ -45,8 +51,8 @@ Queue.prototype = {
     return true
   },
 
-  getQueueSize: function () {
-      client.llen('queue', function(err, reply){
+  getQueueSize: async function () {
+      const res = await llenAsync(['queue'], function(err, reply){
           if(err){
               console.log(`Getting queue size - error: ${err}`)
               return 0
@@ -56,27 +62,31 @@ Queue.prototype = {
               return parseInt(reply)
           }
       });
+      console.log(res);
+      return res;
   },
 
-  isScraped: function (url) {
-    return client.sismember(['scrapedUrl', url], function(err, reply){
-        if(err){
-            console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
-            return false
-        }
-        if(parseInt(reply) == 1){
-            console.log('isScraped function returned true')
-            return true
-        }
-        else{
-            console.log('isScraped function returned false')
-            return false
-        }
-    });
+  isScraped: async function (url) {
+        const res = await sismemberAsync(['scrapedUrl', url], function(err, reply){
+             if(err){
+                 console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
+                 return false
+             }
+             if(parseInt(reply) == 1){
+                 console.log('isScraped function returned true')
+                 return true
+             }
+             else{
+                 console.log('isScraped function returned false')
+                 return false
+             }
+         });
+        console.log(res);
+        return res;
   },
 
-  _setUrlScraped: function (url) {
-      client.sadd(['scrapedUrl', url], function(err, reply){
+  _setUrlScraped: async function (url) {
+      await saddAsync(['scrapedUrl', url], function(err, reply){
           if(err){
               console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
           }
@@ -92,16 +102,21 @@ Queue.prototype = {
 
     console.log(`getNextJob started! queue size: ${this.getQueueSize()}`);
     if (this.getQueueSize() > 0) {
-        console.log('getNextJob queue size ok!');
-        client.lpop('scrapedUrl', function(err, reply){
-            console.log('getNextJob inside lpop!');
-            if(err){
-                console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
-                return false
-            }
-            console.log('getNextJob function returned ' + reply)
-            return JSON.parse(reply)
-        });
+        console.log('getNextJob queue size ok!')
+        async myFunc() {
+            const res = await lpopAsync('scrapedUrl', function(err, reply){
+                console.log('getNextJob inside lpop!')
+                if(err){
+                    console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
+                    return false
+                }
+                console.log('getNextJob function returned ' + reply)
+                return JSON.parse(reply)
+            })
+            console.log(res)
+            return res
+        }
+
     } else {
       console.log('getNextJob queue size is zero!');
       return false
