@@ -98,15 +98,18 @@ Queue.prototype = {
 		// @TODO test this
     console.log('getNextJob started!');
     if (this.getQueueSize() > 0) {
-        return client.lpop('scrapedUrl', function(err, reply){
+        console.log('getNextJob queue size ok!');
+        client.lpop('scrapedUrl', function(err, reply){
+            console.log('getNextJob inside lpop!');
             if(err){
                 console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
                 return false
             }
-            console.log('getNextJob function returned '+reply)
+            console.log('getNextJob function returned ' + reply)
             return JSON.parse(reply)
         });
     } else {
+      console.log('getNextJob queue size is zero!');
       return false
     }
   }
