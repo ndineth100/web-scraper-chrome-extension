@@ -46,7 +46,7 @@ Queue.prototype = {
   },
 
   getQueueSize: function () {
-      return client.llen('queue', function(err, reply){
+      client.llen('queue', function(err, reply){
           if(err){
               console.log(`Getting queue size - error: ${err}`)
               return 0
