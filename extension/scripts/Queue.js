@@ -1,7 +1,14 @@
+const redis = require('redis');
+
+// Create Redis Client
+let client = redis.createClient();
+
+client.on('connect', function(){
+    console.log('Package Queue Initiated a Connection to Redis...');
+});
 
 var Queue = function () {
-  this.jobs = []
-  this.scrapedUrls = {}
+
 }
 
 Queue.prototype = {
@@ -13,8 +20,18 @@ Queue.prototype = {
 	 */
   add: function (job) {
     if (this.canBeAdded(job)) {
-      this.jobs.push(job)
-      this._setUrlScraped(job.url)
+        client.rpush("queue", job, function(err, reply){
+          if(err){
+              console.log(`Job : ${job} did not add properly! error: ${err}`)
+              return false
+          }
+          if(reply){
+              this._setUrlScraped(job.url)
+          }else{
+              console.log(`Job : ${job} Already added!`)
+              return false
+          }
+      });
       return true
     }
     return false
@@ -33,21 +50,48 @@ Queue.prototype = {
   },
 
   getQueueSize: function () {
-    return this.jobs.length
+      client.llen("queue", function(err, reply){
+          if(err){
+              console.log(`Getting queue size - error: ${err}`)
+              return 0
+          }
+          else{
+              return reply
+          }
+      });
   },
 
   isScraped: function (url) {
-    return (this.scrapedUrls[url] !== undefined)
+    client.sismember("scrapedUrl", url, function(err, reply){
+        if(err){
+            console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
+            return false
+        }
+        return reply
+    });
   },
 
   _setUrlScraped: function (url) {
-    this.scrapedUrls[url] = true
+      client.sadd("scrapedUrl", url, function(err, reply){
+          if(err){
+              console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
+          }
+          if(!reply){
+              console.log(`scrapedUrl : ${url} Already added!`)
+          }
+      });
   },
 
   getNextJob: function () {
 		// @TODO test this
     if (this.getQueueSize() > 0) {
-      return this.jobs.pop()
+        client.lpop("scrapedUrl", function(err, reply){
+            if(err){
+                console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
+                return false
+            }
+            return reply
+        });
     } else {
       return false
     }
