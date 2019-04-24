@@ -22,17 +22,10 @@ Queue.prototype = {
     console.log('add function started!');
     if (this.canBeAdded(job)) {
         console.log('add function canBeAdded true!');
-        let status = client.rpush(['queue', JSON.stringify(job)], function(err, reply){
-          if(err){
-              console.log(`Job : ${job} did not add properly! error: ${err}`)
-              return false
-          }
-          return true
-      });
-      if(status){
-          this._setUrlScraped(job.url)
-          console.log('add function returned true')
-          return true
+        client.rpush('queue', JSON.stringify(job))
+        this._setUrlScraped(job.url)
+        console.log('add function returned true')
+        return true
       }
     }
     console.log('add function return false!');
