@@ -89,7 +89,7 @@ Queue.prototype = {
 
   getNextJob: function () {
 		// @TODO test this
-    console.log('getNextJob started!');
+    console.log(`getNextJob started! queue size: ${this.getQueueSize()}`);
     if (this.getQueueSize() > 0) {
         console.log('getNextJob queue size ok!');
         client.lpop('scrapedUrl', function(err, reply){
