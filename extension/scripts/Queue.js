@@ -108,7 +108,7 @@ Queue.prototype = {
           client.lpop('scrapedUrl', function(err, reply){
               console.log('getNextJob inside lpop!')
               if(err){
-                  console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
+                  console.log(`scrapedUrl : ${reply} did not add properly! error: ${err}`)
                   return false
               }
               console.log('getNextJob function returned ' + reply)
