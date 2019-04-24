@@ -30,11 +30,9 @@ Queue.prototype = {
               return false
           }
       });
-      if(!status){
-          return false;
-      }else{
+      if(status){
           this._setUrlScraped(job.url)
-          console.log('add function returned true');
+          console.log('add function returned true')
           return true
       }
     }
@@ -50,7 +48,7 @@ Queue.prototype = {
     if (job.url.match(/\.(doc|docx|pdf|ppt|pptx|odt)$/i) !== null) {
       return false
     }
-    console.log('canBeAdded function returned true');
+    console.log('canBeAdded function returned true')
     return true
   },
 
@@ -61,11 +59,10 @@ Queue.prototype = {
               return 0
           }
           else{
-              console.log('getQueueSize function returned ' + reply);
+              console.log('getQueueSize function returned ' + reply)
               return parseInt(reply)
           }
       });
-      console.log('getQueueSize check!');
   },
 
   isScraped: function (url) {
@@ -74,13 +71,13 @@ Queue.prototype = {
             console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
             return false
         }
-        if(reply){
-            console.log('isScraped function returned true');
-            return true;
+        if(parseInt(reply) == 1){
+            console.log('isScraped function returned true')
+            return true
         }
         else{
-            console.log('isScraped function returned false');
-            return false;
+            console.log('isScraped function returned false')
+            return false
         }
     });
   },
@@ -94,7 +91,7 @@ Queue.prototype = {
               console.log(`scrapedUrl : ${url} Already added!`)
           }
       });
-      console.log('_setUrlScraped function returned true');
+      console.log('_setUrlScraped function returned true')
   },
 
   getNextJob: function () {
@@ -105,7 +102,7 @@ Queue.prototype = {
                 console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
                 return false
             }
-            console.log('getNextJob function returned '+reply);
+            console.log('getNextJob function returned '+reply)
             return JSON.parse(reply)
         });
     } else {
