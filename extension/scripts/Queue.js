@@ -97,13 +97,12 @@ Queue.prototype = {
       console.log('_setUrlScraped function returned true')
   },
 
-  getNextJob: function () {
+  getNextJob: async function () {
 		// @TODO test this
 
     console.log(`getNextJob started! queue size: ${this.getQueueSize()}`);
     if (this.getQueueSize() > 0) {
         console.log('getNextJob queue size ok!')
-        async myFunc() {
             const res = await lpopAsync('scrapedUrl', function(err, reply){
                 console.log('getNextJob inside lpop!')
                 if(err){
@@ -115,7 +114,6 @@ Queue.prototype = {
             })
             console.log(res)
             return res
-        }
 
     } else {
       console.log('getNextJob queue size is zero!');
