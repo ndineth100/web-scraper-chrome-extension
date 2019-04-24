@@ -123,6 +123,7 @@ Scraper.prototype = {
             delete record['_followSelectorId']
           }
           scrapedRecords.push(record)
+          console.log(record)
         }
       }.bind(this))
 

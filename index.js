@@ -56,6 +56,7 @@ function scrape (sitemapInfo, options = {}) {
     s.run(function () {
       // TODO there should be some error handling here
       resolve(store.data)
+      console.log("Hello world web-scraper-2");
     })
   })
 }
