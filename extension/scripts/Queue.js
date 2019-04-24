@@ -46,7 +46,7 @@ Queue.prototype = {
   },
 
   getQueueSize: function () {
-      client.llen('queue', function(err, reply){
+      async client.llen('queue', function(err, reply){
           if(err){
               console.log(`Getting queue size - error: ${err}`)
               return 0
@@ -89,6 +89,7 @@ Queue.prototype = {
 
   getNextJob: function () {
 		// @TODO test this
+
     console.log(`getNextJob started! queue size: ${this.getQueueSize()}`);
     if (this.getQueueSize() > 0) {
         console.log('getNextJob queue size ok!');
