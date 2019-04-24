@@ -20,7 +20,7 @@ Queue.prototype = {
 	 */
   add: function (job) {
     if (this.canBeAdded(job)) {
-        client.rpush(['queue', JSON.stringify(job)], function(err, reply){
+        let status = client.rpush(['queue', JSON.stringify(job)], function(err, reply){
           if(err){
               console.log(`Job : ${job} did not add properly! error: ${err}`)
               return false
@@ -30,9 +30,13 @@ Queue.prototype = {
               return false
           }
       });
-      this._setUrlScraped(job.url)
-      console.log('add function returned true');
-      return true
+      if(!status){
+          return false;
+      }else{
+          this._setUrlScraped(job.url)
+          console.log('add function returned true');
+          return true
+      }
     }
     return false
   },
@@ -51,7 +55,7 @@ Queue.prototype = {
   },
 
   getQueueSize: function () {
-      client.llen('queue', function(err, reply){
+      return client.llen('queue', function(err, reply){
           if(err){
               console.log(`Getting queue size - error: ${err}`)
               return 0
@@ -61,11 +65,10 @@ Queue.prototype = {
               return parseInt(reply)
           }
       });
-      console.log('getQueueSize function returned ' + reply);
   },
 
   isScraped: function (url) {
-    client.sismember(['scrapedUrl', url], function(err, reply){
+    return client.sismember(['scrapedUrl', url], function(err, reply){
         if(err){
             console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
             return false
@@ -96,7 +99,7 @@ Queue.prototype = {
   getNextJob: function () {
 		// @TODO test this
     if (this.getQueueSize() > 0) {
-        client.lpop('scrapedUrl', function(err, reply){
+        return client.lpop('scrapedUrl', function(err, reply){
             if(err){
                 console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
                 return false
