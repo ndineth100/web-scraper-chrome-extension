@@ -58,7 +58,7 @@ Queue.prototype = {
           }
           else{
               console.log('getQueueSize function returned ' + reply);
-              return reply
+              return parseInt(reply)
           }
       });
   },
