@@ -27,10 +27,7 @@ Queue.prototype = {
               console.log(`Job : ${job} did not add properly! error: ${err}`)
               return false
           }
-          if(!reply){
-              console.log(`Job : ${job} Already added!`)
-              return false
-          }
+          return true
       });
       if(status){
           this._setUrlScraped(job.url)
