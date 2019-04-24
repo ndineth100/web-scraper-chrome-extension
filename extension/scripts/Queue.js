@@ -51,11 +51,21 @@ Queue.prototype = {
   },
 
   getQueueSize: function () {
-      return llenAsync('queue').then(function(res) {
+      llenAsync('queue').then(function(res) {
           console.log(res)
           return res
       });
-      
+      //client.llen('queue', (err, reply) =>
+      //{
+      //    if(err){
+      //        console.log(`Getting queue size - error: ${err}`)
+      //        return 0
+      //    }
+      //    else{
+      //        console.log('getQueueSize function returned ' + reply)
+      //        return parseInt(reply)
+      //    }
+      //});
   },
 
   isScraped: function (url) {
