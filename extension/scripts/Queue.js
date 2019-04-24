@@ -1,11 +1,16 @@
 const redis = require('redis');
 
+const {promisify} = require('util');
+
+
 // Create Redis Client
 let client = redis.createClient();
 
 client.on('connect', function(){
     console.log('Package Queue Initiated a Connection to Redis...');
 });
+
+const llenAsync = promisify(client.llen).bind(client);
 
 var Queue = function () {
 
@@ -46,17 +51,11 @@ Queue.prototype = {
   },
 
   getQueueSize: function () {
-      client.llen('queue', (err, reply) =>
-      {
-          if(err){
-              console.log(`Getting queue size - error: ${err}`)
-              return 0
-          }
-          else{
-              console.log('getQueueSize function returned ' + reply)
-              return parseInt(reply)
-          }
+      return llenAsync('queue').then(function(res) {
+          console.log(res)
+          return res
       });
+      
   },
 
   isScraped: function (url) {
