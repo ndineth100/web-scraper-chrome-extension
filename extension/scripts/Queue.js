@@ -74,7 +74,7 @@ Queue.prototype = {
   },
 
   isScraped: function (url) {
-    return client.sismember(['scrapedUrl', JSON.stringify(url)], function(err, reply){
+    return client.sismember(['scrapedUrl', url], function(err, reply){
         if(err){
             console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
             return false
@@ -91,7 +91,7 @@ Queue.prototype = {
   },
 
   _setUrlScraped: function (url) {
-      client.sadd(['scrapedUrl', JSON.stringify(url)], function(err, reply){
+      client.sadd(['scrapedUrl', url], function(err, reply){
           if(err){
               console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
           }

@@ -105,6 +105,7 @@ Scraper.prototype = {
         var deferredDatamanipulations = []
 
         var records = job.getResults()
+        console.log('records : '+JSON.stringify(records));
         records.forEach(function (record) {
           // var record = JSON.parse(JSON.stringify(rec));
 
