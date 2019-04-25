@@ -4,34 +4,36 @@ var Job = require('./Job')
 
 // Create Redis Client
 let client = redis.createClient()
+// var llenAsync
+// var lpopAsync
+// var sismemberAsync
+// var saddAsync
+// var rpushAsync
 
-client.on('connect', function(){
-    console.log('Package Queue Initiated a Connection to Redis...')
-});
+async function fun1(){
+    let response = await client.on('connect', function(){
+        console.log('Package Queue Initiated a Connection to Redis...')
+        // llenAsync = promisify(client.llen).bind(client)
+        // lpopAsync = promisify(client.lpop).bind(client)
+        // sismemberAsync = promisify(client.sismember).bind(client)
+        // saddAsync = promisify(client.sadd).bind(client)
+        // rpushAsync = promisify(client.rpush).bind(client)
+    })
+}
 
-// const llenAsync = promisify(client.llen).bind(client);
-// const lpopAsync = promisify(client.lpop).bind(client);
-// const sismemberAsync = promisify(client.sismember).bind(client);
-// const saddAsync = promisify(client.sadd).bind(client);
-// const rpushAsync = promisify(client.rpush).bind(client);
+// client.on('connect', function(){
+//     console.log('Package Queue Initiated a Connection to Redis...')
+// });
 
-var llenAsync
-var lpopAsync
-var sismemberAsync
-var saddAsync
-var rpushAsync
+const llenAsync = promisify(client.llen).bind(client);
+const lpopAsync = promisify(client.lpop).bind(client);
+const sismemberAsync = promisify(client.sismember).bind(client);
+const saddAsync = promisify(client.sadd).bind(client);
+const rpushAsync = promisify(client.rpush).bind(client);
+
 
 var Queue = function () {
-    async function fun1(){
-        let response = await client.on('connect', function(){
-            console.log('Package Queue Initiated a Connection to Redis...')
-            llenAsync = promisify(client.llen).bind(client)
-            lpopAsync = promisify(client.lpop).bind(client)
-            sismemberAsync = promisify(client.sismember).bind(client)
-            saddAsync = promisify(client.sadd).bind(client)
-            rpushAsync = promisify(client.rpush).bind(client)
-        })
-    }
+
 }
 
 Queue.prototype = {
