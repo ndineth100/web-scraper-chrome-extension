@@ -141,7 +141,7 @@ Scraper.prototype = {
                       _this.queue.canBeAdded(newJob).then(function(result){
                           if (result) {
                             _this.queue.add(newJob).then(function(result){
-                                console.log('new job added : '+JSON.stringify(newJob));
+                                //console.log('new job added : '+JSON.stringify(newJob));
                             }).catch(function(err){
                               console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
                             })
