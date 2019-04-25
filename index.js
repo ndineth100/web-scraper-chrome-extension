@@ -54,7 +54,7 @@ function scrape (sitemapInfo, options = {}) {
       delay: options.delay || 500
     }, {})
     setImmediate(() => {
-        console.log(`executing immediate`)
+        //console.log(`executing immediate`)
         s.run(function () {
           // TODO there should be some error handling here
           resolve(store.data)

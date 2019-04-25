@@ -45,16 +45,16 @@ Queue.prototype = {
 	 * @returns {boolean}
 	 */
   add: function (job) {
-    console.log('add function started!')
+    //console.log('add function started!')
     let _this = this
     return this.canBeAdded(job).then(function(result) {
         if(result){
-            console.log('add function canBeAdded true!')
-            console.log('job: '+JSON.stringify(job))
+            //console.log('add function canBeAdded true!')
+            //console.log('job: '+JSON.stringify(job))
             return rpushAsync(['queue',JSON.stringify(job)]).then(function(result) {
-                console.log('rpush function success! : '+JSON.stringify(result))
+                //console.log('rpush function success! : '+JSON.stringify(result))
                 return _this._setUrlScraped(job.url).then(function(result){
-                    console.log('add function returned true')
+                    //console.log('add function returned true')
                     return new Promise(function(resolve, reject) {
                         resolve(true)
                     })
@@ -89,7 +89,7 @@ Queue.prototype = {
   canBeAdded: function (job) {
     return this.isScraped(job.url).then(function(result) {
         if(result || job.url.match(/\.(doc|docx|pdf|ppt|pptx|odt)$/i) !== null){
-            console.log('canBeAdded function returned false 1')
+            //console.log('canBeAdded function returned false 1')
             return new Promise(function(resolve, reject) {
                 resolve(false)
             })
@@ -104,7 +104,7 @@ Queue.prototype = {
 
   getQueueSize: function () {
       return llenAsync(['queue']).then(function(res) {
-          console.log('queue size: '+res)
+          //console.log('queue size: '+res)
           return new Promise(function(resolve, reject) {
               resolve(res)
           })
@@ -126,7 +126,7 @@ Queue.prototype = {
 
   isScraped: function (url) {
     return sismemberAsync(['scrapedUrl',url]).then(function(res) {
-        console.log('isScraped function returned : '+JSON.stringify(res))
+        //console.log('isScraped function returned : '+JSON.stringify(res))
         return new Promise(function(resolve, reject) {
             resolve(res)
         })
@@ -151,7 +151,7 @@ Queue.prototype = {
 
   _setUrlScraped: function (url) {
       return saddAsync(['scrapedUrl',url]).then(function(res) {
-          console.log('_setUrlScraped function returned : '+JSON.stringify(res))
+          //console.log('_setUrlScraped function returned : '+JSON.stringify(res))
           return new Promise(function(resolve, reject) {
               resolve(res)
           })
@@ -172,13 +172,13 @@ Queue.prototype = {
   getNextJob: function () {
 		// @TODO test this
       return this.getQueueSize().then(function(result) {
-          console.log('getNextJob queue size check!')
+          //console.log('getNextJob queue size check!')
           if(result>0){
-            console.log('getNextJob queue size ok!');
+            //console.log('getNextJob queue size ok!');
             return lpopAsync('queue').then(function(result) {
                 let res = JSON.parse(result)
-                console.log('getNextJob inside lpop!')
-                console.log('Parsed result: '+JSON.stringify(res))
+                //console.log('getNextJob inside lpop!')
+                //console.log('Parsed result: '+JSON.stringify(res))
                 return new Promise(function(resolve, reject) {
                     var job = new Job (res.url, res.parentSelector, res.scraper, res.parentJob, res.baseData)
                     resolve(job)
