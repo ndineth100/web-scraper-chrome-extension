@@ -172,12 +172,12 @@ Queue.prototype = {
   getNextJob: function () {
 		// @TODO test this
       return this.getQueueSize().then(function(result) {
-          console.log('getNextJob queue size check!')
+          //console.log('getNextJob queue size check!')
           if(result>0){
-            console.log('getNextJob queue size ok!');
+            //console.log('getNextJob queue size ok!');
             return lpopAsync('queue').then(function(result) {
                 let res = JSON.parse(result)
-                console.log('getNextJob inside lpop!')
+                //console.log('getNextJob inside lpop!')
                 //console.log('Parsed result: '+JSON.stringify(res))
                 return new Promise(function(resolve, reject) {
                     var job = new Job (res.url, res.parentSelector, res.scraper, res.parentJob, res.baseData)

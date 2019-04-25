@@ -111,14 +111,14 @@ Scraper.prototype = {
       //console.log(JSON.stringify(browser))
       debug('starting execute')
       setTimeout(() => {
-          console.log(`executing Timeout 3`)
+          //console.log(`executing Timeout 3`)
           job.execute(browser, function (err, job) {
             if (err) {
               // jobs don't seem to return anything
               console.log('_run : error in job')
               return console.error('Error in job', err)
             }
-            console.log('_run : inside execute');
+            //console.log('_run : inside execute');
             debug('finished executing')
             var scrapedRecords = []
             var deferredDatamanipulations = []
