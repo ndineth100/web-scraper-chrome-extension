@@ -57,7 +57,9 @@ Queue.prototype = {
           return new Promise(function(resolve, reject) {
               resolve(res)
           })
-      });
+      }).catch(function(err){
+        console.log("Error occured in : getQueueSize function!")
+      })
       //client.llen('queue', (err, reply) =>
       //{
       //    if(err){
@@ -111,6 +113,8 @@ Queue.prototype = {
                 return new Promise(function(resolve, reject) {
                     resolve(res)
                 })
+            }).catch(function(err){
+              console.log("Error occured in : lpopAsync function!")
             })
           }else{
               return new Promise(function(resolve, reject) {
@@ -118,6 +122,8 @@ Queue.prototype = {
               })
           }
 
+      }).catch(function(err){
+        console.log("Error occured in : getNextJob function!")
       })
       //else {
       //    console.log('getNextJob queue size is zero!');

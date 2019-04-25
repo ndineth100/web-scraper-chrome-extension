@@ -143,6 +143,8 @@ Scraper.prototype = {
           }.bind(this))
         }.bind(this))
       }.bind(this))
+    }).catch(function(err){
+      console.log("Error occured in : _run function!")
     })
   }
 }
