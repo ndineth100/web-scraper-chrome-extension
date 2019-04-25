@@ -14,6 +14,7 @@ const llenAsync = promisify(client.llen).bind(client);
 const lpopAsync = promisify(client.lpop).bind(client);
 const sismemberAsync = promisify(client.sismember).bind(client);
 const saddAsync = promisify(client.sadd).bind(client);
+const rpushAsync = promisify(client.rpush).bind(client);
 
 var Queue = function () {
 
@@ -32,12 +33,21 @@ Queue.prototype = {
         if(result){
             console.log('add function canBeAdded true!')
             console.log('job: '+JSON.stringify(job))
-            client.rpush('queue', JSON.stringify(job))
-            this._setUrlScraped(job.url)
-            console.log('add function returned true')
-            return new Promise(function(resolve, reject) {
-                resolve(true)
+            return rpushAsync(['queue',JSON.stringify(job)]).then(function(result) {
+                console.log('rpush function success! : '+JSON.stringify(result))
+                return this._setUrlScraped(job.url).then(function(result){
+                    console.log('add function returned true')
+                    return new Promise(function(resolve, reject) {
+                        resolve(true)
+                    })
+                }).catch(function(err){
+                    console.log("Error occured in : this._setUrlScraped(job.url) function! Err: "+JSON.stringify(err))
+                })
+
+            }).catch(function(err){
+                console.log("Error occured in : rpush function! Err: "+JSON.stringify(err))
             })
+
         }else{
             console.log('add function return false!');
             return new Promise(function(resolve, reject) {
