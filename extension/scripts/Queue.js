@@ -88,7 +88,7 @@ Queue.prototype = {
   },
 
   _setUrlScraped: function (url) {
-      client.sadd(['scrapedUrl', url], function(err, reply){
+      client.sadd('scrapedUrl', url, function(err, reply){
           if(err){
               console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
           }
