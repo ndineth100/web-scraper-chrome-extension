@@ -82,19 +82,20 @@ Scraper.prototype = {
     let browser = this.browser
     this.queue.getNextJob().then(function(job){
       if (job === false) {
-        console.log('_run : job == false');
+        console.log('_run : job == false')
         debug('Scraper execution is finished')
         browser.close()
         this.executionCallback()
         return
       }
       console.log('_run : job == true');
+      console.log(JSON.stringify(job));
       console.log(JSON.stringify(browser));
       debug('starting execute')
       job.execute(browser, function (err, job) {
         if (err) {
           // jobs don't seem to return anything
-          console.log('_run : error in job');
+          console.log('_run : error in job')
           return console.error('Error in job', err)
         }
         console.log('_run : inside execute');
