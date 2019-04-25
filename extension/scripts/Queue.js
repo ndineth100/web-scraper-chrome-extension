@@ -12,6 +12,8 @@ client.on('connect', function(){
 
 const llenAsync = promisify(client.llen).bind(client);
 const lpopAsync = promisify(client.lpop).bind(client);
+const sismemberAsync = promisify(client.sismember).bind(client);
+const saddAsync = promisify(client.sadd).bind(client);
 
 var Queue = function () {
 
@@ -26,31 +28,41 @@ Queue.prototype = {
 	 */
   add: function (job) {
     console.log('add function started!');
-    if (this.canBeAdded(job)) {
-        console.log('add function canBeAdded true!')
-        console.log('job: '+JSON.stringify(job))
-        client.rpush('queue', JSON.stringify(job))
-        this._setUrlScraped(job.url)
-        console.log('add function returned true')
-        return true
-      }
-    console.log('add function return false!');
-    return false
+    return this.canBeAdded(job).then(function(result) {
+        if(result){
+            console.log('add function canBeAdded true!')
+            console.log('job: '+JSON.stringify(job))
+            client.rpush('queue', JSON.stringify(job))
+            this._setUrlScraped(job.url)
+            console.log('add function returned true')
+            return new Promise(function(resolve, reject) {
+                resolve(true)
+            })
+        }else{
+            console.log('add function return false!');
+            return new Promise(function(resolve, reject) {
+                resolve(false)
+            })
+        }
+    }).catch(function(err){
+        console.log("Error occured in : add function! Err: "+JSON.stringify(err))
+    })
   },
 
   canBeAdded: function (job) {
-    if (this.isScraped(job.url)) {
-      console.log('canBeAdded function returned false 1')
-      return false
-    }
-
-		// reject documents
-    if (job.url.match(/\.(doc|docx|pdf|ppt|pptx|odt)$/i) !== null) {
-      console.log('canBeAdded function returned false 2')
-      return false
-    }
-    console.log('canBeAdded function returned true')
-    return true
+    return this.isScraped(job.url).then(function(result) {
+        if(result || job.url.match(/\.(doc|docx|pdf|ppt|pptx|odt)$/i) !== null){
+            console.log('canBeAdded function returned false 1')
+            return new Promise(function(resolve, reject) {
+                resolve(false)
+            })
+        }
+        return new Promise(function(resolve, reject) {
+            resolve(true)
+        })
+    }).catch(function(err){
+        console.log("Error occured in : canBeAdded function! Err: "+JSON.stringify(err))
+    })
   },
 
   getQueueSize: function () {
@@ -76,32 +88,48 @@ Queue.prototype = {
   },
 
   isScraped: function (url) {
-    return client.sismember(['scrapedUrl', url], function(err, reply){
-        if(err){
-            console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
-            return false
-        }
-        if(parseInt(reply) == 1){
-            console.log('isScraped function returned true')
-            return true
-        }
-        else{
-            console.log('isScraped function returned false')
-            return false
-        }
-    });
+    return sismemberAsync(['scrapedUrl',url]).then(function(res) {
+        console.log('isScraped function returned : '+JSON.stringify(res))
+        return new Promise(function(resolve, reject) {
+            resolve(res)
+        })
+    }).catch(function(err){
+        console.log("Error occured in : isScraped function! Err: "+JSON.stringify(err))
+    })
+    //return client.sismember(['scrapedUrl', url], function(err, reply){
+    //    if(err){
+    //        console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
+    //        return false
+    //    }
+    //    if(parseInt(reply) == 1){
+    //        console.log('isScraped function returned true')
+    //        return true
+    //    }
+    //    else{
+    //        console.log('isScraped function returned false')
+    //        return false
+    //    }
+    //});
   },
 
   _setUrlScraped: function (url) {
-      client.sadd(['scrapedUrl', url], function(err, reply){
-          if(err){
-              console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
-          }
-          if(!reply){
-              console.log(`scrapedUrl : ${url} Already added!`)
-          }
-      });
-      console.log('_setUrlScraped function returned true')
+      return saddAsync(['scrapedUrl',url]).then(function(res) {
+          console.log('_setUrlScraped function returned : '+JSON.stringify(res))
+          return new Promise(function(resolve, reject) {
+              resolve(res)
+          })
+      }).catch(function(err){
+          console.log("Error occured in : _setUrlScraped function! Err: "+JSON.stringify(err))
+      })
+      // client.sadd(['scrapedUrl', url], function(err, reply){
+      //     if(err){
+      //         console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
+      //     }
+      //     if(!reply){
+      //         console.log(`scrapedUrl : ${url} Already added!`)
+      //     }
+      // });
+      // console.log('_setUrlScraped function returned true')
   },
 
   getNextJob: function () {

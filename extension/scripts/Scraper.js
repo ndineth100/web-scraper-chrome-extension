@@ -24,7 +24,11 @@ Scraper.prototype = {
 
     urls.forEach(function (url) {
       var firstJob = new Job(url, '_root', this)
-      this.queue.add(firstJob)
+      this.queue.add(firstJob).then(function(result){
+          console.log('new job added : '+JSON.stringify(result));
+      }).catch(function(err){
+        console.log("Error occured in : this.queue.add(firstJob)! Err: "+JSON.stringify(err))
+      })
     }.bind(this))
   },
 
@@ -113,31 +117,38 @@ Scraper.prototype = {
 
           // @TODO refactor job exstraction to a seperate method
           if (_this.recordCanHaveChildJobs(record)) {
-            console.log('record can have chlid jobs : '+JSON.stringify(record));
-            var followSelectorId = record._followSelectorId
-            var followURL = record['_follow']
-            delete record['_follow']
-            delete record['_followSelectorId']
-            var newJob = new Job(followURL, followSelectorId, _this, job, record)
-            if (_this.queue.canBeAdded(newJob)) {
-              _this.queue.add(newJob)
-              console.log('new job added : '+JSON.stringify(newJob));
-            } else {
-              // store already scraped links
-              debug('Ignoring next')
-              console.log('ignoring record : '+JSON.stringify(record));
-              debug(record)
-        //						scrapedRecords.push(record);
-            }
-          } else {
-            console.log('record can not have chlid jobs : '+JSON.stringify(record));
-            if (record._follow !== undefined) {
-              console.log('record _follow is not undefined : '+JSON.stringify(record._follow));
+              console.log('record can have chlid jobs : '+JSON.stringify(record));
+              var followSelectorId = record._followSelectorId
+              var followURL = record['_follow']
               delete record['_follow']
               delete record['_followSelectorId']
-            }
-            scrapedRecords.push(record)
-            console.log(record)
+              var newJob = new Job(followURL, followSelectorId, _this, job, record)
+              _this.queue.canBeAdded(newJob).then(function(result){
+                  if (result) {
+                    _this.queue.add(newJob).then(function(result){
+                        console.log('new job added : '+JSON.stringify(newJob));
+                    }).catch(function(err){
+                      console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
+                    })
+                  } else {
+                    // store already scraped links
+                    debug('Ignoring next')
+                    console.log('ignoring record : '+JSON.stringify(record));
+                    debug(record)
+              //						scrapedRecords.push(record);
+                }
+              }).catch(function(err){
+                console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
+              })
+          } else {
+                console.log('record can not have chlid jobs : '+JSON.stringify(record));
+                if (record._follow !== undefined) {
+                  console.log('record _follow is not undefined : '+JSON.stringify(record._follow));
+                  delete record['_follow']
+                  delete record['_followSelectorId']
+                }
+                scrapedRecords.push(record)
+                console.log(record)
           }
         }.bind(_this))
 
