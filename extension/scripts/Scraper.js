@@ -49,7 +49,7 @@ Scraper.prototype = {
         return result
       }).then(function(result){
           setTimeout(() => {
-              console.log(`executing Timeout 2`)
+              //console.log(`executing Timeout 2`)
               scraper.store.initSitemapDataDb(scraper.sitemap._id, function (resultWriter) {
                   scraper.resultWriter = resultWriter
                   scraper._run()
@@ -167,7 +167,7 @@ Scraper.prototype = {
                         scrapedRecords.push(record)
                         console.log(record)
                   }
-              },_timeOutS)
+              },_timeOutM)
             }.bind(_this))
             whenCallSequentially(deferredDatamanipulations).done(function () {
               _this.resultWriter.writeDocs(scrapedRecords, function () {
