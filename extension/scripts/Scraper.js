@@ -54,7 +54,7 @@ Scraper.prototype = {
                   scraper.resultWriter = resultWriter
                   scraper._run()
               })
-          },_timeOutL)
+          },_timeOutL*2)
       }).catch(function(err){
         console.log("Error occured in : initFirstJobs function! Err: "+JSON.stringify(err))
     })
