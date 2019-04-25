@@ -94,6 +94,7 @@ Scraper.prototype = {
       job.execute(browser, function (err, job) {
         if (err) {
           // jobs don't seem to return anything
+          console.log('_run : error in job');
           return console.error('Error in job', err)
         }
         console.log('_run : inside execute');
