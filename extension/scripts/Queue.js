@@ -49,12 +49,12 @@ Queue.prototype = {
     let _this = this
     return this.canBeAdded(job).then(function(result) {
         if(result){
-            console.log('add function canBeAdded true!')
+            //console.log('add function canBeAdded true!')
             //console.log('job: '+JSON.stringify(job))
             return rpushAsync(['queue',JSON.stringify(job)]).then(function(result) {
                 //console.log('rpush function success! : '+JSON.stringify(result))
                 return _this._setUrlScraped(job.url).then(function(result){
-                    console.log('add function returned true')
+                    //console.log('add function returned true')
                     return new Promise(function(resolve, reject) {
                         resolve(true)
                     })
@@ -73,7 +73,7 @@ Queue.prototype = {
             })
 
         }else{
-            console.log('add function return false!');
+            //console.log('add function return false!');
             return new Promise(function(resolve, reject) {
                 resolve(false)
             })
@@ -89,7 +89,7 @@ Queue.prototype = {
   canBeAdded: function (job) {
     return this.isScraped(job.url).then(function(result) {
         if(result || job.url.match(/\.(doc|docx|pdf|ppt|pptx|odt)$/i) !== null){
-            console.log('canBeAdded function returned false 1')
+            //console.log('canBeAdded function returned false 1')
             return new Promise(function(resolve, reject) {
                 resolve(false)
             })
@@ -126,7 +126,7 @@ Queue.prototype = {
 
   isScraped: function (url) {
     return sismemberAsync(['scrapedUrl',url]).then(function(res) {
-        console.log('isScraped function returned : '+JSON.stringify(res))
+        //console.log('isScraped function returned : '+JSON.stringify(res))
         return new Promise(function(resolve, reject) {
             resolve(res)
         })
@@ -151,7 +151,7 @@ Queue.prototype = {
 
   _setUrlScraped: function (url) {
       return saddAsync(['scrapedUrl',url]).then(function(res) {
-          console.log('_setUrlScraped function returned : '+JSON.stringify(res))
+          //console.log('_setUrlScraped function returned : '+JSON.stringify(res))
           return new Promise(function(resolve, reject) {
               resolve(res)
           })
