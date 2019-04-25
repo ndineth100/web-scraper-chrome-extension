@@ -80,12 +80,13 @@ Scraper.prototype = {
 	// @TODO remove recursion and add an iterative way to run these jobs.
   _run: function () {
     let browser = this.browser
+    let _this = this
     this.queue.getNextJob().then(function(job){
       if (job === false) {
         console.log('_run : job == false')
         debug('Scraper execution is finished')
         browser.close()
-        this.executionCallback()
+        _this.executionCallback()
         return
       }
       console.log('_run : job == true')
@@ -107,17 +108,17 @@ Scraper.prototype = {
         records.forEach(function (record) {
           // var record = JSON.parse(JSON.stringify(rec));
 
-          deferredDatamanipulations.push(this.saveImages.bind(this, record))
+          deferredDatamanipulations.push(_this.saveImages.bind(_this, record))
 
           // @TODO refactor job exstraction to a seperate method
-          if (this.recordCanHaveChildJobs(record)) {
+          if (_this.recordCanHaveChildJobs(record)) {
             var followSelectorId = record._followSelectorId
             var followURL = record['_follow']
             delete record['_follow']
             delete record['_followSelectorId']
-            var newJob = new Job(followURL, followSelectorId, this, job, record)
-            if (this.queue.canBeAdded(newJob)) {
-              this.queue.add(newJob)
+            var newJob = new Job(followURL, followSelectorId, _this, job, record)
+            if (_this.queue.canBeAdded(newJob)) {
+              _this.queue.add(newJob)
             } else {
               // store already scraped links
               debug('Ignoring next')
@@ -132,24 +133,24 @@ Scraper.prototype = {
             scrapedRecords.push(record)
             console.log(record)
           }
-        }.bind(this))
+        }.bind(_this))
 
         whenCallSequentially(deferredDatamanipulations).done(function () {
-          this.resultWriter.writeDocs(scrapedRecords, function () {
+          _this.resultWriter.writeDocs(scrapedRecords, function () {
             var now = (new Date()).getTime()
             // delay next job if needed
-            this._timeNextScrapeAvailable = now + this.requestInterval
-            if (now >= this._timeNextScrapeAvailable) {
-              this._run()
+            this._timeNextScrapeAvailable = now + _this.requestInterval
+            if (now >= _this._timeNextScrapeAvailable) {
+              _this._run()
             } else {
-              var delay = this._timeNextScrapeAvailable - now
+              var delay = _this._timeNextScrapeAvailable - now
               setTimeout(function () {
-                this._run()
-              }.bind(this), delay)
+                _this._run()
+              }.bind(_this), delay)
             }
-          }.bind(this))
-        }.bind(this))
-      }.bind(this))
+          }.bind(_this))
+        }.bind(_this))
+      }.bind(_this))
     }).catch(function(err){
       console.log("Error occured in : _run function! Err: "+JSON.stringify(err))
     })
