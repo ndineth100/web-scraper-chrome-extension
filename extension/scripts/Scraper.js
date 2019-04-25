@@ -11,6 +11,7 @@ var Scraper = function (options, moreOptions) {
   this.pageLoadDelay = parseInt(options.pageLoadDelay)
 }
 let _timeOut = 7000;
+let temp = 0;
 Scraper.prototype = {
 
 	/**
@@ -132,6 +133,7 @@ Scraper.prototype = {
 
                   // @TODO refactor job exstraction to a seperate method
                   if (_this.recordCanHaveChildJobs(record)) {
+                      temp = 10
                       //console.log('record can have chlid jobs : '+JSON.stringify(record));
                       var followSelectorId = record._followSelectorId
                       var followURL = record['_follow']
@@ -156,6 +158,7 @@ Scraper.prototype = {
                         console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
                       })
                   } else {
+                        temp = 1
                         //console.log('record can not have chlid jobs : '+JSON.stringify(record));
                         if (record._follow !== undefined) {
                           //console.log('record _follow is not undefined : '+JSON.stringify(record._follow));
@@ -165,7 +168,7 @@ Scraper.prototype = {
                         scrapedRecords.push(record)
                         console.log(record)
                   }
-              },_timeOut)
+              },2000*temp)
             }.bind(_this))
             whenCallSequentially(deferredDatamanipulations).done(function () {
               _this.resultWriter.writeDocs(scrapedRecords, function () {
@@ -184,7 +187,7 @@ Scraper.prototype = {
             }.bind(_this))
           }.bind(_this))
 
-      },_timeOut)
+      },20000)
       }).catch(function(err){
       console.log("Error occured in : _run function! Err: "+JSON.stringify(err))
     })
