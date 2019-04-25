@@ -30,6 +30,7 @@ Scraper.prototype = {
         console.log("Error occured in : this.queue.add(firstJob)! Err: "+JSON.stringify(err))
       })
     }.bind(this))
+    console.log('End of initFirstJobs!')
     return new Promise(function(resolve, reject) {
         resolve(true)
     })
