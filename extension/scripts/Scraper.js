@@ -110,78 +110,82 @@ Scraper.prototype = {
 
       console.log(JSON.stringify(browser))
       debug('starting execute')
-      job.execute(browser, function (err, job) {
-        if (err) {
-          // jobs don't seem to return anything
-          console.log('_run : error in job')
-          return console.error('Error in job', err)
-        }
-        console.log('_run : inside execute');
-        debug('finished executing')
-        var scrapedRecords = []
-        var deferredDatamanipulations = []
-
-        var records = job.getResults()
-
-        records.forEach(function (record) {
-          // var record = JSON.parse(JSON.stringify(rec));
-
-          deferredDatamanipulations.push(_this.saveImages.bind(_this, record))
-
-          // @TODO refactor job exstraction to a seperate method
-          if (_this.recordCanHaveChildJobs(record)) {
-              console.log('record can have chlid jobs : '+JSON.stringify(record));
-              var followSelectorId = record._followSelectorId
-              var followURL = record['_follow']
-              delete record['_follow']
-              delete record['_followSelectorId']
-              var newJob = new Job(followURL, followSelectorId, _this, job, record)
-              _this.queue.canBeAdded(newJob).then(function(result){
-                  if (result) {
-                    _this.queue.add(newJob).then(function(result){
-                        console.log('new job added : '+JSON.stringify(newJob));
-                    }).catch(function(err){
-                      console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
-                    })
-                  } else {
-                    // store already scraped links
-                    debug('Ignoring next')
-                    console.log('ignoring record : '+JSON.stringify(record));
-                    debug(record)
-              //						scrapedRecords.push(record);
-                }
-              }).catch(function(err){
-                console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
-              })
-          } else {
-                console.log('record can not have chlid jobs : '+JSON.stringify(record));
-                if (record._follow !== undefined) {
-                  console.log('record _follow is not undefined : '+JSON.stringify(record._follow));
-                  delete record['_follow']
-                  delete record['_followSelectorId']
-                }
-                scrapedRecords.push(record)
-                console.log(record)
-          }
-        }.bind(_this))
-
-        whenCallSequentially(deferredDatamanipulations).done(function () {
-          _this.resultWriter.writeDocs(scrapedRecords, function () {
-            var now = (new Date()).getTime()
-            // delay next job if needed
-            this._timeNextScrapeAvailable = now + _this.requestInterval
-            if (now >= _this._timeNextScrapeAvailable) {
-              _this._run()
-            } else {
-              var delay = _this._timeNextScrapeAvailable - now
-              setTimeout(function () {
-                _this._run()
-              }.bind(_this), delay)
+      setTimeout(() => {
+          console.log(`executing Timeout 3`)
+          job.execute(browser, function (err, job) {
+            if (err) {
+              // jobs don't seem to return anything
+              console.log('_run : error in job')
+              return console.error('Error in job', err)
             }
+            console.log('_run : inside execute');
+            debug('finished executing')
+            var scrapedRecords = []
+            var deferredDatamanipulations = []
+
+            var records = job.getResults()
+
+            records.forEach(function (record) {
+              // var record = JSON.parse(JSON.stringify(rec));
+              setTimeout(() => {
+                  deferredDatamanipulations.push(_this.saveImages.bind(_this, record))
+
+                  // @TODO refactor job exstraction to a seperate method
+                  if (_this.recordCanHaveChildJobs(record)) {
+                      console.log('record can have chlid jobs : '+JSON.stringify(record));
+                      var followSelectorId = record._followSelectorId
+                      var followURL = record['_follow']
+                      delete record['_follow']
+                      delete record['_followSelectorId']
+                      var newJob = new Job(followURL, followSelectorId, _this, job, record)
+                      _this.queue.canBeAdded(newJob).then(function(result){
+                          if (result) {
+                            _this.queue.add(newJob).then(function(result){
+                                console.log('new job added : '+JSON.stringify(newJob));
+                            }).catch(function(err){
+                              console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
+                            })
+                          } else {
+                            // store already scraped links
+                            debug('Ignoring next')
+                            console.log('ignoring record : '+JSON.stringify(record));
+                            debug(record)
+                      //						scrapedRecords.push(record);
+                        }
+                      }).catch(function(err){
+                        console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
+                      })
+                  } else {
+                        console.log('record can not have chlid jobs : '+JSON.stringify(record));
+                        if (record._follow !== undefined) {
+                          console.log('record _follow is not undefined : '+JSON.stringify(record._follow));
+                          delete record['_follow']
+                          delete record['_followSelectorId']
+                        }
+                        scrapedRecords.push(record)
+                        console.log(record)
+                  }
+                }.bind(_this))
+            },2500)
+            whenCallSequentially(deferredDatamanipulations).done(function () {
+              _this.resultWriter.writeDocs(scrapedRecords, function () {
+                var now = (new Date()).getTime()
+                // delay next job if needed
+                this._timeNextScrapeAvailable = now + _this.requestInterval
+                if (now >= _this._timeNextScrapeAvailable) {
+                  _this._run()
+                } else {
+                  var delay = _this._timeNextScrapeAvailable - now
+                  setTimeout(function () {
+                    _this._run()
+                  }.bind(_this), delay)
+                }
+              }.bind(_this))
+            }.bind(_this))
           }.bind(_this))
-        }.bind(_this))
-      }.bind(_this))
-    }).catch(function(err){
+
+      },2500)
+      }).catch(function(err){
       console.log("Error occured in : _run function! Err: "+JSON.stringify(err))
     })
   }
