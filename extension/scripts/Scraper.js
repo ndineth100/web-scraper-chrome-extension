@@ -84,14 +84,14 @@ Scraper.prototype = {
       if (job === false) {
         console.log('_run : job == false');
         debug('Scraper execution is finished')
-        this.browser.close()
+        browser.close()
         this.executionCallback()
         return
       }
       console.log('_run : job == true');
       console.log(JSON.stringify(browser));
       debug('starting execute')
-      job.execute(this.browser, function (err, job) {
+      job.execute(browser, function (err, job) {
         if (err) {
           // jobs don't seem to return anything
           return console.error('Error in job', err)
