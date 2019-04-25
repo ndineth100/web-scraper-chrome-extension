@@ -108,7 +108,7 @@ Queue.prototype = {
           console.log('getNextJob queue size check!');
           if(result>0){
             console.log('getNextJob queue size ok!');
-            return lpopAsync('scrapedUrl').then(function(res) {
+            return lpopAsync('queue').then(function(res) {
                 console.log('getNextJob inside lpop!')
                 console.log(JSON.stringify(res))
                 return new Promise(function(resolve, reject) {
