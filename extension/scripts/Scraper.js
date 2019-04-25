@@ -105,7 +105,7 @@ Scraper.prototype = {
         var deferredDatamanipulations = []
 
         var records = job.getResults()
-        console.log('records : '+JSON.stringify(records));
+
         records.forEach(function (record) {
           // var record = JSON.parse(JSON.stringify(rec));
 
@@ -113,6 +113,7 @@ Scraper.prototype = {
 
           // @TODO refactor job exstraction to a seperate method
           if (_this.recordCanHaveChildJobs(record)) {
+            console.log('record can have chlid jobs : '+JSON.stringify(record));
             var followSelectorId = record._followSelectorId
             var followURL = record['_follow']
             delete record['_follow']
@@ -120,14 +121,18 @@ Scraper.prototype = {
             var newJob = new Job(followURL, followSelectorId, _this, job, record)
             if (_this.queue.canBeAdded(newJob)) {
               _this.queue.add(newJob)
+              console.log('new job added : '+JSON.stringify(newJob));
             } else {
               // store already scraped links
               debug('Ignoring next')
+              console.log('ignoring record : '+JSON.stringify(record));
               debug(record)
         //						scrapedRecords.push(record);
             }
           } else {
+            console.log('record can not have chlid jobs : '+JSON.stringify(record));
             if (record._follow !== undefined) {
+              console.log('record _follow is not undefined : '+JSON.stringify(record._follow));
               delete record['_follow']
               delete record['_followSelectorId']
             }
