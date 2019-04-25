@@ -10,7 +10,7 @@ var Scraper = function (options, moreOptions) {
   this.requestInterval = parseInt(options.requestInterval)
   this.pageLoadDelay = parseInt(options.pageLoadDelay)
 }
-let _timeOutL = 7000;
+let _timeOut = 7000;
 Scraper.prototype = {
 
 	/**
@@ -47,12 +47,12 @@ Scraper.prototype = {
         return result
       }).then(function(result){
           setTimeout(() => {
-              //console.log(`executing Timeout 2`)
+              console.log(`executing Timeout 2`)
               scraper.store.initSitemapDataDb(scraper.sitemap._id, function (resultWriter) {
                   scraper.resultWriter = resultWriter
                   scraper._run()
               })
-          },_timeOutL)
+          },_timeOut)
       }).catch(function(err){
         console.log("Error occured in : initFirstJobs function! Err: "+JSON.stringify(err))
     })
@@ -165,7 +165,7 @@ Scraper.prototype = {
                         scrapedRecords.push(record)
                         console.log(record)
                   }
-              },_timeOutL)
+              },_timeOut)
             }.bind(_this))
             whenCallSequentially(deferredDatamanipulations).done(function () {
               _this.resultWriter.writeDocs(scrapedRecords, function () {
@@ -184,7 +184,7 @@ Scraper.prototype = {
             }.bind(_this))
           }.bind(_this))
 
-      },_timeOutL)
+      },_timeOut)
       }).catch(function(err){
       console.log("Error occured in : _run function! Err: "+JSON.stringify(err))
     })
