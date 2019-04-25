@@ -25,12 +25,12 @@ Scraper.prototype = {
     urls.forEach(function (url) {
       var firstJob = new Job(url, '_root', this)
       this.queue.add(firstJob).then(function(result){
-          //console.log('new job added : '+JSON.stringify(result));
+          console.log('new job added : '+JSON.stringify(result));
       }).catch(function(err){
         console.log("Error occured in : this.queue.add(firstJob)! Err: "+JSON.stringify(err))
       })
     }.bind(this))
-    //console.log('End of initFirstJobs!')
+    console.log('End of initFirstJobs!')
     return new Promise(function(resolve, reject) {
         resolve(true)
     })
@@ -43,11 +43,11 @@ Scraper.prototype = {
     this.executionCallback = executionCallback
 
     this.initFirstJobs().then(function(result){
-        //console.log("initFirstJobs function! result: "+JSON.stringify(result))
+        console.log("initFirstJobs function! result: "+JSON.stringify(result))
         return result
       }).then(function(result){
           setTimeout(() => {
-              //console.log(`executing Timeout 2`)
+              console.log(`executing Timeout 2`)
               scraper.store.initSitemapDataDb(scraper.sitemap._id, function (resultWriter) {
                   scraper.resultWriter = resultWriter
                   scraper._run()
@@ -100,25 +100,25 @@ Scraper.prototype = {
     let _this = this
     this.queue.getNextJob().then(function(job){
       if (job === false) {
-        //console.log('_run : job == false')
+        console.log('_run : job == false')
         debug('Scraper execution is finished')
         browser.close()
         _this.executionCallback()
         return
       }
-      //console.log('_run : job == true')
+      console.log('_run : job == true')
 
-      //console.log(JSON.stringify(browser))
+      console.log(JSON.stringify(browser))
       debug('starting execute')
       setTimeout(() => {
-          //console.log(`executing Timeout 3`)
+          console.log(`executing Timeout 3`)
           job.execute(browser, function (err, job) {
             if (err) {
               // jobs don't seem to return anything
-              //console.log('_run : error in job')
+              console.log('_run : error in job')
               return console.error('Error in job', err)
             }
-            //console.log('_run : inside execute');
+            console.log('_run : inside execute');
             debug('finished executing')
             var scrapedRecords = []
             var deferredDatamanipulations = []
@@ -132,7 +132,7 @@ Scraper.prototype = {
 
                   // @TODO refactor job exstraction to a seperate method
                   if (_this.recordCanHaveChildJobs(record)) {
-                      //console.log('record can have chlid jobs : '+JSON.stringify(record));
+                      console.log('record can have chlid jobs : '+JSON.stringify(record));
                       var followSelectorId = record._followSelectorId
                       var followURL = record['_follow']
                       delete record['_follow']
@@ -141,7 +141,7 @@ Scraper.prototype = {
                       _this.queue.canBeAdded(newJob).then(function(result){
                           if (result) {
                             _this.queue.add(newJob).then(function(result){
-                                //console.log('new job added : '+JSON.stringify(newJob));
+                                console.log('new job added : '+JSON.stringify(newJob));
                             }).catch(function(err){
                               console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
                             })
@@ -156,9 +156,9 @@ Scraper.prototype = {
                         console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
                       })
                   } else {
-                        //console.log('record can not have chlid jobs : '+JSON.stringify(record));
+                        console.log('record can not have chlid jobs : '+JSON.stringify(record));
                         if (record._follow !== undefined) {
-                          //console.log('record _follow is not undefined : '+JSON.stringify(record._follow));
+                          console.log('record _follow is not undefined : '+JSON.stringify(record._follow));
                           delete record['_follow']
                           delete record['_followSelectorId']
                         }
