@@ -114,7 +114,7 @@ Queue.prototype = {
             })
           }else{
               return new Promise(function(resolve, reject) {
-                  resolve(null)
+                  resolve(false)
               })
           }
 
