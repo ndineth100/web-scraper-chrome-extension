@@ -40,13 +40,13 @@ Queue.prototype = {
 
   canBeAdded: function (job) {
     if (this.isScraped(job.url)) {
-      console.log('canBeAdded function returned false')
+      console.log('canBeAdded function returned false 1')
       return false
     }
 
 		// reject documents
     if (job.url.match(/\.(doc|docx|pdf|ppt|pptx|odt)$/i) !== null) {
-      console.log('canBeAdded function returned false')
+      console.log('canBeAdded function returned false 2')
       return false
     }
     console.log('canBeAdded function returned true')
