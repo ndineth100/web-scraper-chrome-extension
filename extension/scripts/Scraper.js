@@ -88,6 +88,7 @@ Scraper.prototype = {
         return
       }
       console.log('_run : job == true');
+      console.log(JSON.stringify(this.browser));
       debug('starting execute')
       job.execute(this.browser, function (err, job) {
         if (err) {
