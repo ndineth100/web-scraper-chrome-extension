@@ -86,8 +86,8 @@ Queue.prototype = {
   },
 
   getQueueSize: function () {
-      return llenAsync('queue').then(function(res) {
-          console.log(res)
+      return llenAsync(['queue']).then(function(res) {
+          console.log('queue size: '+res)
           return new Promise(function(resolve, reject) {
               resolve(res)
           })
