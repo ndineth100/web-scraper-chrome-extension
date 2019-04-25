@@ -20,6 +20,7 @@ async function fun1(){
         // rpushAsync = promisify(client.rpush).bind(client)
     })
 }
+fun1()
 
 // client.on('connect', function(){
 //     console.log('Package Queue Initiated a Connection to Redis...')
