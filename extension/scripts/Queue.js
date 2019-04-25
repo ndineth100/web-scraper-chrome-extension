@@ -43,10 +43,16 @@ Queue.prototype = {
                     })
                 }).catch(function(err){
                     console.log("Error occured in : this._setUrlScraped(job.url) function! Err: "+JSON.stringify(err))
+                    return new Promise(function(resolve, reject) {
+                        resolve(false)
+                    })
                 })
 
             }).catch(function(err){
                 console.log("Error occured in : rpush function! Err: "+JSON.stringify(err))
+                return new Promise(function(resolve, reject) {
+                    resolve(false)
+                })
             })
 
         }else{
@@ -57,6 +63,9 @@ Queue.prototype = {
         }
     }).catch(function(err){
         console.log("Error occured in : add function! Err: "+JSON.stringify(err))
+        return new Promise(function(resolve, reject) {
+            resolve(false)
+        })
     })
   },
 

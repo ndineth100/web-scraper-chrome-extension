@@ -30,6 +30,9 @@ Scraper.prototype = {
         console.log("Error occured in : this.queue.add(firstJob)! Err: "+JSON.stringify(err))
       })
     }.bind(this))
+    return new Promise(function(resolve, reject) {
+        resolve(true)
+    })
   },
 
   run: function (executionCallback) {
@@ -38,12 +41,16 @@ Scraper.prototype = {
 		// callback when scraping is finished
     this.executionCallback = executionCallback
 
-    this.initFirstJobs()
-
-    this.store.initSitemapDataDb(this.sitemap._id, function (resultWriter) {
-      scraper.resultWriter = resultWriter
-      scraper._run()
+    this.initFirstJobs().then(function(result){
+        console.log("initFirstJobs function! result: "+JSON.stringify(result))
+        scraper.store.initSitemapDataDb(scraper.sitemap._id, function (resultWriter) {
+          scraper.resultWriter = resultWriter
+          scraper._run()
+        })
+    }).catch(function(err){
+        console.log("Error occured in : initFirstJobs function! Err: "+JSON.stringify(err))
     })
+
   },
 
   recordCanHaveChildJobs: function (record) {
