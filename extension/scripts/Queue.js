@@ -1,9 +1,37 @@
-const {client, llenAsync, lpopAsync, sismemberAsync, saddAsync, rpushAsync} = require('./redis-client')
-var Job = require('./Job')
+const redis = require('redis')
 const {promisify} = require('util')
+var Job = require('./Job')
+
+// Create Redis Client
+let client = redis.createClient()
+
+client.on('connect', function(){
+    console.log('Package Queue Initiated a Connection to Redis...')
+});
+
+// const llenAsync = promisify(client.llen).bind(client);
+// const lpopAsync = promisify(client.lpop).bind(client);
+// const sismemberAsync = promisify(client.sismember).bind(client);
+// const saddAsync = promisify(client.sadd).bind(client);
+// const rpushAsync = promisify(client.rpush).bind(client);
+
+const llenAsync
+const lpopAsync
+const sismemberAsync
+const saddAsync
+const rpushAsync
 
 var Queue = function () {
-
+    async function fun1(){
+        let response = await client.on('connect', function(){
+            console.log('Package Queue Initiated a Connection to Redis...')
+            llenAsync = promisify(client.llen).bind(client)
+            lpopAsync = promisify(client.lpop).bind(client)
+            sismemberAsync = promisify(client.sismember).bind(client)
+            saddAsync = promisify(client.sadd).bind(client)
+            rpushAsync = promisify(client.rpush).bind(client)
+        })
+    }
 }
 
 Queue.prototype = {
@@ -14,7 +42,7 @@ Queue.prototype = {
 	 * @returns {boolean}
 	 */
   add: function (job) {
-    console.log('add function started!');
+    console.log('add function started!')
     let _this = this
     return this.canBeAdded(job).then(function(result) {
         if(result){
@@ -141,7 +169,7 @@ Queue.prototype = {
   getNextJob: function () {
 		// @TODO test this
       return this.getQueueSize().then(function(result) {
-          console.log('getNextJob queue size check!');
+          console.log('getNextJob queue size check!')
           if(result>0){
             console.log('getNextJob queue size ok!');
             return lpopAsync('queue').then(function(result) {
