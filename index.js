@@ -53,9 +53,13 @@ function scrape (sitemapInfo, options = {}) {
       store,
       delay: options.delay || 500
     }, {})
-    s.run(function () {
-      // TODO there should be some error handling here
-      resolve(store.data)
+    setImmediate((arg) => {
+        console.log(`executing immediate`)
+        s.run(function () {
+          // TODO there should be some error handling here
+          resolve(store.data)
+        })
     })
+
   })
 }
