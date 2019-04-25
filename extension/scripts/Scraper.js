@@ -156,7 +156,7 @@ Scraper.prototype = {
                         console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
                       })
                   } else {
-                        console.log('record can not have chlid jobs : '+JSON.stringify(record));
+                        //console.log('record can not have chlid jobs : '+JSON.stringify(record));
                         if (record._follow !== undefined) {
                           console.log('record _follow is not undefined : '+JSON.stringify(record._follow));
                           delete record['_follow']
