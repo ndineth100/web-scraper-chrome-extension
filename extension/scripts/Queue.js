@@ -50,9 +50,9 @@ Queue.prototype = {
     return this.canBeAdded(job).then(function(result) {
         if(result){
             console.log('add function canBeAdded true!')
-            console.log('job: '+JSON.stringify(job))
+            //console.log('job: '+JSON.stringify(job))
             return rpushAsync(['queue',JSON.stringify(job)]).then(function(result) {
-                console.log('rpush function success! : '+JSON.stringify(result))
+                //console.log('rpush function success! : '+JSON.stringify(result))
                 return _this._setUrlScraped(job.url).then(function(result){
                     console.log('add function returned true')
                     return new Promise(function(resolve, reject) {
@@ -178,7 +178,7 @@ Queue.prototype = {
             return lpopAsync('queue').then(function(result) {
                 let res = JSON.parse(result)
                 console.log('getNextJob inside lpop!')
-                console.log('Parsed result: '+JSON.stringify(res))
+                //console.log('Parsed result: '+JSON.stringify(res))
                 return new Promise(function(resolve, reject) {
                     var job = new Job (res.url, res.parentSelector, res.scraper, res.parentJob, res.baseData)
                     resolve(job)

@@ -12,7 +12,7 @@ var Job = function (url, parentSelector, scraper, parentJob, baseData) {
 }
 
 Job.prototype = {
-
+//console.log
   combineUrls: function (parentUrl, childUrl) {
     var urlMatcher = new RegExp('(https?://)?([a-z0-9\\-\\.]+\\.[a-z0-9\\-]+(:\\d+)?|\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}(:\\d+)?)?(\\/[^\\?]*\\/|\\/)?([^\\?]*)?(\\?.*)?', 'i')
 
@@ -53,7 +53,7 @@ Job.prototype = {
     var sitemap = this.scraper.sitemap
     var job = this
     debug('starting fetching')
-    console.log('starting execution')
+    //console.log('starting execution')
     browser.fetchData(this.url, sitemap, this.parentSelector, function (err, results) {
       if (err) {
         return callback(err)

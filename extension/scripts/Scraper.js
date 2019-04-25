@@ -10,7 +10,7 @@ var Scraper = function (options, moreOptions) {
   this.requestInterval = parseInt(options.requestInterval)
   this.pageLoadDelay = parseInt(options.pageLoadDelay)
 }
-let _timeOut = 2500;
+let _timeOut = 3000;
 Scraper.prototype = {
 
 	/**
@@ -108,7 +108,7 @@ Scraper.prototype = {
       }
       console.log('_run : job == true')
 
-      console.log(JSON.stringify(browser))
+      //console.log(JSON.stringify(browser))
       debug('starting execute')
       setTimeout(() => {
           console.log(`executing Timeout 3`)
@@ -132,7 +132,7 @@ Scraper.prototype = {
 
                   // @TODO refactor job exstraction to a seperate method
                   if (_this.recordCanHaveChildJobs(record)) {
-                      console.log('record can have chlid jobs : '+JSON.stringify(record));
+                      //console.log('record can have chlid jobs : '+JSON.stringify(record));
                       var followSelectorId = record._followSelectorId
                       var followURL = record['_follow']
                       delete record['_follow']
@@ -141,14 +141,14 @@ Scraper.prototype = {
                       _this.queue.canBeAdded(newJob).then(function(result){
                           if (result) {
                             _this.queue.add(newJob).then(function(result){
-                                console.log('new job added : '+JSON.stringify(newJob));
+                                //console.log('new job added : '+JSON.stringify(newJob));
                             }).catch(function(err){
                               console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
                             })
                           } else {
                             // store already scraped links
                             debug('Ignoring next')
-                            console.log('ignoring record : '+JSON.stringify(record));
+                            //console.log('ignoring record : '+JSON.stringify(record));
                             debug(record)
                       //						scrapedRecords.push(record);
                         }
@@ -156,9 +156,9 @@ Scraper.prototype = {
                         console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
                       })
                   } else {
-                        console.log('record can not have chlid jobs : '+JSON.stringify(record));
+                        //console.log('record can not have chlid jobs : '+JSON.stringify(record));
                         if (record._follow !== undefined) {
-                          console.log('record _follow is not undefined : '+JSON.stringify(record._follow));
+                          //console.log('record _follow is not undefined : '+JSON.stringify(record._follow));
                           delete record['_follow']
                           delete record['_followSelectorId']
                         }
