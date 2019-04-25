@@ -165,8 +165,8 @@ Scraper.prototype = {
                         scrapedRecords.push(record)
                         console.log(record)
                   }
-                }.bind(_this))
-            },2500)
+              },2500)
+            }.bind(_this))
             whenCallSequentially(deferredDatamanipulations).done(function () {
               _this.resultWriter.writeDocs(scrapedRecords, function () {
                 var now = (new Date()).getTime()
