@@ -93,7 +93,62 @@ Scraper.prototype = {
       console.log(JSON.stringify(browser))
       debug('starting execute')
       job.execute(browser, function (err, job) {
-        console.log(JSON.stringify(job))
+        if (err) {
+          // jobs don't seem to return anything
+          console.log('_run : error in job')
+          return console.error('Error in job', err)
+        }
+        console.log('_run : inside execute');
+        debug('finished executing')
+        var scrapedRecords = []
+        var deferredDatamanipulations = []
+
+        var records = job.getResults()
+        records.forEach(function (record) {
+          // var record = JSON.parse(JSON.stringify(rec));
+
+          deferredDatamanipulations.push(this.saveImages.bind(this, record))
+
+          // @TODO refactor job exstraction to a seperate method
+          if (this.recordCanHaveChildJobs(record)) {
+            var followSelectorId = record._followSelectorId
+            var followURL = record['_follow']
+            delete record['_follow']
+            delete record['_followSelectorId']
+            var newJob = new Job(followURL, followSelectorId, this, job, record)
+            if (this.queue.canBeAdded(newJob)) {
+              this.queue.add(newJob)
+            } else {
+              // store already scraped links
+              debug('Ignoring next')
+              debug(record)
+        //						scrapedRecords.push(record);
+            }
+          } else {
+            if (record._follow !== undefined) {
+              delete record['_follow']
+              delete record['_followSelectorId']
+            }
+            scrapedRecords.push(record)
+            console.log(record)
+          }
+        }.bind(this))
+
+        whenCallSequentially(deferredDatamanipulations).done(function () {
+          this.resultWriter.writeDocs(scrapedRecords, function () {
+            var now = (new Date()).getTime()
+            // delay next job if needed
+            this._timeNextScrapeAvailable = now + this.requestInterval
+            if (now >= this._timeNextScrapeAvailable) {
+              this._run()
+            } else {
+              var delay = this._timeNextScrapeAvailable - now
+              setTimeout(function () {
+                this._run()
+              }.bind(this), delay)
+            }
+          }.bind(this))
+        }.bind(this))
       }.bind(this))
     }).catch(function(err){
       console.log("Error occured in : _run function! Err: "+JSON.stringify(err))
