@@ -58,7 +58,7 @@ Queue.prototype = {
               resolve(res)
           })
       }).catch(function(err){
-        console.log("Error occured in : getQueueSize function! Err: "+JSON.stringify(err))
+          console.log("Error occured in : getQueueSize function! Err: "+JSON.stringify(err))
       })
       //client.llen('queue', (err, reply) =>
       //{
@@ -107,14 +107,14 @@ Queue.prototype = {
       return this.getQueueSize().then(function(result) {
           console.log('getNextJob queue size ok!');
           if(result>0){
-            return lpopAsync('scrapedUrl').then(function(res) {
+            return lpopAsync(['scrapedUrl']).then(function(res) {
                 console.log('getNextJob inside lpop!')
                 console.log(res)
                 return new Promise(function(resolve, reject) {
                     resolve(res)
                 })
             }).catch(function(err){
-              console.log("Error occured in : lpopAsync function! Err: "+JSON.stringify(err))
+                console.log("Error occured in : lpopAsync function! Err: "+JSON.stringify(err))
             })
           }else{
               return new Promise(function(resolve, reject) {
@@ -123,7 +123,7 @@ Queue.prototype = {
           }
 
       }).catch(function(err){
-        console.log("Error occured in : getNextJob function! Err: "+JSON.stringify(err))
+          console.log("Error occured in : getNextJob function! Err: "+JSON.stringify(err))
       })
       //else {
       //    console.log('getNextJob queue size is zero!');
