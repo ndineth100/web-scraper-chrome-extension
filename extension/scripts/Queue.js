@@ -45,7 +45,7 @@ Queue.prototype = {
 	 * @returns {boolean}
 	 */
   add: function (job) {
-    console.log('add function started!')
+    //console.log('add function started!')
     let _this = this
     return this.canBeAdded(job).then(function(result) {
         if(result){

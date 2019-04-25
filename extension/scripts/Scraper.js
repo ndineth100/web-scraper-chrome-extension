@@ -10,7 +10,7 @@ var Scraper = function (options, moreOptions) {
   this.requestInterval = parseInt(options.requestInterval)
   this.pageLoadDelay = parseInt(options.pageLoadDelay)
 }
-let _timeOut = 4000;
+let _timeOut = 7000;
 Scraper.prototype = {
 
 	/**
