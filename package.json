@@ -1,6 +1,6 @@
 {
   "name": "web-scraper-headless-2",
-  "version": "1.0.47",
+  "version": "1.0.48",
   "description": "Web Scraper Headless allows to extract data from web pages using plans (sitemaps) created with the Web Scraper browser extension. Using these sitemaps the  Web Scraper will navigate the site accordingly and extract all data. Scraped  data later can be exported as CSV.",
   "main": "index.js",
   "directories": {
