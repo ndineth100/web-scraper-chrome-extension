@@ -1,5 +1,5 @@
 const redis = require('redis');
-
+var Job = require('./Job')
 const {promisify} = require('util');
 
 
@@ -108,11 +108,13 @@ Queue.prototype = {
           console.log('getNextJob queue size check!');
           if(result>0){
             console.log('getNextJob queue size ok!');
-            return lpopAsync('queue').then(function(res) {
+            return lpopAsync('queue').then(function(result) {
+                let res = JSON.parse(result)
                 console.log('getNextJob inside lpop!')
-                console.log(JSON.stringify(res))
+                console.log('Parsed result: '+JSON.stringify(res))
                 return new Promise(function(resolve, reject) {
-                    resolve(res)
+                    var job = new Job (res.url, res.parentSelector, res.scraper, res.parentJob, res.baseData)
+                    resolve(job)
                 })
             }).catch(function(err){
                 console.log("Error occured in : lpopAsync function! Err: "+JSON.stringify(err))

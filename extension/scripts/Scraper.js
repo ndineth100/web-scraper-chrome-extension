@@ -88,7 +88,7 @@ Scraper.prototype = {
         this.executionCallback()
         return
       }
-      console.log('_run : job == true');
+      console.log('_run : job == true')
 
       console.log(JSON.stringify(browser))
       debug('starting execute')
