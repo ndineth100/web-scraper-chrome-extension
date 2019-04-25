@@ -29,13 +29,14 @@ Queue.prototype = {
 	 */
   add: function (job) {
     console.log('add function started!');
+    let _this = this
     return this.canBeAdded(job).then(function(result) {
         if(result){
             console.log('add function canBeAdded true!')
             console.log('job: '+JSON.stringify(job))
             return rpushAsync(['queue',JSON.stringify(job)]).then(function(result) {
                 console.log('rpush function success! : '+JSON.stringify(result))
-                return this._setUrlScraped(job.url).then(function(result){
+                return _this._setUrlScraped(job.url).then(function(result){
                     console.log('add function returned true')
                     return new Promise(function(resolve, reject) {
                         resolve(true)
