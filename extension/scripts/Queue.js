@@ -15,11 +15,11 @@ client.on('connect', function(){
 // const saddAsync = promisify(client.sadd).bind(client);
 // const rpushAsync = promisify(client.rpush).bind(client);
 
-const llenAsync
-const lpopAsync
-const sismemberAsync
-const saddAsync
-const rpushAsync
+let llenAsync
+let lpopAsync
+let sismemberAsync
+let saddAsync
+let rpushAsync
 
 var Queue = function () {
     async function fun1(){
