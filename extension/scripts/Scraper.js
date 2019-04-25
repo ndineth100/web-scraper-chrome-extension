@@ -79,6 +79,7 @@ Scraper.prototype = {
 
 	// @TODO remove recursion and add an iterative way to run these jobs.
   _run: function () {
+    let browser = this.browser
     this.queue.getNextJob().then(function(job){
       if (job === false) {
         console.log('_run : job == false');
@@ -88,7 +89,7 @@ Scraper.prototype = {
         return
       }
       console.log('_run : job == true');
-      console.log(JSON.stringify(this.browser));
+      console.log(JSON.stringify(browser));
       debug('starting execute')
       job.execute(this.browser, function (err, job) {
         if (err) {
