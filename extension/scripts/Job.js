@@ -53,7 +53,7 @@ Job.prototype = {
     var sitemap = this.scraper.sitemap
     var job = this
     debug('starting fetching')
-    console.log('starting execution  ')
+    console.log('starting execution')
     browser.fetchData(this.url, sitemap, this.parentSelector, function (err, results) {
       if (err) {
         return callback(err)
