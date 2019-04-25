@@ -144,7 +144,7 @@ Scraper.prototype = {
         }.bind(this))
       }.bind(this))
     }).catch(function(err){
-      console.log("Error occured in : _run function!")
+      console.log("Error occured in : _run function! Err: "+JSON.stringify(err))
     })
   }
 }
