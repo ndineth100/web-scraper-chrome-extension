@@ -11,6 +11,7 @@ client.on('connect', function(){
 });
 
 const llenAsync = promisify(client.llen).bind(client);
+const lpopAsync = promisify(client.lpop).bind(client);
 
 var Queue = function () {
 
@@ -101,17 +102,22 @@ Queue.prototype = {
 
   getNextJob: function () {
 		// @TODO test this
-      this.getQueueSize().then(function(result) {
+      return this.getQueueSize().then(function(result) {
           console.log('getNextJob queue size ok!');
-          client.lpop('scrapedUrl', function(err, reply){
-              console.log('getNextJob inside lpop!')
-              if(err){
-                  console.log(`scrapedUrl : ${reply} did not add properly! error: ${err}`)
-                  return false
-              }
-              console.log('getNextJob function returned ' + reply)
-              return JSON.parse(reply)
-          })
+          if(result>0){
+            return lpopAsync('scrapedUrl').then(function(res) {
+                console.log('getNextJob inside lpop!')
+                console.log(res)
+                return new Promise(function(resolve, reject) {
+                    resolve(res)
+                })
+            })
+          }else{
+              return new Promise(function(resolve, reject) {
+                  resolve(null)
+              })
+          }
+
       })
       //else {
       //    console.log('getNextJob queue size is zero!');
