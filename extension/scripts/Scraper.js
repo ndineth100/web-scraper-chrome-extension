@@ -20,10 +20,10 @@ Scraper.prototype = {
   requestInterval: 2000,
   _timeNextScrapeAvailable: 0,
 
-  initFirstJobs: function () {
+  initFirstJobs: async function () {
         var urls = this.sitemap.getStartUrls()
         console.log('Inside initFirstJobs');
-        urls.forEach(function (url) {
+        await urls.forEach(function (url) {
           var firstJob = new Job(url, '_root', this)
           this.queue.add(firstJob).then(function(result){
               console.log('new job added : '+JSON.stringify(result));
