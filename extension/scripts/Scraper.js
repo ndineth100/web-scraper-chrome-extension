@@ -164,6 +164,7 @@ Scraper.prototype = {
                                       return new Promise(function(resolve, reject){
                                           _this.queue.add(newJob).then(function(result){
                                               console.log('new job added');
+                                              resolve()
                                           }).catch(function(err){
                                             console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
                                           })
@@ -178,7 +179,6 @@ Scraper.prototype = {
                                 }).catch(function(err){
                                   console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
                                 })
-                              })
                               console.log('end of the if after the jobs are added');
 
                           } else {
