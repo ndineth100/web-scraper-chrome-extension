@@ -114,17 +114,13 @@ Scraper.prototype = {
 
     console.log('Start count : '+count);
     return new Promise(function(resolve, reject) {
-        if(count == 0){
-            browser.close()
-            _this.executionCallback()
-            resolve()
-        }
-        count = count - 1
         return new Promise(function(resolve, reject) {
             _this.queue.getNextJob().then(function(job){
               if (job === false) {
                 console.log('_run : job == false')
                 debug('Scraper execution is finished')
+                browser.close()
+                _this.executionCallback()
                 //browser.close()
                 //_this.executionCallback()
               }
@@ -215,16 +211,14 @@ Scraper.prototype = {
                       _this._timeNextScrapeAvailable = now + _this.requestInterval
                       if (now >= _this._timeNextScrapeAvailable) {
                         return new Promise(function(resolve, reject){
-                            count = count + 1
-                            return resolve(_this._run(count, resolve))
+                             _this._run()
                         })
                         //_this._run()
                       } else {
                         var delay = _this._timeNextScrapeAvailable - now
                         setTimeout(function () {
                           return new Promise(function(resolve, reject){
-                              count = count + 1
-                              return resolve(_this._run(count, resolve))
+                              _this._run()
                           })
                           //_this._run()
 
