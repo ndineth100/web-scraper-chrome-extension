@@ -178,6 +178,7 @@ Scraper.prototype = {
                                   console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
                                 })
                               })
+                              console.log('end of the if after the jobs are added');
 
                           } else {
                                 console.log('record can not have chlid jobs');
@@ -193,6 +194,7 @@ Scraper.prototype = {
                                 })
 
                           }
+                          console.log('end of the above function')
                       })
 
 
