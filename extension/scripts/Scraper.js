@@ -158,6 +158,7 @@ Scraper.prototype = {
                               delete record['_followSelectorId']
                               var newJob = new Job(followURL, followSelectorId, _this, job, record)
                               return new Promise(function(resolve, reject){
+                                console.log('record can have chlid jobs - inside the promise');
                                 _this.queue.canBeAdded(newJob).then(function(result){
                                     if (result) {
                                       return new Promise(function(resolve, reject){
