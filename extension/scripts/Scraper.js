@@ -22,7 +22,7 @@ Scraper.prototype = {
 
   initFirstJobs: function () {
     var urls = this.sitemap.getStartUrls()
-
+    console.log('Inside initFirstJobs');
     urls.forEach(function (url) {
       var firstJob = new Job(url, '_root', this)
       this.queue.add(firstJob).then(function(result){
@@ -38,6 +38,7 @@ Scraper.prototype = {
   },
 
   run: function (executionCallback) {
+    console.log('run function started');
     var scraper = this
 
 		// callback when scraping is finished
@@ -47,13 +48,12 @@ Scraper.prototype = {
         console.log("initFirstJobs function! result: "+JSON.stringify(result))
         return result
       }).then(function(result){
-          setTimeout(() => {
-              console.log(`executing Timeout 2`)
+        console.log("initFirstJobs inside then.")
               scraper.store.initSitemapDataDb(scraper.sitemap._id, function (resultWriter) {
+                  console.log('initFirstJobs - initSitemapDataDb');
                   scraper.resultWriter = resultWriter
                   scraper._run()
               })
-          },_timeOut)
       }).catch(function(err){
         console.log("Error occured in : initFirstJobs function! Err: "+JSON.stringify(err))
     })
@@ -97,6 +97,7 @@ Scraper.prototype = {
 
 	// @TODO remove recursion and add an iterative way to run these jobs.
   _run: function () {
+    console.log("_run function started");
     let browser = this.browser
     let _this = this
     this.queue.getNextJob().then(function(job){
@@ -125,8 +126,10 @@ Scraper.prototype = {
             var deferredDatamanipulations = []
 
             var records = job.getResults()
-
+            let _temp = 0
             records.forEach(function (record) {
+              console.log('Record '+_temp+' executed')
+              _temp = _temp + 1
               // var record = JSON.parse(JSON.stringify(rec));
               setTimeout(() => {
                   deferredDatamanipulations.push(_this.saveImages.bind(_this, record))
