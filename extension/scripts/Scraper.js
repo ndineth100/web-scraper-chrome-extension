@@ -120,7 +120,7 @@ Scraper.prototype = {
 
       //console.log(JSON.stringify(browser))
       debug('starting execute')
-      setTimeout(() => {
+
           //console.log(`executing Timeout 3`)
           job.execute(browser, function (err, job) {
             if (err) {
@@ -139,7 +139,6 @@ Scraper.prototype = {
               //console.log('Record '+_temp+' executed')
               _temp = _temp + 1
               // var record = JSON.parse(JSON.stringify(rec));
-              setTimeout(() => {
                   deferredDatamanipulations.push(_this.saveImages.bind(_this, record))
 
                   // @TODO refactor job exstraction to a seperate method
@@ -180,7 +179,6 @@ Scraper.prototype = {
                         _this.queue.addScrapedRecord(record)
                         console.log(record)
                   }
-              },2000*temp)
             }.bind(_this))
             whenCallSequentially(deferredDatamanipulations).done(function () {
               _this.resultWriter.writeDocs(scrapedRecords, function () {
@@ -198,8 +196,6 @@ Scraper.prototype = {
               }.bind(_this))
             }.bind(_this))
           }.bind(_this))
-
-      },20000)
       }).catch(function(err){
       console.log("Error occured in : _run function! Err: "+JSON.stringify(err))
     })
