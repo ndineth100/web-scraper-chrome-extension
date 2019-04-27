@@ -59,7 +59,7 @@ Scraper.prototype = {
         })
       }).then(function(){
         console.log('initFirstJobs _run');
-        scraper._run()
+        scraper._run(0)
       })
       .catch(function(err){
         //console.error('outer', err.message);
@@ -104,19 +104,19 @@ Scraper.prototype = {
   },
 
 	// @TODO remove recursion and add an iterative way to run these jobs.
-  _run: function () {
+  _run: function (count) {
     //console.log("_run function started");
     let browser = this.browser
     let _this = this
     let _temp = 0
-    return new Promise(function(resolve, reject) {
+    let count = count + 1
+    //return new Promise(function(resolve, reject) {
         _this.queue.getNextJob().then(function(job){
-          if (job === false && records.length == _temp) {
+          if (job === false) {
             console.log('_run : job == false')
             debug('Scraper execution is finished')
-            browser.close()
-            _this.executionCallback()
-            resolve()
+            //browser.close()
+            //_this.executionCallback()
           }
           console.log('_run : job == true')
 
@@ -129,7 +129,7 @@ Scraper.prototype = {
               // jobs don't seem to return anything
               console.log('_run : error in job')
               console.error('Error in job', err)
-              resolve()
+              //resolve()
             }
             //console.log('_run : inside execute');
             debug('finished executing')
@@ -194,7 +194,7 @@ Scraper.prototype = {
                 if (now >= _this._timeNextScrapeAvailable) {
                   var _runPromise = Promise.resolve().then(
                       function() {
-                          return( _this._run() ); // RECURSE!
+                          return( _this._run(count) ); // RECURSE!
                       }
                   );
                   return( _runPromise );
@@ -204,7 +204,7 @@ Scraper.prototype = {
                   setTimeout(function () {
                     var _runPromise = Promise.resolve().then(
                         function() {
-                            return( _this._run() ); // RECURSE!
+                            return( _this._run(count) ); // RECURSE!
                         }
                     );
                     return( _runPromise );
@@ -215,10 +215,15 @@ Scraper.prototype = {
               }.bind(_this))
             }.bind(_this))
           }.bind(_this))
+          count = count - 1
+          if(count == 0){
+              browser.close()
+              _this.executionCallback()
+          }
       }).catch(function(err){
           console.log("Error occured in : _run function! Err: "+JSON.stringify(err))
       })
-    })
+    //})
   }
 }
 
