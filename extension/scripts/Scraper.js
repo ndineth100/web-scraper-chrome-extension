@@ -59,7 +59,7 @@ Scraper.prototype = {
       }).then(function(){
         console.log('initFirstJobs _run');
         return new Promise(function (resolve, reject){
-            scraper._run(1, resolve)
+            scraper._run()
         })
 
       })
@@ -106,21 +106,21 @@ Scraper.prototype = {
   },
 
 	// @TODO remove recursion and add an iterative way to run these jobs.
-  _run: function (count, resolve) {
+  _run: function () {
     //console.log("_run function started");
     let browser = this.browser
     let _this = this
     let _temp = 1
 
-    console.log('Start count : '+count);
+    console.log('Start count');
     return new Promise(function(resolve, reject) {
-        return new Promise(function(resolve, reject) {
-            _this.queue.getNextJob().then(function(job){
+        _this.queue.getNextJob().then(function(job){
               if (job === false) {
                 console.log('_run : job == false')
                 debug('Scraper execution is finished')
                 browser.close()
                 _this.executionCallback()
+                resolve()
                 //browser.close()
                 //_this.executionCallback()
               }
@@ -136,7 +136,7 @@ Scraper.prototype = {
                     console.error('Error in job', err)
                     //resolve()
                   }
-                  //console.log('_run : inside execute');
+                  console.log('_run : inside execute');
                   debug('finished executing')
                   var scrapedRecords = []
                   var deferredDatamanipulations = []
@@ -180,9 +180,9 @@ Scraper.prototype = {
                               })
 
                           } else {
-                                //console.log('record can not have chlid jobs : '+JSON.stringify(record));
+                                console.log('record can not have chlid jobs');
                                 if (record._follow !== undefined) {
-                                  //console.log('record _follow is not undefined : '+JSON.stringify(record._follow));
+                                  console.log('record _follow is not undefined');
                                   delete record['_follow']
                                   delete record['_followSelectorId']
                                 }
@@ -211,6 +211,7 @@ Scraper.prototype = {
                       _this._timeNextScrapeAvailable = now + _this.requestInterval
                       if (now >= _this._timeNextScrapeAvailable) {
                         return new Promise(function(resolve, reject){
+                              console.log('Inside now >= _this._timeNextScrapeAvailable');
                              _this._run()
                         })
                         //_this._run()
@@ -218,6 +219,7 @@ Scraper.prototype = {
                         var delay = _this._timeNextScrapeAvailable - now
                         setTimeout(function () {
                           return new Promise(function(resolve, reject){
+                              console.log('Inside setTimeout');
                               _this._run()
                           })
                           //_this._run()
@@ -230,13 +232,12 @@ Scraper.prototype = {
 
               })
               //console.log(`executing Timeout 3`)
-              console.log('End count : '+count);
+              console.log('End count : ');
 
             })
         }).catch(function(err){
           console.log("Error occured in : _run function! Err: "+JSON.stringify(err))
       })
-    })
   }
 }
 
