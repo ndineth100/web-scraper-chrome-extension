@@ -10,8 +10,7 @@ var Scraper = function (options, moreOptions) {
   this.requestInterval = parseInt(options.requestInterval)
   this.pageLoadDelay = parseInt(options.pageLoadDelay)
 }
-let _timeOut = 7000;
-let temp = 0;
+let temp = 0
 Scraper.prototype = {
 
 	/**
@@ -110,6 +109,7 @@ Scraper.prototype = {
     let _this = this
     let _temp = 0
     count = count + 1
+    console.log('Start count : '+count);
     //return new Promise(function(resolve, reject) {
         _this.queue.getNextJob().then(function(job){
           if (job === false) {
@@ -170,7 +170,6 @@ Scraper.prototype = {
                         console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
                       })
                   } else {
-                        temp = 1
                         //console.log('record can not have chlid jobs : '+JSON.stringify(record));
                         if (record._follow !== undefined) {
                           //console.log('record _follow is not undefined : '+JSON.stringify(record._follow));
@@ -194,7 +193,7 @@ Scraper.prototype = {
                 if (now >= _this._timeNextScrapeAvailable) {
                   var _runPromise = Promise.resolve().then(
                       function() {
-                          return( _this._run(count) ); // RECURSE!
+                          return(_this._run(count)) // RECURSE!
                       }
                   );
                   return( _runPromise );
@@ -204,10 +203,10 @@ Scraper.prototype = {
                   setTimeout(function () {
                     var _runPromise = Promise.resolve().then(
                         function() {
-                            return( _this._run(count) ); // RECURSE!
+                            return(_this._run(count)) // RECURSE!
                         }
                     );
-                    return( _runPromise );
+                    return(_runPromise)
                     //_this._run()
 
                   }.bind(_this), delay)
@@ -216,6 +215,7 @@ Scraper.prototype = {
             }.bind(_this))
           }.bind(_this))
           count = count - 1
+          console.log('End count : '+count);
           if(count == 0){
               browser.close()
               _this.executionCallback()
