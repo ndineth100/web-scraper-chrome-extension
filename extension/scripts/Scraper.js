@@ -24,17 +24,23 @@ Scraper.prototype = {
     let _this = this
     return new Promise(function(resolve, reject) {
         var urls = _this.sitemap.getStartUrls()
+        let temp = 0
         console.log('Inside initFirstJobs');
         urls.forEach(function (url) {
           var firstJob = new Job(url, '_root', _this)
           _this.queue.add(firstJob).then(function(result){
-              console.log('new job added : '+JSON.stringify(result));
+              console.log('new job added : '+JSON.stringify(result))
+              if (urls.length == temp){
+                resolve(true)
+              }
+              temp = temp +1
           }).catch(function(err){
             console.log("Error occured in : this.queue.add(firstJob)! Err: "+JSON.stringify(err))
           })
+
         }.bind(_this))
         console.log('End of initFirstJobs!')
-        resolve(true)
+
     })
   },
 
