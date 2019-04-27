@@ -108,18 +108,19 @@ Scraper.prototype = {
     //console.log("_run function started");
     let browser = this.browser
     let _this = this
-    this.queue.getNextJob().then(function(job){
-      if (job === false) {
-        console.log('_run : job == false')
-        debug('Scraper execution is finished')
-        browser.close()
-        _this.executionCallback()
-        return
-      }
-      console.log('_run : job == true')
+    return new Promise(function(resolve, reject) {
+        _this.queue.getNextJob().then(function(job){
+          if (job === false) {
+            console.log('_run : job == false')
+            debug('Scraper execution is finished')
+            browser.close()
+            _this.executionCallback()
+            return
+          }
+          console.log('_run : job == true')
 
-      //console.log(JSON.stringify(browser))
-      debug('starting execute')
+          //console.log(JSON.stringify(browser))
+          debug('starting execute')
 
           //console.log(`executing Timeout 3`)
           job.execute(browser, function (err, job) {
@@ -136,15 +137,14 @@ Scraper.prototype = {
             var records = job.getResults()
             let _temp = 0
             records.forEach(function (record) {
-              //console.log('Record '+_temp+' executed')
+              console.log('Record '+_temp+' executed')
               _temp = _temp + 1
               // var record = JSON.parse(JSON.stringify(rec));
                   deferredDatamanipulations.push(_this.saveImages.bind(_this, record))
 
                   // @TODO refactor job exstraction to a seperate method
                   if (_this.recordCanHaveChildJobs(record)) {
-                      temp = 10
-                      //console.log('record can have chlid jobs : '+JSON.stringify(record));
+                      console.log('record can have chlid jobs : '+JSON.stringify(record));
                       var followSelectorId = record._followSelectorId
                       var followURL = record['_follow']
                       delete record['_follow']
@@ -153,14 +153,14 @@ Scraper.prototype = {
                       _this.queue.canBeAdded(newJob).then(function(result){
                           if (result) {
                             _this.queue.add(newJob).then(function(result){
-                                //console.log('new job added : '+JSON.stringify(newJob));
+                                console.log('new job added');
                             }).catch(function(err){
                               console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
                             })
                           } else {
                             // store already scraped links
                             debug('Ignoring next')
-                            //console.log('ignoring record : '+JSON.stringify(record));
+                            console.log('ignoring record');
                             debug(record)
                       //						scrapedRecords.push(record);
                         }
@@ -179,12 +179,15 @@ Scraper.prototype = {
                         _this.queue.addScrapedRecord(record)
                         console.log(record)
                   }
+                  if(records.length == _temp){
+                      resolve(true)
+                  }
             }.bind(_this))
             whenCallSequentially(deferredDatamanipulations).done(function () {
               _this.resultWriter.writeDocs(scrapedRecords, function () {
                 var now = (new Date()).getTime()
                 // delay next job if needed
-                this._timeNextScrapeAvailable = now + _this.requestInterval
+                _this._timeNextScrapeAvailable = now + _this.requestInterval
                 if (now >= _this._timeNextScrapeAvailable) {
                   _this._run()
                 } else {
@@ -197,7 +200,8 @@ Scraper.prototype = {
             }.bind(_this))
           }.bind(_this))
       }).catch(function(err){
-      console.log("Error occured in : _run function! Err: "+JSON.stringify(err))
+          console.log("Error occured in : _run function! Err: "+JSON.stringify(err))
+      })
     })
   }
 }
