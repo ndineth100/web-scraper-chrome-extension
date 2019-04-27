@@ -104,7 +104,7 @@ Queue.prototype = {
 
   getQueueSize: function () {
       return llenAsync(['queue']).then(function(res) {
-          console.log('queue size: '+res)
+          //console.log('queue size: '+res)
           return new Promise(function(resolve, reject) {
               resolve(res)
           })
@@ -151,6 +151,26 @@ Queue.prototype = {
 
   _setUrlScraped: function (url) {
       return saddAsync(['scrapedUrl',url]).then(function(res) {
+          //console.log('_setUrlScraped function returned : '+JSON.stringify(res))
+          return new Promise(function(resolve, reject) {
+              resolve(res)
+          })
+      }).catch(function(err){
+          console.log("Error occured in : _setUrlScraped function! Err: "+JSON.stringify(err))
+      })
+      // client.sadd(['scrapedUrl', url], function(err, reply){
+      //     if(err){
+      //         console.log(`scrapedUrl : ${url} did not add properly! error: ${err}`)
+      //     }
+      //     if(!reply){
+      //         console.log(`scrapedUrl : ${url} Already added!`)
+      //     }
+      // });
+      // console.log('_setUrlScraped function returned true')
+  },
+
+  addScrapedRecord: function (record) {
+      return rpushAsync(['scrapedRecords',record]).then(function(res) {
           //console.log('_setUrlScraped function returned : '+JSON.stringify(res))
           return new Promise(function(resolve, reject) {
               resolve(res)

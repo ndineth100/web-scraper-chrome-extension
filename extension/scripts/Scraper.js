@@ -25,11 +25,11 @@ Scraper.prototype = {
     return new Promise(function(resolve, reject) {
         var urls = _this.sitemap.getStartUrls()
         let temp = 1
-        console.log('Inside initFirstJobs');
+        //console.log('Inside initFirstJobs');
         urls.forEach(function (url) {
           var firstJob = new Job(url, '_root', _this)
           _this.queue.add(firstJob).then(function(result){
-              console.log('new job added : '+JSON.stringify(result))
+              //console.log('new job added : '+JSON.stringify(result))
               if (urls.length == temp){
                 resolve(true)
               }
@@ -39,27 +39,27 @@ Scraper.prototype = {
           })
 
         }.bind(_this))
-        console.log('End of initFirstJobs!')
+        //console.log('End of initFirstJobs!')
 
     })
   },
 
   run: function (executionCallback) {
-    console.log('run function started');
+    //console.log('run function started');
     var scraper = this
 
 		// callback when scraping is finished
     this.executionCallback = executionCallback
 
     this.initFirstJobs().then(function(result){
-        console.log("initFirstJobs inside.")
+        //console.log("initFirstJobs inside.")
         scraper.store.initSitemapDataDb(scraper.sitemap._id, function (resultWriter) {
-            console.log('initFirstJobs - initSitemapDataDb');
+            //console.log('initFirstJobs - initSitemapDataDb');
             scraper.resultWriter = resultWriter
             scraper._run()
         })
       }).catch(function(err){
-        console.error('outer', err.message);
+        //console.error('outer', err.message);
         console.log("Error occured in : initFirstJobs function! Err: "+JSON.stringify(err))
     })
 
@@ -102,18 +102,18 @@ Scraper.prototype = {
 
 	// @TODO remove recursion and add an iterative way to run these jobs.
   _run: function () {
-    console.log("_run function started");
+    //console.log("_run function started");
     let browser = this.browser
     let _this = this
     this.queue.getNextJob().then(function(job){
       if (job === false) {
-        console.log('_run : job == false')
+        //console.log('_run : job == false')
         debug('Scraper execution is finished')
         browser.close()
         _this.executionCallback()
         return
       }
-      console.log('_run : job == true')
+      //console.log('_run : job == true')
 
       //console.log(JSON.stringify(browser))
       debug('starting execute')
@@ -133,7 +133,7 @@ Scraper.prototype = {
             var records = job.getResults()
             let _temp = 0
             records.forEach(function (record) {
-              console.log('Record '+_temp+' executed')
+              //console.log('Record '+_temp+' executed')
               _temp = _temp + 1
               // var record = JSON.parse(JSON.stringify(rec));
               setTimeout(() => {
@@ -174,6 +174,7 @@ Scraper.prototype = {
                           delete record['_followSelectorId']
                         }
                         scrapedRecords.push(record)
+                        _this.queue.addScrapedRecord(record)
                         console.log(record)
                   }
               },2000*temp)
