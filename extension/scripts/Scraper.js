@@ -109,7 +109,7 @@ Scraper.prototype = {
     let browser = this.browser
     let _this = this
     let _temp = 0
-    let count = count + 1
+    count = count + 1
     //return new Promise(function(resolve, reject) {
         _this.queue.getNextJob().then(function(job){
           if (job === false) {
