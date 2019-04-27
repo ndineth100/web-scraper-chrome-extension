@@ -159,8 +159,8 @@ Scraper.prototype = {
                               var newJob = new Job(followURL, followSelectorId, _this, job, record)
                               return new Promise(function(resolve, reject){
                                 console.log('record can have chlid jobs - inside the promise');
-                                _this.queue.canBeAdded(newJob).then(function(result){
-                                    if (result) {
+                                // _this.queue.canBeAdded(newJob).then(function(result){
+                                //     if (result) {
                                       return new Promise(function(resolve, reject){
                                           _this.queue.add(newJob).then(function(result){
                                               console.log('new job added');
@@ -168,13 +168,13 @@ Scraper.prototype = {
                                             console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
                                           })
                                       })
-                                    } else {
-                                      // store already scraped links
-                                      debug('Ignoring next')
-                                      console.log('ignoring record');
-                                      debug(record)
-                                //						scrapedRecords.push(record);
-                                  }
+                                //     } else {
+                                //       // store already scraped links
+                                //       debug('Ignoring next')
+                                //       console.log('ignoring record');
+                                //       debug(record)
+                                // //						scrapedRecords.push(record);
+                                //   }
                                 }).catch(function(err){
                                   console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
                                 })
