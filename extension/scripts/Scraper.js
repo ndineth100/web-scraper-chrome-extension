@@ -21,18 +21,18 @@ Scraper.prototype = {
   _timeNextScrapeAvailable: 0,
 
   initFirstJobs: function () {
-    var urls = this.sitemap.getStartUrls()
-    console.log('Inside initFirstJobs');
-    urls.forEach(function (url) {
-      var firstJob = new Job(url, '_root', this)
-      this.queue.add(firstJob).then(function(result){
-          console.log('new job added : '+JSON.stringify(result));
-      }).catch(function(err){
-        console.log("Error occured in : this.queue.add(firstJob)! Err: "+JSON.stringify(err))
-      })
-    }.bind(this))
-    console.log('End of initFirstJobs!')
     return new Promise(function(resolve, reject) {
+        var urls = this.sitemap.getStartUrls()
+        console.log('Inside initFirstJobs');
+        urls.forEach(function (url) {
+          var firstJob = new Job(url, '_root', this)
+          this.queue.add(firstJob).then(function(result){
+              console.log('new job added : '+JSON.stringify(result));
+          }).catch(function(err){
+            console.log("Error occured in : this.queue.add(firstJob)! Err: "+JSON.stringify(err))
+          })
+        }.bind(this))
+        console.log('End of initFirstJobs!')
         resolve(true)
     })
   },
