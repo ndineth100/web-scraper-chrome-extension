@@ -58,7 +58,10 @@ Scraper.prototype = {
         })
       }).then(function(){
         console.log('initFirstJobs _run');
-        scraper._run(0)
+        return new Promise(function (resolve, reject){
+            scraper._run(0, resolve)
+        })
+
       })
       .catch(function(err){
         //console.error('outer', err.message);
@@ -103,14 +106,15 @@ Scraper.prototype = {
   },
 
 	// @TODO remove recursion and add an iterative way to run these jobs.
-  _run: function (count) {
+  _run: function (count, resolve) {
     //console.log("_run function started");
     let browser = this.browser
     let _this = this
     let _temp = 0
-    count = count + 1
+
     console.log('Start count : '+count);
-    //return new Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
+        count = count + 1
         _this.queue.getNextJob().then(function(job){
           if (job === false) {
             console.log('_run : job == false')
@@ -192,14 +196,14 @@ Scraper.prototype = {
                 _this._timeNextScrapeAvailable = now + _this.requestInterval
                 if (now >= _this._timeNextScrapeAvailable) {
                   return new Promise(function(resolve, reject){
-                      return resolve(_this._run(count))
+                      return resolve(_this._run(count, resolve))
                   })
                   //_this._run()
                 } else {
                   var delay = _this._timeNextScrapeAvailable - now
                   setTimeout(function () {
                     return new Promise(function(resolve, reject){
-                        return resolve(_this._run(count))
+                        return resolve(_this._run(count, resolve))
                     })
                     //_this._run()
 
@@ -217,7 +221,7 @@ Scraper.prototype = {
       }).catch(function(err){
           console.log("Error occured in : _run function! Err: "+JSON.stringify(err))
       })
-    //})
+    })
   }
 }
 
