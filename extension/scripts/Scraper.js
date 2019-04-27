@@ -54,10 +54,11 @@ Scraper.prototype = {
     this.initFirstJobs().then(function(result){
         //console.log("initFirstJobs inside.")
         scraper.store.initSitemapDataDb(scraper.sitemap._id, function (resultWriter) {
-            //console.log('initFirstJobs - initSitemapDataDb');
+            console.log('initFirstJobs - initSitemapDataDb');
             scraper.resultWriter = resultWriter
         })
       }).then(function(){
+        console.log('initFirstJobs _run');
         scraper._run()
       })
       .catch(function(err){
@@ -109,13 +110,13 @@ Scraper.prototype = {
     let _this = this
     this.queue.getNextJob().then(function(job){
       if (job === false) {
-        //console.log('_run : job == false')
+        console.log('_run : job == false')
         debug('Scraper execution is finished')
         browser.close()
         _this.executionCallback()
         return
       }
-      //console.log('_run : job == true')
+      console.log('_run : job == true')
 
       //console.log(JSON.stringify(browser))
       debug('starting execute')
