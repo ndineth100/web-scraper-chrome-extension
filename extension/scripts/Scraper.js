@@ -191,22 +191,16 @@ Scraper.prototype = {
                 // delay next job if needed
                 _this._timeNextScrapeAvailable = now + _this.requestInterval
                 if (now >= _this._timeNextScrapeAvailable) {
-                  var _runPromise = Promise.resolve().then(
-                      function() {
-                          return(_this._run(count)) // RECURSE!
-                      }
-                  );
-                  return( _runPromise );
+                  return new Promise(function(resolve, reject){
+                      return resolve(_this._run(count))
+                  })
                   //_this._run()
                 } else {
                   var delay = _this._timeNextScrapeAvailable - now
                   setTimeout(function () {
-                    var _runPromise = Promise.resolve().then(
-                        function() {
-                            return(_this._run(count)) // RECURSE!
-                        }
-                    );
-                    return(_runPromise)
+                    return new Promise(function(resolve, reject){
+                        return resolve(_this._run(count))
+                    })
                     //_this._run()
 
                   }.bind(_this), delay)
