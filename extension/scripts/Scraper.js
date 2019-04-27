@@ -59,7 +59,7 @@ Scraper.prototype = {
       }).then(function(){
         console.log('initFirstJobs _run');
         return new Promise(function (resolve, reject){
-            scraper._run(0, resolve)
+            scraper._run(1, resolve)
         })
 
       })
@@ -110,11 +110,16 @@ Scraper.prototype = {
     //console.log("_run function started");
     let browser = this.browser
     let _this = this
-    let _temp = 0
+    let _temp = 1
 
     console.log('Start count : '+count);
     return new Promise(function(resolve, reject) {
-        count = count + 1
+        if(count == 0){
+            browser.close()
+            _this.executionCallback()
+            resolve()
+        }
+        count = count - 1
         _this.queue.getNextJob().then(function(job){
           if (job === false) {
             console.log('_run : job == false')
@@ -196,6 +201,7 @@ Scraper.prototype = {
                 _this._timeNextScrapeAvailable = now + _this.requestInterval
                 if (now >= _this._timeNextScrapeAvailable) {
                   return new Promise(function(resolve, reject){
+                      count = count + 1
                       return resolve(_this._run(count, resolve))
                   })
                   //_this._run()
@@ -203,6 +209,7 @@ Scraper.prototype = {
                   var delay = _this._timeNextScrapeAvailable - now
                   setTimeout(function () {
                     return new Promise(function(resolve, reject){
+                        count = count + 1
                         return resolve(_this._run(count, resolve))
                     })
                     //_this._run()
@@ -212,12 +219,8 @@ Scraper.prototype = {
               }.bind(_this))
             }.bind(_this))
           }.bind(_this))
-          count = count - 1
           console.log('End count : '+count);
-          if(count == 0){
-              browser.close()
-              _this.executionCallback()
-          }
+
       }).catch(function(err){
           console.log("Error occured in : _run function! Err: "+JSON.stringify(err))
       })
