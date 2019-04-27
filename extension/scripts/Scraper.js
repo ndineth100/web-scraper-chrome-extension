@@ -116,7 +116,7 @@ Scraper.prototype = {
             debug('Scraper execution is finished')
             browser.close()
             _this.executionCallback()
-            return
+            resolve()
           }
           console.log('_run : job == true')
 
@@ -128,7 +128,8 @@ Scraper.prototype = {
             if (err) {
               // jobs don't seem to return anything
               console.log('_run : error in job')
-              return console.error('Error in job', err)
+              console.error('Error in job', err)
+              resolve()
             }
             //console.log('_run : inside execute');
             debug('finished executing')
