@@ -109,15 +109,14 @@ Scraper.prototype = {
     let browser = this.browser
     let _this = this
     let _temp = 0
-    //return new Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
         _this.queue.getNextJob().then(function(job){
           if (job === false && records.length == _temp) {
             console.log('_run : job == false')
             debug('Scraper execution is finished')
             browser.close()
             _this.executionCallback()
-            //resolve()
-            return
+            resolve()
           }
           console.log('_run : job == true')
 
@@ -130,8 +129,7 @@ Scraper.prototype = {
               // jobs don't seem to return anything
               console.log('_run : error in job')
               console.error('Error in job', err)
-              //resolve()
-              return
+              resolve()
             }
             //console.log('_run : inside execute');
             debug('finished executing')
@@ -183,9 +181,9 @@ Scraper.prototype = {
                         _this.queue.addScrapedRecord(record)
                         console.log(record)
                   }
-                  if(records.length == _temp){
-                      //resolve(true)
-                  }
+                  // if(records.length == _temp){
+                  //     resolve(true)
+                  // }
             }.bind(_this))
             whenCallSequentially(deferredDatamanipulations).done(function () {
               console.log('whenCallSequentially started');
@@ -199,6 +197,7 @@ Scraper.prototype = {
                   var delay = _this._timeNextScrapeAvailable - now
                   setTimeout(function () {
                     _this._run()
+                    resolve(true)
                   }.bind(_this), delay)
                 }
               }.bind(_this))
@@ -207,7 +206,7 @@ Scraper.prototype = {
       }).catch(function(err){
           console.log("Error occured in : _run function! Err: "+JSON.stringify(err))
       })
-    //})
+    })
   }
 }
 
