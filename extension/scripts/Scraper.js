@@ -44,7 +44,7 @@ Scraper.prototype = {
 		// callback when scraping is finished
     this.executionCallback = executionCallback
 
-    this.initFirstJobs().then(function(result){
+    this.initFirstJobs(function(result){
         console.log("initFirstJobs function! result: "+JSON.stringify(result))
         return result
       }).then(function(result){
