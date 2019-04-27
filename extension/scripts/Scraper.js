@@ -120,108 +120,126 @@ Scraper.prototype = {
             resolve()
         }
         count = count - 1
-        _this.queue.getNextJob().then(async function(job){
-          if (job === false) {
-            console.log('_run : job == false')
-            debug('Scraper execution is finished')
-            //browser.close()
-            //_this.executionCallback()
-          }
-          console.log('_run : job == true')
+        return new Promise(function(resolve, reject) {
+            _this.queue.getNextJob().then(function(job){
+              if (job === false) {
+                console.log('_run : job == false')
+                debug('Scraper execution is finished')
+                //browser.close()
+                //_this.executionCallback()
+              }
+              console.log('_run : job == true')
 
-          //console.log(JSON.stringify(browser))
-          debug('starting execute')
-
-          //console.log(`executing Timeout 3`)
-          await job.execute(browser, function (err, job) {
-            if (err) {
-              // jobs don't seem to return anything
-              console.log('_run : error in job')
-              console.error('Error in job', err)
-              //resolve()
-            }
-            //console.log('_run : inside execute');
-            debug('finished executing')
-            var scrapedRecords = []
-            var deferredDatamanipulations = []
-
-            var records = job.getResults()
-
-            records.forEach(function (record) {
-              console.log('Record '+_temp+' executed')
-              _temp = _temp + 1
-              // var record = JSON.parse(JSON.stringify(rec));
-                  deferredDatamanipulations.push(_this.saveImages.bind(_this, record))
-
-                  // @TODO refactor job exstraction to a seperate method
-                  if (_this.recordCanHaveChildJobs(record)) {
-                      console.log('record can have chlid jobs');
-                      var followSelectorId = record._followSelectorId
-                      var followURL = record['_follow']
-                      delete record['_follow']
-                      delete record['_followSelectorId']
-                      var newJob = new Job(followURL, followSelectorId, _this, job, record)
-                      _this.queue.canBeAdded(newJob).then(function(result){
-                          if (result) {
-                            _this.queue.add(newJob).then(function(result){
-                                console.log('new job added');
-                            }).catch(function(err){
-                              console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
-                            })
-                          } else {
-                            // store already scraped links
-                            debug('Ignoring next')
-                            console.log('ignoring record');
-                            debug(record)
-                      //						scrapedRecords.push(record);
-                        }
-                      }).catch(function(err){
-                        console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
-                      })
-                  } else {
-                        //console.log('record can not have chlid jobs : '+JSON.stringify(record));
-                        if (record._follow !== undefined) {
-                          //console.log('record _follow is not undefined : '+JSON.stringify(record._follow));
-                          delete record['_follow']
-                          delete record['_followSelectorId']
-                        }
-                        scrapedRecords.push(record)
-                        _this.queue.addScrapedRecord(record)
-                        console.log(record)
+              //console.log(JSON.stringify(browser))
+              debug('starting execute')
+              return new Promise(function (resolve, reject){
+                job.execute(browser, function (err, job) {
+                  if (err) {
+                    // jobs don't seem to return anything
+                    console.log('_run : error in job')
+                    console.error('Error in job', err)
+                    //resolve()
                   }
-                  // if(records.length == _temp){
-                  //     resolve(true)
-                  // }
-            }.bind(_this))
-            whenCallSequentially(deferredDatamanipulations).done(function () {
-              console.log('whenCallSequentially started');
-              _this.resultWriter.writeDocs(scrapedRecords, function () {
-                var now = (new Date()).getTime()
-                // delay next job if needed
-                _this._timeNextScrapeAvailable = now + _this.requestInterval
-                if (now >= _this._timeNextScrapeAvailable) {
+                  //console.log('_run : inside execute');
+                  debug('finished executing')
+                  var scrapedRecords = []
+                  var deferredDatamanipulations = []
+
+                  var records = job.getResults()
                   return new Promise(function(resolve, reject){
-                      count = count + 1
-                      return resolve(_this._run(count, resolve))
+                    records.forEach(function (record) {
+                      return new Promise(function(resolve, reject){
+                          console.log('Record '+_temp+' executed')
+                          _temp = _temp + 1
+                          // var record = JSON.parse(JSON.stringify(rec));
+                          deferredDatamanipulations.push(_this.saveImages.bind(_this, record))
+                          // @TODO refactor job exstraction to a seperate method
+                          if (_this.recordCanHaveChildJobs(record)) {
+                              console.log('record can have chlid jobs');
+                              var followSelectorId = record._followSelectorId
+                              var followURL = record['_follow']
+                              delete record['_follow']
+                              delete record['_followSelectorId']
+                              var newJob = new Job(followURL, followSelectorId, _this, job, record)
+                              return new Promise(function(resolve, reject){
+                                _this.queue.canBeAdded(newJob).then(function(result){
+                                    if (result) {
+                                      return new Promise(function(resolve, reject){
+                                          _this.queue.add(newJob).then(function(result){
+                                              console.log('new job added');
+                                          }).catch(function(err){
+                                            console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
+                                          })
+                                      })
+                                    } else {
+                                      // store already scraped links
+                                      debug('Ignoring next')
+                                      console.log('ignoring record');
+                                      debug(record)
+                                //						scrapedRecords.push(record);
+                                  }
+                                }).catch(function(err){
+                                  console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
+                                })
+                              })
+
+                          } else {
+                                //console.log('record can not have chlid jobs : '+JSON.stringify(record));
+                                if (record._follow !== undefined) {
+                                  //console.log('record _follow is not undefined : '+JSON.stringify(record._follow));
+                                  delete record['_follow']
+                                  delete record['_followSelectorId']
+                                }
+                                scrapedRecords.push(record)
+                                return new Promise(function(resolve,reject){
+                                  _this.queue.addScrapedRecord(record)
+                                  console.log(record)
+                                })
+
+                          }
+                      })
+
+
+
+                          // if(records.length == _temp){
+                          //     resolve(true)
+                          // }
+                    }.bind(_this))
+
                   })
-                  //_this._run()
-                } else {
-                  var delay = _this._timeNextScrapeAvailable - now
-                  setTimeout(function () {
-                    return new Promise(function(resolve, reject){
-                        count = count + 1
-                        return resolve(_this._run(count, resolve))
-                    })
-                    //_this._run()
+                  whenCallSequentially(deferredDatamanipulations).done(function () {
+                    console.log('whenCallSequentially started');
+                    _this.resultWriter.writeDocs(scrapedRecords, function () {
+                      var now = (new Date()).getTime()
+                      // delay next job if needed
+                      _this._timeNextScrapeAvailable = now + _this.requestInterval
+                      if (now >= _this._timeNextScrapeAvailable) {
+                        return new Promise(function(resolve, reject){
+                            count = count + 1
+                            return resolve(_this._run(count, resolve))
+                        })
+                        //_this._run()
+                      } else {
+                        var delay = _this._timeNextScrapeAvailable - now
+                        setTimeout(function () {
+                          return new Promise(function(resolve, reject){
+                              count = count + 1
+                              return resolve(_this._run(count, resolve))
+                          })
+                          //_this._run()
 
-                  }.bind(_this), delay)
-                }
-              }.bind(_this))
-            }.bind(_this))
-          }.bind(_this))
-          console.log('End count : '+count);
+                        }.bind(_this), delay)
+                      }
+                    }.bind(_this))
+                  }.bind(_this))
+                }.bind(_this))
 
-      }).catch(function(err){
+              })
+              //console.log(`executing Timeout 3`)
+              console.log('End count : '+count);
+
+            })
+        }).catch(function(err){
           console.log("Error occured in : _run function! Err: "+JSON.stringify(err))
       })
     })
