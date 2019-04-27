@@ -21,7 +21,6 @@ Scraper.prototype = {
   _timeNextScrapeAvailable: 0,
 
   initFirstJobs: function () {
-    return new Promise(function(resolve, reject) {
         var urls = this.sitemap.getStartUrls()
         console.log('Inside initFirstJobs');
         urls.forEach(function (url) {
@@ -33,8 +32,9 @@ Scraper.prototype = {
           })
         }.bind(this))
         console.log('End of initFirstJobs!')
-        resolve(true)
-    })
+        return new Promise(function(resolve, reject) {
+            resolve(true)
+        })
   },
 
   run: function (executionCallback) {
@@ -52,6 +52,7 @@ Scraper.prototype = {
             scraper._run()
         })
       }).catch(function(err){
+        console.error('outer', err.message);
         console.log("Error occured in : initFirstJobs function! Err: "+JSON.stringify(err))
     })
 
