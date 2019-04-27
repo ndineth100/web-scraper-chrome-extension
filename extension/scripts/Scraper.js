@@ -24,7 +24,7 @@ Scraper.prototype = {
     let _this = this
     return new Promise(function(resolve, reject) {
         var urls = _this.sitemap.getStartUrls()
-        let temp = 0
+        let temp = 1
         console.log('Inside initFirstJobs');
         urls.forEach(function (url) {
           var firstJob = new Job(url, '_root', _this)
