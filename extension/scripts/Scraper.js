@@ -120,7 +120,7 @@ Scraper.prototype = {
             resolve()
         }
         count = count - 1
-        _this.queue.getNextJob().then(function(job){
+        _this.queue.getNextJob().then(async function(job){
           if (job === false) {
             console.log('_run : job == false')
             debug('Scraper execution is finished')
@@ -133,7 +133,7 @@ Scraper.prototype = {
           debug('starting execute')
 
           //console.log(`executing Timeout 3`)
-          job.execute(browser, function (err, job) {
+          await job.execute(browser, function (err, job) {
             if (err) {
               // jobs don't seem to return anything
               console.log('_run : error in job')
