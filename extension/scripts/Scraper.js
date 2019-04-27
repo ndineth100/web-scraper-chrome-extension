@@ -44,16 +44,13 @@ Scraper.prototype = {
 		// callback when scraping is finished
     this.executionCallback = executionCallback
 
-    this.initFirstJobs(function(result){
-        console.log("initFirstJobs function! result: "+JSON.stringify(result))
-        return result
-      }).then(function(result){
-        console.log("initFirstJobs inside then.")
-              scraper.store.initSitemapDataDb(scraper.sitemap._id, function (resultWriter) {
-                  console.log('initFirstJobs - initSitemapDataDb');
-                  scraper.resultWriter = resultWriter
-                  scraper._run()
-              })
+    this.initFirstJobs().then(function(result){
+        console.log("initFirstJobs inside.")
+        scraper.store.initSitemapDataDb(scraper.sitemap._id, function (resultWriter) {
+            console.log('initFirstJobs - initSitemapDataDb');
+            scraper.resultWriter = resultWriter
+            scraper._run()
+        })
       }).catch(function(err){
         console.log("Error occured in : initFirstJobs function! Err: "+JSON.stringify(err))
     })
