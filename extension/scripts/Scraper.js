@@ -108,9 +108,10 @@ Scraper.prototype = {
     //console.log("_run function started");
     let browser = this.browser
     let _this = this
+    let _temp = 0
     return new Promise(function(resolve, reject) {
         _this.queue.getNextJob().then(function(job){
-          if (job === false) {
+          if (job === false && records.length == _temp) {
             console.log('_run : job == false')
             debug('Scraper execution is finished')
             browser.close()
@@ -135,7 +136,7 @@ Scraper.prototype = {
             var deferredDatamanipulations = []
 
             var records = job.getResults()
-            let _temp = 0
+
             records.forEach(function (record) {
               console.log('Record '+_temp+' executed')
               _temp = _temp + 1
@@ -144,7 +145,7 @@ Scraper.prototype = {
 
                   // @TODO refactor job exstraction to a seperate method
                   if (_this.recordCanHaveChildJobs(record)) {
-                      console.log('record can have chlid jobs : '+JSON.stringify(record));
+                      console.log('record can have chlid jobs');
                       var followSelectorId = record._followSelectorId
                       var followURL = record['_follow']
                       delete record['_follow']
@@ -184,6 +185,7 @@ Scraper.prototype = {
                   }
             }.bind(_this))
             whenCallSequentially(deferredDatamanipulations).done(function () {
+              console.log('whenCallSequentially started');
               _this.resultWriter.writeDocs(scrapedRecords, function () {
                 var now = (new Date()).getTime()
                 // delay next job if needed
