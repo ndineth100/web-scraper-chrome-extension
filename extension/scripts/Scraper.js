@@ -20,21 +20,22 @@ Scraper.prototype = {
   requestInterval: 2000,
   _timeNextScrapeAvailable: 0,
 
-  initFirstJobs: async function () {
-        var urls = this.sitemap.getStartUrls()
+  initFirstJobs: function () {
+    let _this = this
+    return new Promise(function(resolve, reject) {
+        var urls = _this.sitemap.getStartUrls()
         console.log('Inside initFirstJobs');
-        await urls.forEach(function (url) {
-          var firstJob = new Job(url, '_root', this)
-          this.queue.add(firstJob).then(function(result){
+        urls.forEach(function (url) {
+          var firstJob = new Job(url, '_root', _this)
+          _this.queue.add(firstJob).then(function(result){
               console.log('new job added : '+JSON.stringify(result));
           }).catch(function(err){
             console.log("Error occured in : this.queue.add(firstJob)! Err: "+JSON.stringify(err))
           })
-        }.bind(this))
+        }.bind(_this))
         console.log('End of initFirstJobs!')
-        return new Promise(function(resolve, reject) {
-            resolve(true)
-        })
+        resolve(true)
+    })
   },
 
   run: function (executionCallback) {
