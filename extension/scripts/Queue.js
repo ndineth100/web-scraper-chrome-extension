@@ -170,13 +170,13 @@ Queue.prototype = {
   },
 
   addScrapedRecord: function (record) {
-      return rpushAsync(['scrapedRecords',record]).then(function(res) {
+      return rpushAsync(['scrapedRecords',JSON.stringify(record)]).then(function(res) {
           //console.log('_setUrlScraped function returned : '+JSON.stringify(res))
           return new Promise(function(resolve, reject) {
               resolve(res)
           })
       }).catch(function(err){
-          console.log("Error occured in : _setUrlScraped function! Err: "+JSON.stringify(err))
+          console.log("Error occured in : addScrapedRecord function! Err: "+JSON.stringify(err))
       })
       // client.sadd(['scrapedUrl', url], function(err, reply){
       //     if(err){

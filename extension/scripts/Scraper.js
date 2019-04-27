@@ -56,9 +56,11 @@ Scraper.prototype = {
         scraper.store.initSitemapDataDb(scraper.sitemap._id, function (resultWriter) {
             //console.log('initFirstJobs - initSitemapDataDb');
             scraper.resultWriter = resultWriter
-            scraper._run()
         })
-      }).catch(function(err){
+      }).then(function(){
+        scraper._run()
+      })
+      .catch(function(err){
         //console.error('outer', err.message);
         console.log("Error occured in : initFirstJobs function! Err: "+JSON.stringify(err))
     })
