@@ -107,15 +107,16 @@ Scraper.prototype = {
 
 	// @TODO remove recursion and add an iterative way to run these jobs.
   _run: function () {
-    var job = this.queue.getNextJob()
+    var _this = this
+    var job = _this.queue.getNextJob()
         if (job === false) {
           debug('Scraper execution is finished')
-          this.browser.close()
-          this.executionCallback()
+          _this.browser.close()
+          _this.executionCallback()
           return
         }
         debug('starting execute')
-        job.execute(this.browser, function (err, job) {
+        job.execute(_this.browser, function (err, job) {
           if (err) {
             // jobs don't seem to return anything
             return console.error('Error in job', err)
@@ -128,10 +129,10 @@ Scraper.prototype = {
           records.forEach(function (record) {
     				// var record = JSON.parse(JSON.stringify(rec));
 
-            deferredDatamanipulations.push(this.saveImages.bind(this, record))
+            deferredDatamanipulations.push(_this.saveImages.bind(_this, record))
 
     				// @TODO refactor job exstraction to a seperate method
-            if (this.recordCanHaveChildJobs(record)) {
+            if (_this.recordCanHaveChildJobs(record)) {
               var followSelectorId = record._followSelectorId
               var followURL = record['_follow']
               delete record['_follow']
@@ -142,28 +143,27 @@ Scraper.prototype = {
                   _this.queue.add(newJob).then(function(result){
                       console.log('new job added');
                       whenCallSequentially(deferredDatamanipulations).done(function () {
-                        this.resultWriter.writeDocs(scrapedRecords, function () {
+                        _this.resultWriter.writeDocs(scrapedRecords, function () {
                           var now = (new Date()).getTime()
                 					// delay next job if needed
-                          this._timeNextScrapeAvailable = now + this.requestInterval
-                          if (now >= this._timeNextScrapeAvailable) {
-                            this._run()
+                          _this._timeNextScrapeAvailable = now + _this.requestInterval
+                          if (now >= _this._timeNextScrapeAvailable) {
+                            _this._run()
                             resolve()
                           } else {
-                            var delay = this._timeNextScrapeAvailable - now
+                            var delay = _this._timeNextScrapeAvailable - now
                             setTimeout(function () {
-                              this._run()
+                              _this._run()
                               resolve()
-                            }.bind(this), delay)
+                            }.bind(_this), delay)
                           }
-                        }.bind(this))
-                      }.bind(this))
+                        }.bind(_this))
+                      }.bind(_this))
 
                   }).catch(function(err){
                     console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
                   })
               })
-                this.queue.add(newJob)
     //           } else {
     //             // store already scraped links
     //             debug('Ignoring next')
@@ -181,30 +181,30 @@ Scraper.prototype = {
                         _this.queue.addScrapedRecord(record)
                         console.log(record)
                         whenCallSequentially(deferredDatamanipulations).done(function () {
-                          this.resultWriter.writeDocs(scrapedRecords, function () {
+                          _this.resultWriter.writeDocs(scrapedRecords, function () {
                             var now = (new Date()).getTime()
                   					// delay next job if needed
-                            this._timeNextScrapeAvailable = now + this.requestInterval
-                            if (now >= this._timeNextScrapeAvailable) {
-                              this._run()
+                            _this._timeNextScrapeAvailable = now + _this.requestInterval
+                            if (now >= _this._timeNextScrapeAvailable) {
+                              _this._run()
                               resolve()
                             } else {
-                              var delay = this._timeNextScrapeAvailable - now
+                              var delay = _this._timeNextScrapeAvailable - now
                               setTimeout(function () {
-                                this._run()
+                                _this._run()
                                 resolve()
-                              }.bind(this), delay)
+                              }.bind(_this), delay)
                             }
-                          }.bind(this))
-                        }.bind(this))
+                          }.bind(_this))
+                        }.bind(_this))
                       })
               })
 
             }
-          }.bind(this))
+          }.bind(_this))
 
 
-        }.bind(this))
+        }.bind(_this))
       }
 }
 
