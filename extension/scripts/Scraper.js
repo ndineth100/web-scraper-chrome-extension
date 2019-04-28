@@ -50,22 +50,12 @@ Scraper.prototype = {
 		// callback when scraping is finished
     this.executionCallback = executionCallback
 
-    this.initFirstJobs().then(function(result){
+    this.initFirstJobs()
         //console.log("initFirstJobs inside.")
-        scraper.store.initSitemapDataDb(scraper.sitemap._id, function (resultWriter) {
-            console.log('initFirstJobs - initSitemapDataDb');
-            scraper.resultWriter = resultWriter
-        })
-      }).then(function(){
-        console.log('initFirstJobs _run');
-        return new Promise(function (resolve, reject){
-            scraper._run()
-        })
-
-      })
-      .catch(function(err){
-        //console.error('outer', err.message);
-        console.log("Error occured in : initFirstJobs function! Err: "+JSON.stringify(err))
+    scraper.store.initSitemapDataDb(scraper.sitemap._id, function (resultWriter) {
+        console.log('initFirstJobs - initSitemapDataDb');
+        scraper.resultWriter = resultWriter
+        scraper._run()
     })
 
   },
@@ -107,16 +97,20 @@ Scraper.prototype = {
 
 	// @TODO remove recursion and add an iterative way to run these jobs.
   _run: function () {
-    var _this = this
-    var job = _this.queue.getNextJob()
+      let _this = this
+      console.log("Inside run function");
+      _this.queue.getNextJob(function(job){
         if (job === false) {
+          console.log("job === false");
           debug('Scraper execution is finished')
           _this.browser.close()
           _this.executionCallback()
           return
         }
+        console.log("job === true");
         debug('starting execute')
         job.execute(_this.browser, function (err, job) {
+          console.log("job.execute");
           if (err) {
             // jobs don't seem to return anything
             return console.error('Error in job', err)
@@ -127,84 +121,69 @@ Scraper.prototype = {
 
           var records = job.getResults()
           records.forEach(function (record) {
-    				// var record = JSON.parse(JSON.stringify(rec));
+            console.log("records.forEach");
+            // var record = JSON.parse(JSON.stringify(rec));
 
             deferredDatamanipulations.push(_this.saveImages.bind(_this, record))
 
-    				// @TODO refactor job exstraction to a seperate method
+            // @TODO refactor job exstraction to a seperate method
             if (_this.recordCanHaveChildJobs(record)) {
+              console.log("_this.recordCanHaveChildJobs true");
               var followSelectorId = record._followSelectorId
               var followURL = record['_follow']
               delete record['_follow']
               delete record['_followSelectorId']
-              var newJob = new Job(followURL, followSelectorId, this, job, record)
-              //if (this.queue.canBeAdded(newJob)) {
-              //return new Promise(function(resolve, reject){
-                  _this.queue.add(newJob).then(function(result){
-                      console.log('new job added');
-                      whenCallSequentially(deferredDatamanipulations).done(function () {
-                        _this.resultWriter.writeDocs(scrapedRecords, function () {
-                          var now = (new Date()).getTime()
-                					// delay next job if needed
-                          _this._timeNextScrapeAvailable = now + _this.requestInterval
-                          if (now >= _this._timeNextScrapeAvailable) {
-                            _this._run()
-                            //resolve()
-                          } else {
-                            var delay = _this._timeNextScrapeAvailable - now
-                            setTimeout(function () {
-                              _this._run()
-                              //resolve()
-                            }.bind(_this), delay)
-                          }
-                        }.bind(_this))
-                      }.bind(_this))
+              var newJob = new Job(followURL, followSelectorId, _this, job, record)
+              // if (_this.queue.canBeAdded(newJob)) {
+                 _this.queue.add(newJob).then(function(res){
 
-                  }).catch(function(err){
-                    console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
-                  })
-            //  })
-    //           } else {
-    //             // store already scraped links
-    //             debug('Ignoring next')
-    //             debug(record)
-    // //						scrapedRecords.push(record);
-    //           }
+                    if(!res){
+                      console.log("_this.queue.add(newJob) false");
+                      // store already scraped links
+                      debug('Ignoring next')
+                      debug(record)
+          //						scrapedRecords.push(record);
+                    }else{
+                      console.log("_this.queue.add(newJob) true");
+                    }
+
+                 })
+              //} else {
+
+              //}
             } else {
-            //  return new Promise(function(resolve, reject){
-                      if (record._follow !== undefined) {
-                        delete record['_follow']
-                        delete record['_followSelectorId']
-                      }
-                      scrapedRecords.push(record)
-                      //return new Promise(function(resolve,reject){
-                        _this.queue.addScrapedRecord(record)
-                        console.log(record)
-                        whenCallSequentially(deferredDatamanipulations).done(function () {
-                          _this.resultWriter.writeDocs(scrapedRecords, function () {
-                            var now = (new Date()).getTime()
-                  					// delay next job if needed
-                            _this._timeNextScrapeAvailable = now + _this.requestInterval
-                            if (now >= _this._timeNextScrapeAvailable) {
-                              _this._run()
-                              //resolve()
-                            } else {
-                              var delay = _this._timeNextScrapeAvailable - now
-                              setTimeout(function () {
-                                _this._run()
-                                //resolve()
-                              }.bind(_this), delay)
-                            }
-                          }.bind(_this))
-                        }.bind(_this))
-                    //  })
-            //  })
-
+              console.log("_this.recordCanHaveChildJobs false");
+              if (record._follow !== undefined) {
+                delete record['_follow']
+                delete record['_followSelectorId']
+              }
+              scrapedRecords.push(record)
+              console.log(record)
             }
           }.bind(_this))
 
-
+          whenCallSequentially(deferredDatamanipulations).done(function () {
+            console.log("whenCallSequentially(deferredDatamanipulations)");
+            _this.resultWriter.writeDocs(scrapedRecords, function () {
+              console.log("_this.resultWriter.writeDocs");
+              var now = (new Date()).getTime()
+              // delay next job if needed
+              _this._timeNextScrapeAvailable = now + _this.requestInterval
+              if (now >= _this._timeNextScrapeAvailable) {
+                console.log("now >= _this._timeNextScrapeAvailable true");
+                _this._run()
+              } else {
+                console.log("now >= _this._timeNextScrapeAvailable false");
+                var delay = _this._timeNextScrapeAvailable - now
+                setTimeout(function () {
+                  _this._run()
+                }.bind(_this), delay)
+              }
+            }.bind(_this))
+          }.bind(_this))
         }.bind(_this))
+      })
+
       }
 }
 

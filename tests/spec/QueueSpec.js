@@ -12,25 +12,36 @@ describe('Queue', function () {
   })
 
   it('should be able to add items to queue', function () {
-    q.add(job)
-    assert.equal(q.getQueueSize(), 1)
-    assert.equal(q.jobs[0].url, 'http://test.lv/')
+    q.add(job).then(function(){
+        q.getQueueSize().then(function (size){
+            assert.equal(size, 1)
+        })
+    })
+
+    //assert.equal(q.jobs[0].url, 'http://test.lv/')
   })
 
-  it('should be able to mark urls as scraped', function () {
-    q.add(job)
-    q.getNextJob()
-    assert.equal(q.getQueueSize(), 0)
+  it('should be able to mark urls as scraped', async function () {
+    await q.add(job)
+    await q.getNextJob()
+    await q.getQueueSize(function(size){
+      assert.equal(size, 0)
+    })
+
 
 		// try to add this job again
-    q.add(job)
-    assert.equal(q.getQueueSize(), 0)
+    await q.add(job)
+    await q.getQueueSize(function(size){
+      assert.equal(size, 0)
+    })
   })
 
   it('should be able to reject documents', function () {
     job = new Job('http://test.lv/test.doc')
 
-    var accepted = q.add(job)
-    assert.isFalse(accepted)
+    q.add(job).then(function(result){
+      assert.isFalse(result)
+    })
+
   })
 })
