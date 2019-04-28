@@ -139,7 +139,7 @@ Scraper.prototype = {
               delete record['_followSelectorId']
               var newJob = new Job(followURL, followSelectorId, this, job, record)
               //if (this.queue.canBeAdded(newJob)) {
-              return new Promise(function(resolve, reject){
+              //return new Promise(function(resolve, reject){
                   _this.queue.add(newJob).then(function(result){
                       console.log('new job added');
                       whenCallSequentially(deferredDatamanipulations).done(function () {
@@ -149,12 +149,12 @@ Scraper.prototype = {
                           _this._timeNextScrapeAvailable = now + _this.requestInterval
                           if (now >= _this._timeNextScrapeAvailable) {
                             _this._run()
-                            resolve()
+                            //resolve()
                           } else {
                             var delay = _this._timeNextScrapeAvailable - now
                             setTimeout(function () {
                               _this._run()
-                              resolve()
+                              //resolve()
                             }.bind(_this), delay)
                           }
                         }.bind(_this))
@@ -163,7 +163,7 @@ Scraper.prototype = {
                   }).catch(function(err){
                     console.log("Error occured in : _this.queue.canBeAdded! Err: "+JSON.stringify(err))
                   })
-              })
+            //  })
     //           } else {
     //             // store already scraped links
     //             debug('Ignoring next')
@@ -171,13 +171,13 @@ Scraper.prototype = {
     // //						scrapedRecords.push(record);
     //           }
             } else {
-              return new Promise(function(resolve, reject){
+            //  return new Promise(function(resolve, reject){
                       if (record._follow !== undefined) {
                         delete record['_follow']
                         delete record['_followSelectorId']
                       }
                       scrapedRecords.push(record)
-                      return new Promise(function(resolve,reject){
+                      //return new Promise(function(resolve,reject){
                         _this.queue.addScrapedRecord(record)
                         console.log(record)
                         whenCallSequentially(deferredDatamanipulations).done(function () {
@@ -187,18 +187,18 @@ Scraper.prototype = {
                             _this._timeNextScrapeAvailable = now + _this.requestInterval
                             if (now >= _this._timeNextScrapeAvailable) {
                               _this._run()
-                              resolve()
+                              //resolve()
                             } else {
                               var delay = _this._timeNextScrapeAvailable - now
                               setTimeout(function () {
                                 _this._run()
-                                resolve()
+                                //resolve()
                               }.bind(_this), delay)
                             }
                           }.bind(_this))
                         }.bind(_this))
-                      })
-              })
+                    //  })
+            //  })
 
             }
           }.bind(_this))
