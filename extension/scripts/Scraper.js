@@ -206,7 +206,6 @@ Scraper.prototype = {
 
         }.bind(this))
       }
-  }
 }
 
 module.exports = Scraper
